@@ -3,18 +3,21 @@
 #include <stdint.h>
 #include "i2c.h"
 
-#define MCP_DIR_REG 0x20
-#define MCP_STATE_REG 0x10
+#define MCP_DIRA_REG    0x00
+#define MCP_DIRB_REG    0x01
+#define MCP_GPIOA_REG   0x12
+#define MCP_GPIOB_REG   0x13
 
-class Mcpxxxx: private I2c {
+#define MCP_NUM_PINS    16
+
+class Mcp23017: private I2c {
     private:
-        int bus;
-        int address;
         int clear_settings();
         int set_dir(int pin, uint8_t dir);
         uint8_t get_dir(int pin);
     public:
-        Mcpxxxx(int bus, int addr);
+        Mcp23017(int bus, int addr);
+        int begin(uint8_t directions[]);
         uint8_t get_state(int pin);
         int set_state(int pin, uint8_t val);
 };

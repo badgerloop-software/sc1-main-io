@@ -1,11 +1,34 @@
+#include <iostream>
 #include "i2c.h"
 #include "mcp23017.h"
 
 int main() {
-    Mcp23017 rick = Mcp23017(0, 0x54);
-    Mcp23017 morty = Mcp23017(1, 0x45);
+    uint8_t rick_directions[16] = 
+    {
+        1, 0, 1, 1, 1, 1, 0, 0,
+        0, 1, 1, 1, 1, 1, 1, 1
+    };
 
-    morty.get_state(0);
-    rick.set_state(0, 4);
+    uint8_t morty_directions[16] =
+    {
+        0, 0, 0, 0, 1, 1, 1, 1,
+        1, 1, 0, 0, 1, 0, 1, 1
+    };
+
+    Mcp23017 rick = Mcp23017(2, 0x20);
+    rick.begin(rick_directions);
+
+    rick.set_state(1, 0);
+    std::cout << (int)rick.get_state(1) << std::endl;
+    rick.set_state(1, 1);
+    std::cout << (int)rick.get_state(1) << std::endl;
+
+    rick.set_state(8, 0);
+    std::cout << (int)rick.get_state(8) << std::endl;
+    rick.set_state(8, 1);
+    std::cout << (int)rick.get_state(8) << std::endl;
+
+    /* Set some more pin states or something idk */
+
     return 0;
 }

@@ -3,18 +3,6 @@
 #include "mcp23017.h"
 
 int main() {
-    uint8_t rick_directions[16] = 
-    {
-        1, 0, 1, 1, 1, 1, 0, 0,
-        0, 1, 1, 1, 1, 1, 1, 1
-    };
-
-    uint8_t morty_directions[16] =
-    {
-        0, 0, 0, 0, 1, 1, 1, 1,
-        1, 1, 0, 0, 1, 0, 1, 1
-    };
-
     Mcp23017 rick = Mcp23017(2, 0x20);
     rick.begin(rick_directions);
 

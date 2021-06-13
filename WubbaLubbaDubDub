@@ -1,0 +1,44 @@
+#!/bin/bash
+
+if [ "$1" == "build" ]; then
+    ./WubbaLubbaDubDub clean
+    mkdir build && cd build
+    cmake ..
+
+    if [ $? -ne 0 ]; then
+        echo "Awwwww geeeeez rick, CMake failed"
+        exit 1
+    fi
+    
+    make
+
+    if [ $? -ne 0 ]; then
+        echo "Awwwww geeeeez rick, Make failed"
+        exit 1
+    fi
+    cat <<'EOF'
+        ___
+    . -^   `--,      
+   /# =========`-_   
+  /# (--====___====\ 
+ /#   .- --.  . --.| 
+/##   |  * ) (   * ),
+|##   \    /\ \   / |
+|###   ---   \ ---  |
+|####      ___)    #|
+|######           ##|
+ \##### ---------- / 
+  \####           (  
+   `\###          |  
+     \###         |  
+      \##        |   
+       \###.    .)   
+        `======/
+EOF
+
+elif [ "$1" == "clean" ]; then
+	rm -rf build
+	rm -rf out
+	rm -rf coverage
+	echo "clean finished"
+fi

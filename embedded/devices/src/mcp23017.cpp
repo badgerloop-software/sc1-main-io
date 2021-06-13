@@ -20,7 +20,7 @@ int Mcp23017::clear_settings() {
     return 0;
 }
 
-int Mcp23017::begin(uint8_t directions[]) {
+int Mcp23017::begin(const uint8_t directions[]) {
     int rc;
 
     if (!this->is_open()) {

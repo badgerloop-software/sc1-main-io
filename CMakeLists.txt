@@ -14,5 +14,5 @@ set(dependencies main.cpp)
 set(libraries devices
     drivers)
 
-add_executable(badgerloop main.cpp ${dependecies})
-target_link_libraries(badgerloop PRIVATE ${libraries})
+add_executable(PickleRick main.cpp ${dependecies})
+target_link_libraries(PickleRick  PRIVATE ${libraries})

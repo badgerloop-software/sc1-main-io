@@ -1,6 +1,6 @@
 #ifndef __mcp__h__
 #define __mcp__h__
-#include <stdint.h>
+
 #include "i2c.h"
 
 #define MCP_DIRA_REG    0x00

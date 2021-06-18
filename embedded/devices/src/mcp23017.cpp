@@ -82,7 +82,7 @@ uint8_t Mcp23017::get_dir(int pin) {
     dirReg = getDirBank(pin);
     pin = getRelativePin(pin);
 
-    current_status = this->read_from_addr(dirReg);
+    current_status = this->read_from_reg(dirReg);
 
     return ((current_status >> pin) & 1);
 }
@@ -98,7 +98,7 @@ int Mcp23017::set_dir(int pin, uint8_t dir) {
     dirReg = getDirBank(pin);
     pin = getRelativePin(pin);
 
-    current_status = this->read_from_addr(dirReg);
+    current_status = this->read_from_reg(dirReg);
 
     if (dir)
         rc = this->write_data(dirReg, current_status | (1 << pin));
@@ -118,7 +118,7 @@ uint8_t Mcp23017::get_state(int pin) {
     stateReg = getGpioBank(pin);
     pin = getRelativePin(pin);
 
-    current_status = this->read_from_addr(stateReg);
+    current_status = this->read_from_reg(stateReg);
 
     return ((current_status >> pin) & 1);
 }
@@ -137,11 +137,11 @@ int Mcp23017::set_state(int pin, uint8_t dir) {
     dirReg = getDirBank(pin);
     pin = getRelativePin(pin);
 
-    current_dir = this->read_from_addr(dirReg);
+    current_dir = this->read_from_reg(dirReg);
 
     if (current_dir)
         return -EINVAL;
-    current_status = this->read_from_addr(stateReg);
+    current_status = this->read_from_reg(stateReg);
 
     if (dir)
         rc = this->write_data(stateReg, current_status | (1 << pin));

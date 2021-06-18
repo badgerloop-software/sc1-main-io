@@ -15,6 +15,6 @@ class I2c {
         bool is_open();
         int write_data(uint8_t reg, uint8_t val);
         int read_data(uint8_t *buff, int size);
-        uint8_t read_from_addr(uint8_t addr);
+        uint8_t read_from_reg(uint8_t reg);
 };
 #endif

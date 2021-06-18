@@ -78,11 +78,11 @@ int I2c::read_data(uint8_t *buff, int size) {
     return 0;
 }
 
-uint8_t I2c::read_from_addr(uint8_t addr) {
+uint8_t I2c::read_from_reg(uint8_t reg) {
     int rc;
     uint8_t buff[1];
 
-    rc = this->write_byte(addr);
+    rc = this->write_byte(reg);
     if (rc)
         return 0xFF;
 

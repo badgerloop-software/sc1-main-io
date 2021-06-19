@@ -47,31 +47,6 @@ int Mcp23017::begin(const uint8_t directions[]) {
     return 0;
 }
 
-/* I really don't like these next 3 functions I think they can be consolidated */
-static uint8_t getDirBank(int pin) {
-    if (pin < (MCP_NUM_PINS >> 1))
-        return MCP_DIRA_REG;
-    else
-        return MCP_DIRB_REG;
-}
-
-static uint8_t getGpioBank(int pin) {
-    if (pin < (MCP_NUM_PINS >> 1))
-        return MCP_GPIOA_REG;
-    else
-        return MCP_GPIOB_REG;
-}
-
-static uint8_t getRelativePin(int pin) {
-    if (pin >= (MCP_NUM_PINS >> 1)) {
-        pin -= (MCP_NUM_PINS >> 1);
-    }
-    return pin;
-}
-
-
-/* These 4 methods have way too much in common
- * Definitely need some helper methods */
 uint8_t Mcp23017::get_dir(int pin) {
     uint8_t current_status;
     uint8_t dirReg;
@@ -79,8 +54,8 @@ uint8_t Mcp23017::get_dir(int pin) {
     if (pin >= MCP_NUM_PINS)
         return -EINVAL;
 
-    dirReg = getDirBank(pin);
-    pin = getRelativePin(pin);
+    dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
+    pin = GET_REL_PIN(pin);
 
     current_status = this->read_from_reg(dirReg);
 
@@ -95,8 +70,8 @@ int Mcp23017::set_dir(int pin, uint8_t dir) {
     if (pin >= MCP_NUM_PINS)
         return -EINVAL;
 
-    dirReg = getDirBank(pin);
-    pin = getRelativePin(pin);
+    dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
+    pin = GET_REL_PIN(pin);
 
     current_status = this->read_from_reg(dirReg);
 
@@ -115,8 +90,8 @@ uint8_t Mcp23017::get_state(int pin) {
     if (pin >= MCP_NUM_PINS)
         return -EINVAL;
 
-    stateReg = getGpioBank(pin);
-    pin = getRelativePin(pin);
+    stateReg = IS_BANK_A(pin) ? MCP_GPIOA_REG : MCP_GPIOB_REG;
+    pin = GET_REL_PIN(pin);
 
     current_status = this->read_from_reg(stateReg);
 
@@ -133,9 +108,9 @@ int Mcp23017::set_state(int pin, uint8_t dir) {
     if (pin >= MCP_NUM_PINS)
         return -EINVAL;
 
-    stateReg = getGpioBank(pin);
-    dirReg = getDirBank(pin);
-    pin = getRelativePin(pin);
+    dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
+    stateReg = IS_BANK_A(pin) ? MCP_GPIOA_REG : MCP_GPIOB_REG;
+    pin = GET_REL_PIN(pin);
 
     current_dir = this->read_from_reg(dirReg);
 

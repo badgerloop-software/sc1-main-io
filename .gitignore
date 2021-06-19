@@ -34,3 +34,6 @@
 # Build Artifacts
 out/
 build/
+
+# Python
+.env

@@ -1,5 +1,10 @@
 #!/bin/bash
 
+PYTHON_ENV=$(pwd)/.env
+PYBIN=$PYTHON_ENV/bin
+PRE_COMMIT=$PYBIN/pre-commit
+
+
 if [ $# -eq 0 ]; then
     echo "Usage $0 {clean, build}"
     exit 1
@@ -94,4 +99,21 @@ elif [ "$1" == "clean" ]; then
 	rm -rf out
 	rm -rf coverage
 	echo "clean finished"
+
+elif [ "$1" == "setup" ]; then
+    sudo apt update
+    sudo apt install \
+        python3 \
+        clang-format \
+        cppcheck
+
+    virtualenv -p python3 $PYTHON_ENV
+
+    $PYBIN/pip install pre-commit
+
+    $PRE_COMMIT install
+
+
+elif [ "$1" == "lint" ]; then
+    $PRE_COMMIT run -a
 fi

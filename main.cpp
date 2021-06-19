@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "i2c.h"
 #include "mcp23017.h"
 #include <unistd.h>
@@ -40,5 +41,5 @@ int main() {
         std::cout << "Pin " << +i << " val " << (int)morty.get_state(i) << std::endl;
     }
 
-    return 0;
+  return 0;
 }

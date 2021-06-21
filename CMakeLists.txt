@@ -16,3 +16,10 @@ set(libraries devices
 
 add_executable(badgerloop main.cpp ${dependecies})
 target_link_libraries(badgerloop PRIVATE ${libraries})
+
+if( MATCHES "Linux")
+    add_subdirectory(Test)
+    setup_target_for_coverage_gcovr_html(NAME pod_coverage
+                                         EXECUTABLE /out/run_all_tests
+                                        )
+endif()

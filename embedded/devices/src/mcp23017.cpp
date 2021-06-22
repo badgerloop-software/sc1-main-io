@@ -114,7 +114,7 @@ int Mcp23017::set_state(int pin, uint8_t dir) {
 
     current_dir = this->read_from_reg(dirReg);
 
-    if (current_dir)
+    if (current_dir==1)
         return -EINVAL;
     current_status = this->read_from_reg(stateReg);
 

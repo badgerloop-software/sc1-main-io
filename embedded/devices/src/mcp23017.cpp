@@ -98,7 +98,7 @@ uint8_t Mcp23017::get_state(int pin) {
     return ((current_status >> pin) & 1);
 }
 
-int Mcp23017::set_state(int pin, uint8_t dir) {
+int Mcp23017::set_state(int pin, uint8_t val) {
     uint8_t current_status;
     uint8_t current_dir;
     uint8_t stateReg;
@@ -114,11 +114,11 @@ int Mcp23017::set_state(int pin, uint8_t dir) {
 
     current_dir = this->read_from_reg(dirReg);
 
-    if (current_dir)
+    if ((current_dir >> pin) & 0x1)
         return -EINVAL;
     current_status = this->read_from_reg(stateReg);
 
-    if (dir)
+    if (val)
         rc = this->write_data(stateReg, current_status | (1 << pin));
     else
         rc = this->write_data(stateReg, current_status & ~(1 << pin));

@@ -15,14 +15,14 @@
 
 static const uint8_t rick_directions[16] = 
 {
-    1, 0, 1, 1, 1, 1, 0, 0,
-    0, 1, 1, 1, 1, 1, 1, 1
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
 };
 
 static const uint8_t morty_directions[16] =
 {
-    0, 0, 0, 0, 1, 1, 1, 1,
-    1, 1, 0, 0, 1, 0, 1, 1
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
 };
 
 class Mcp23017: private I2c {

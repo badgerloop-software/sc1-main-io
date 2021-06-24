@@ -1,0 +1,36 @@
+name: C/C++ CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup
+      run: ./bloop-dev setup
+    - name: Build
+      run: ./bloop-dev build
+
+  cross-compile:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup
+      run: ./bloop-dev setup
+    - name: Debug
+      run: cd ~ && ls
+    - name: Cross-Compile
+      run: ./bloop-dev cross
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup
+      run: ./bloop-dev setup
+    - name: Lint
+      run: ./bloop-dev lint

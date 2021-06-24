@@ -53,8 +53,8 @@ uint8_t Mcp23017::get_dir(int pin) {
 
   if (pin >= MCP_NUM_PINS) return -EINVAL;
 
-    dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
-    pin = GET_REL_PIN(pin);
+  dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
+  pin = GET_REL_PIN(pin);
 
   current_status = this->read_from_reg(dirReg);
 
@@ -68,8 +68,8 @@ int Mcp23017::set_dir(int pin, uint8_t dir) {
 
   if (pin >= MCP_NUM_PINS) return -EINVAL;
 
-    dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
-    pin = GET_REL_PIN(pin);
+  dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
+  pin = GET_REL_PIN(pin);
 
   current_status = this->read_from_reg(dirReg);
 
@@ -87,8 +87,8 @@ uint8_t Mcp23017::get_state(int pin) {
 
   if (pin >= MCP_NUM_PINS) return -EINVAL;
 
-    stateReg = IS_BANK_A(pin) ? MCP_GPIOA_REG : MCP_GPIOB_REG;
-    pin = GET_REL_PIN(pin);
+  stateReg = IS_BANK_A(pin) ? MCP_GPIOA_REG : MCP_GPIOB_REG;
+  pin = GET_REL_PIN(pin);
 
   current_status = this->read_from_reg(stateReg);
 
@@ -96,28 +96,27 @@ uint8_t Mcp23017::get_state(int pin) {
 }
 
 int Mcp23017::set_state(int pin, uint8_t val) {
-    uint8_t current_status;
-    uint8_t current_dir;
-    uint8_t stateReg;
-    uint8_t dirReg;
-    int rc;
+  uint8_t current_status;
+  uint8_t current_dir;
+  uint8_t stateReg;
+  uint8_t dirReg;
+  int rc;
 
   if (pin >= MCP_NUM_PINS) return -EINVAL;
 
-    dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
-    stateReg = IS_BANK_A(pin) ? MCP_GPIOA_REG : MCP_GPIOB_REG;
-    pin = GET_REL_PIN(pin);
+  dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
+  stateReg = IS_BANK_A(pin) ? MCP_GPIOA_REG : MCP_GPIOB_REG;
+  pin = GET_REL_PIN(pin);
 
   current_dir = this->read_from_reg(dirReg);
 
-    if ((current_dir >> pin) & 0x1)
-        return -EINVAL;
-    current_status = this->read_from_reg(stateReg);
+  if ((current_dir >> pin) & 0x1) return -EINVAL;
+  current_status = this->read_from_reg(stateReg);
 
-    if (val)
-        rc = this->write_data(stateReg, current_status | (1 << pin));
-    else
-        rc = this->write_data(stateReg, current_status & ~(1 << pin));
+  if (val)
+    rc = this->write_data(stateReg, current_status | (1 << pin));
+  else
+    rc = this->write_data(stateReg, current_status & ~(1 << pin));
 
   return rc;
 }

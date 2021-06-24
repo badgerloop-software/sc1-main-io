@@ -1,4 +1,4 @@
-project(DevicesLib VERSION 0.1 LANGUAGES CXX)
+project(DevicesLib)
 
 add_library(devices src/mcp23017.cpp)
 

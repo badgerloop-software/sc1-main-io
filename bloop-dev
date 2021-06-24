@@ -1,5 +1,62 @@
 #!/bin/bash
 
+DIR=$(dirname $(readlink -f $0))
+
+cross_setup() {
+
+	    cd /tmp/
+	    wget -c https://releases.linaro.org/components/toolchain/binaries/6.5-2018.12/arm-linux-gnueabihf/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
+	    if [ $? -ne 0 ]; then
+	    	echo "Failure to get arm-linux-gnueabihf"
+	    fi
+	    sudo tar xf gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz -C /opt/
+
+	    rm gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
+}
+
+gtest_setup() {
+
+	sudo apt-get update
+	sudo apt-get install -y build-essential
+	sudo apt-get install -y cmake libgtest-dev
+		
+	#cd /usr/src/gtest
+	#sudo cmake CMakeLists.txt
+	#sudo make
+    #sudo cp lib/*.a /usr/lib
+
+	# BB_TOOLCHAIN=$PWD/toolchains/beaglebone.cmake
+	# sudo mkdir /usr/src/googletest/ARM
+	# cd /usr/src/googletest
+	# sudo cmake -DCMAKE_TOOLCHAIN_FILE=$BB_TOOLCHAIN . -B ARM/
+	# cd ARM
+	# sudo make
+	# sudo make install
+}
+
+picklerick() {
+
+    cat <<'EOF'
+        ___
+    . -^   `--,      
+   /# =========`-_   
+  /# (--====___====\ 
+ /#   .- --.  . --.| 
+/##   |  * ) (   * ),
+|##   \    /\ \   / |
+|###   ---   \ ---  |
+|####      ___)    #|
+|######           ##|
+ \##### ---------- / 
+  \####           (  
+   `\###          |  
+     \###         |  
+      \##        |   
+       \###.    .)   
+        `======/
+EOF
+}
+
 if [ $# -eq 0 ]; then
     echo "Usage $0 {clean, build}"
     exit 1
@@ -8,6 +65,11 @@ fi
 
 
 if [ "$1" == "build" ]; then
+	if [ ! -f /usr/src/googletest/googtest/lib/libgtest.a ]; then
+        gtest_setup
+	fi
+
+    cd $DIR
     $0 clean
     mkdir build && cd build
     cmake ..
@@ -23,39 +85,20 @@ if [ "$1" == "build" ]; then
         echo "Awwwww geeeeez rick, Make failed"
         exit 1
     fi
-    cat <<'EOF'
-        ___
-    . -^   `--,      
-   /# =========`-_   
-  /# (--====___====\ 
- /#   .- --.  . --.| 
-/##   |  * ) (   * ),
-|##   \    /\ \   / |
-|###   ---   \ ---  |
-|####      ___)    #|
-|######           ##|
- \##### ---------- / 
-  \####           (  
-   `\###          |  
-     \###         |  
-      \##        |   
-       \###.    .)   
-        `======/
-EOF
+    picklerick
+
 
 elif [ "$1" == "cross" ]; then
+    if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
+        $(cross_setup)
+    fi
+
+	if [ ! -f /usr/src/googletest/ARM/googlemcok/gtest/libgtest.a ]; then
+        $(gtest_setup cross)
+	fi
+
     $0 clean
     mkdir build && cd build
-    if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
-	cd /tmp/
-	wget -c https://releases.linaro.org/components/toolchain/binaries/6.5-2018.12/arm-linux-gnueabihf/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
-	if [ $? -ne 0 ]; then
-		echo "Failure to get arm-linux-gnueabihf"
-	fi
-	sudo tar xf gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz -C /opt/
-
-	rm gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
-    fi
     cmake -DCMAKE_TOOLCHAIN_FILE=./toolchains/beaglebone.cmake ..
 
     if [ $? -ne 0 ]; then
@@ -69,25 +112,8 @@ elif [ "$1" == "cross" ]; then
         echo "Awwwww geeeeez rick, Make failed"
         exit 1
     fi
-    cat <<'EOF'
-        ___
-    . -^   `--,      
-   /# =========`-_   
-  /# (--====___====\ 
- /#   .- --.  . --.| 
-/##   |  * ) (   * ),
-|##   \    /\ \   / |
-|###   ---   \ ---  |
-|####      ___)    #|
-|######           ##|
- \##### ---------- / 
-  \####           (  
-   `\###          |  
-     \###         |  
-      \##        |   
-       \###.    .)   
-        `======/
-EOF
+    picklerick
+
 
 elif [ "$1" == "clean" ]; then
 	rm -rf build

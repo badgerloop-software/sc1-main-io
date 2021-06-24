@@ -1,4 +1,4 @@
-project(DriversLib VERSION 0.1 LANGUAGES CXX)
+project(DriversLib)
 
 add_library(drivers src/i2c.cpp)
 

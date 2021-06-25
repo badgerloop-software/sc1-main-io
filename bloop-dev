@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 DIR=$(dirname $(readlink -f $0))
 
 cross_setup() {
@@ -16,22 +17,20 @@ cross_setup() {
 
 gtest_setup() {
 
-	sudo apt-get update
-	sudo apt-get install -y build-essential
-	sudo apt-get install -y cmake libgtest-dev
-		
-	#cd /usr/src/gtest
-	#sudo cmake CMakeLists.txt
-	#sudo make
-    #sudo cp lib/*.a /usr/lib
+	sudo apt update
+	sudo apt install -y libgtest-dev
 
-	# BB_TOOLCHAIN=$PWD/toolchains/beaglebone.cmake
-	# sudo mkdir /usr/src/googletest/ARM
-	# cd /usr/src/googletest
-	# sudo cmake -DCMAKE_TOOLCHAIN_FILE=$BB_TOOLCHAIN . -B ARM/
-	# cd ARM
-	# sudo make
-	# sudo make install
+	cd /usr/src/gtest
+	if [ "$1" == "cross" ]; then
+	    BB_TOOLCHAIN=$PWD/toolchains/beaglebone.cmake
+	    mkdir ARM
+	    cd ARM
+	    sudo cmake -DCMAKE_TOOLCHAIN_FILE=$BB_TOOLCHAIN .. 
+	    sudo make
+	else
+	    sudo cmake .
+	    sudo make
+        fi
 }
 
 picklerick() {
@@ -63,55 +62,33 @@ if [ $# -eq 0 ]; then
 fi
 
 
-
 if [ "$1" == "build" ]; then
-	if [ ! -f /usr/src/googletest/googtest/lib/libgtest.a ]; then
-        gtest_setup
-	fi
+    export GLIB_PATH="libgtest.a"
+    if [ ! -e '/usr/src/gtest/libgtest.a' ]; then
+        $(gtest_setup)
+    fi
 
-    cd $DIR
     $0 clean
     mkdir build && cd build
     cmake ..
-
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, CMake failed"
-        exit 1
-    fi
-    
     make
-
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, Make failed"
-        exit 1
-    fi
     picklerick
 
 
 elif [ "$1" == "cross" ]; then
+    export GLIB_PATH="ARM/libgtest.a"
     if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
         $(cross_setup)
     fi
 
-	if [ ! -f /usr/src/googletest/ARM/googlemcok/gtest/libgtest.a ]; then
+    if [ ! -e '/usr/src/gtest/ARM/libgtest.a' ]; then
         $(gtest_setup cross)
-	fi
+    fi
 
     $0 clean
     mkdir build && cd build
     cmake -DCMAKE_TOOLCHAIN_FILE=./toolchains/beaglebone.cmake ..
-
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, CMake failed"
-        exit 1
-    fi
-    
     make
-
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, Make failed"
-        exit 1
-    fi
     picklerick
 
 

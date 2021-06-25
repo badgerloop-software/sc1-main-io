@@ -18,5 +18,6 @@ set(libraries devices
               drivers
               btf)
 
+# No export needed for executables
 add_executable(badgerloop main.cpp ${dependecies})
-target_link_libraries(badgerloop PRIVATE ${libraries})
+target_link_libraries(badgerloop ${libraries})

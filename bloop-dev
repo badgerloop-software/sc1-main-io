@@ -1,5 +1,10 @@
 #!/bin/bash
 
+PYTHON_ENV=$(pwd)/.env
+PYBIN=$PYTHON_ENV/bin
+PRE_COMMIT=$PYBIN/pre-commit
+
+
 if [ $# -eq 0 ]; then
     echo "Usage $0 {clean, build}"
     exit 1
@@ -47,14 +52,15 @@ elif [ "$1" == "cross" ]; then
     $0 clean
     mkdir build && cd build
     if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
-	cd /tmp/
-	wget -c https://releases.linaro.org/components/toolchain/binaries/6.5-2018.12/arm-linux-gnueabihf/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
+	wget -c \
+    https://releases.linaro.org/components/toolchain/binaries/6.5-2018.12/arm-linux-gnueabihf/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz \
+    -P /tmp/
 	if [ $? -ne 0 ]; then
 		echo "Failure to get arm-linux-gnueabihf"
 	fi
-	sudo tar xf gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz -C /opt/
+	sudo tar xf /tmp/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz -C /opt/
 
-	rm gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
+	rm /tmp/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
     fi
     cmake -DCMAKE_TOOLCHAIN_FILE=./toolchains/beaglebone.cmake ..
 
@@ -94,4 +100,22 @@ elif [ "$1" == "clean" ]; then
 	rm -rf out
 	rm -rf coverage
 	echo "clean finished"
+
+elif [ "$1" == "setup" ]; then
+    sudo apt update
+    sudo apt install \
+        python3 \
+        virtualenv \
+        clang-format \
+        cppcheck
+
+    virtualenv -p python3 $PYTHON_ENV
+
+    $PYBIN/pip install pre-commit
+
+    $PRE_COMMIT install
+
+
+elif [ "$1" == "lint" ]; then
+    $PRE_COMMIT run -a
 fi

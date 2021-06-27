@@ -18,18 +18,18 @@
 #endif
 
 extern volatile bool NEW_CAN_MESSAGE;
+static const struct itimerval new_val = {
+    { 0, 10000 },
+    { 0, 10000 }
+};
 
 void updateNewMessage(int signum) { NEW_CAN_MESSAGE = true; }
 
 class CAN {
     private:
-        struct sockaddr_can addr;
-        struct ifreq ifr;
-        int socket;
-        const struct itimerval new_val = {
-            { 0, 10000 },
-            { 0, 10000 }
-        };
+        static struct sockaddr_can addr;
+        static struct ifreq ifr;
+        static int socket;
 
     protected:
         CAN(int* s);

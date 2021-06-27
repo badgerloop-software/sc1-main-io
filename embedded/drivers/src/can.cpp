@@ -34,6 +34,8 @@ int CAN::begin() {
     sigaction(SIGALRM, &action, NULL);
     setitimer(ITIMER_REAL, &new_val, NULL);
     return 0;
+
+    sem_init(&this->canSem, 0, 1);
 }
 
 int CAN::canRead(struct can_frame* recvd_msg) {

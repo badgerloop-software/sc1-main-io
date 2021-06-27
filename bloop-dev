@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-DIR=$(dirname $(readlink -f $0))
 
 cross_setup() {
 
@@ -13,25 +12,21 @@ cross_setup() {
 	    sudo tar xf gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz -C /opt/
 
 	    rm gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
-}
+} &> /dev/null
 
 gtest_setup() {
-
-	sudo apt update
-	sudo apt install -y libgtest-dev
-
+	BB_TOOLCHAIN=$PWD/toolchains/beaglebone.cmake
 	cd /usr/src/gtest
 	if [ "$1" == "cross" ]; then
-	    BB_TOOLCHAIN=$PWD/toolchains/beaglebone.cmake
-	    mkdir ARM
+	    sudo rm -rf ARM && sudo mkdir ARM
 	    cd ARM
-	    sudo cmake -DCMAKE_TOOLCHAIN_FILE=$BB_TOOLCHAIN .. 
+	    sudo cmake -DCMAKE_TOOLCHAIN_FILE=$BB_TOOLCHAIN .. -B .
 	    sudo make
 	else
 	    sudo cmake .
 	    sudo make
         fi
-}
+} &> /dev/null
 
 picklerick() {
 
@@ -65,6 +60,7 @@ fi
 if [ "$1" == "build" ]; then
     export GLIB_PATH="libgtest.a"
     if [ ! -e '/usr/src/gtest/libgtest.a' ]; then
+	echo 'setting up gtest...'
         $(gtest_setup)
     fi
 
@@ -78,10 +74,12 @@ if [ "$1" == "build" ]; then
 elif [ "$1" == "cross" ]; then
     export GLIB_PATH="ARM/libgtest.a"
     if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
+	echo 'setting up cross compiler...'
         $(cross_setup)
     fi
 
     if [ ! -e '/usr/src/gtest/ARM/libgtest.a' ]; then
+	echo 'setting up gtest...'
         $(gtest_setup cross)
     fi
 

@@ -32,7 +32,7 @@ int CAN::begin() {
     struct sigaction action;
     action.sa_handler = updateNewMessage;
     sigaction(SIGALRM, &action, NULL);
-    setitimer(ITIMER_REAL, &this->new_val, NULL);
+    setitimer(ITIMER_REAL, &new_val, NULL);
     return 0;
 }
 

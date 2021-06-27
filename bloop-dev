@@ -15,6 +15,8 @@ cross_setup() {
 } &> /dev/null
 
 gtest_setup() {
+    sudo apt update
+    sudo apt install -y libgtest-dev
 	BB_TOOLCHAIN=$PWD/toolchains/beaglebone.cmake
 	cd /usr/src/gtest
 	if [ "$1" == "cross" ]; then
@@ -58,8 +60,8 @@ fi
 
 
 if [ "$1" == "build" ]; then
-    export GLIB_PATH="libgtest.a"
-    if [ ! -e '/usr/src/gtest/libgtest.a' ]; then
+    export GLIB_PATH="lib/libgtest.a"
+    if [ ! -e "/usr/src/gtest/${GLIB_PATH}" ]; then
 	echo 'setting up gtest...'
         $(gtest_setup)
     fi
@@ -72,13 +74,13 @@ if [ "$1" == "build" ]; then
 
 
 elif [ "$1" == "cross" ]; then
-    export GLIB_PATH="ARM/libgtest.a"
+    export GLIB_PATH="ARM/lib/libgtest.a"
     if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
 	echo 'setting up cross compiler...'
         $(cross_setup)
     fi
 
-    if [ ! -e '/usr/src/gtest/ARM/libgtest.a' ]; then
+    if [ ! -e "/usr/src/gtest/${GLIB_PATH}" ]; then
 	echo 'setting up gtest...'
         $(gtest_setup cross)
     fi

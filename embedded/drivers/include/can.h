@@ -2,6 +2,7 @@
 #define __CAN_H__
 
 #include <linux/can.h>
+#include <semaphore.h>
 #include <net/if.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -31,7 +32,8 @@ class CAN {
         static struct ifreq ifr;
         static int socket;
 
-    protected:
+    public:
+        sem_t canSem;
         CAN(int* s);
         ~CAN();
         int begin();

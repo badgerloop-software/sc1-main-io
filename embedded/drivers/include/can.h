@@ -3,6 +3,7 @@
 
 #include <linux/can.h>
 #include <semaphore.h>
+#include <thread>
 #include <net/if.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -18,24 +19,22 @@
 #define CAN_INTF "can0"
 #endif
 
-extern volatile bool NEW_CAN_MESSAGE;
 static const struct itimerval new_val = {
     { 0, 10000 },
     { 0, 10000 }
 };
-
-void updateNewMessage(int signum) { NEW_CAN_MESSAGE = true; }
 
 class CAN {
     private:
         static struct sockaddr_can addr;
         static struct ifreq ifr;
         static int socket;
+        std::thread canThread;
 
     public:
         sem_t canSem;
-        CAN(int* s);
-        ~CAN();
+        CAN();
+        void canLoop();
         int begin();
         int canRead(struct can_frame* can_mesg);
         int canSend(uint32_t id, uint8_t* data, uint8_t size);

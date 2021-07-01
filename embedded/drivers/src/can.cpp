@@ -1,3 +1,4 @@
+#include <thread>
 #include "can.h"
 #include <linux/can.h>
 #include <net/if.h>
@@ -12,8 +13,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-CAN::CAN(int *s) {
-    this->socket = *s;
+CAN::CAN() {
+    // idk
+}
+
+
+void CAN::canLoop() {
+    struct can_frame can_mesg;
+    while (1) {
+        sem_wait(&canSem);
+        // TODO
+        sem_post(&canSem);
+        usleep(50);
+    }
 }
 
 int CAN::begin() {
@@ -26,16 +38,12 @@ int CAN::begin() {
 
     this->addr.can_family = AF_CAN;
     this->addr.can_ifindex = ifr.ifr_ifindex;
-
     bind(this->socket, (struct sockaddr*)&this->addr, sizeof(this->addr));
 
-    struct sigaction action;
-    action.sa_handler = updateNewMessage;
-    sigaction(SIGALRM, &action, NULL);
-    setitimer(ITIMER_REAL, &new_val, NULL);
-    return 0;
-
+    canThread = std::thread(&CAN::canLoop, this);
+    
     sem_init(&this->canSem, 0, 1);
+    return 0;
 }
 
 int CAN::canRead(struct can_frame* recvd_msg) {

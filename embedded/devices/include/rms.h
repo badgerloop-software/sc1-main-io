@@ -27,7 +27,7 @@ class RMS {
         void CANLoop();
 
         void rx_recv(struct can_frame* can_mesg);
-        CAN can; // can you do the can can
+        CAN* can; // can you do the can can
 
         int rmsEnHeartbeat();
         int rmsClrFaults();

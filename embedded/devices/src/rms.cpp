@@ -18,27 +18,25 @@
 /* TODO figure out if heartbeat values may just be torque */
 
 
-RMS::RMS(CAN &c): can(c)
+RMS::RMS(CAN &c)
 {
+    this->can = &c;
 }
 
 
 int RMS::begin() {
-    sem_init(&this->can.canSem, 0, 1);
     /*	initMotor();*/
 
     // create CAN thread for this device
-    CANThread = std::thread(&RMS::CANLoop, this);
-    CANThread.detach();
     return 0;
 }
 
 void RMS::CANLoop() {
     struct can_frame can_mesg;
     while (1) {
-        sem_wait(&this->can.canSem);
+        sem_wait(&this->can->canSem);
         rx_recv(&can_mesg);
-        sem_post(&this->can.canSem);
+        sem_post(&this->can->canSem);
         usleep(50);
     }
 }
@@ -47,13 +45,12 @@ void RMS::CANLoop() {
 void RMS::rx_recv(struct can_frame* can_mesg)
 {
 
-    if (!this->can.canRead(can_mesg)) { // Checks for a CAN message
+    if (!this->can->canRead(can_mesg)) { // Checks for a CAN message
         //	printf("ID: %#X || ", (unsigned int) can_mesg->can_id);
         //	printf("Data: [%#X.%#X.%#X.%#X.%#X.%#X.%#X.%#X]\n\r", can_mesg->data[0], can_mesg->data[1], can_mesg->data[2], can_mesg->data[3], can_mesg->data[4], can_mesg->data[5], can_mesg->data[6], can_mesg->data[7]);
         if (parser(can_mesg->can_id, can_mesg->data, NO_FILTER)) {
             // printf("didn't receive rms data\n");
         }
-        NEW_CAN_MESSAGE = false;
     }
 }
 
@@ -172,9 +169,9 @@ int RMS::parser(uint32_t id, uint8_t* rmsData, uint32_t filter) {
 int RMS::rmsEnHeartbeat()
 {
     uint8_t payload[] = { 0x92, 0x0, 0x1, 0x0, 0x1, 0x0, 0x0, 0x0 };
-    sem_wait(&this->can.canSem);
-    int ret = this->can.canSend(RMS_HB_ID, payload, 8);
-    sem_post(&this->can.canSem);
+    sem_wait(&this->can->canSem);
+    int ret = this->can->canSend(RMS_HB_ID, payload, 8);
+    sem_post(&this->can->canSem);
     return ret;
 }
 
@@ -182,9 +179,9 @@ int RMS::rmsEnHeartbeat()
 int RMS::rmsClrFaults()
 {
     uint8_t payload[] = { 0x14, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0 };
-    sem_wait(&this->can.canSem);
-    int ret = this->can.canSend(RMS_CLR_FAULTS_ID, payload, 8);
-    sem_post(&this->can.canSem);
+    sem_wait(&this->can->canSem);
+    int ret = this->can->canSend(RMS_CLR_FAULTS_ID, payload, 8);
+    sem_post(&this->can->canSem);
     return ret;
 }
 
@@ -192,9 +189,9 @@ int RMS::rmsClrFaults()
 int RMS::rmsInvDis()
 {
     uint8_t payload[] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
-    sem_wait(&this->can.canSem);
-    int ret = this->can.canSend(RMS_INV_DIS_ID, payload, 8);
-    sem_post(&this->can.canSem);
+    sem_wait(&this->can->canSem);
+    int ret = this->can->canSend(RMS_INV_DIS_ID, payload, 8);
+    sem_post(&this->can->canSem);
     return ret;
 }
 
@@ -202,18 +199,18 @@ int RMS::rmsInvDis()
 int RMS::rmsInvEn()
 {
     uint8_t payload[] = { 40 /*TORQUE_SCALE_LWR(1)*/, 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0 };
-    sem_wait(&this->can.canSem);
-    int ret = this->can.canSend(RMS_INV_EN_ID, payload, 8);
-    sem_post(&this->can.canSem);
+    sem_wait(&this->can->canSem);
+    int ret = this->can->canSend(RMS_INV_EN_ID, payload, 8);
+    sem_post(&this->can->canSem);
     return ret;
 }
 
 int RMS::rmsInvEnNoTorque()
 {
     uint8_t payload[] = { 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0 };
-    sem_wait(&this->can.canSem);
-    int ret = this->can.canSend(RMS_INV_EN_ID, payload, 8);
-    sem_post(&this->can.canSem);
+    sem_wait(&this->can->canSem);
+    int ret = this->can->canSend(RMS_INV_EN_ID, payload, 8);
+    sem_post(&this->can->canSem);
     return ret;
 }
 
@@ -221,9 +218,9 @@ int RMS::rmsInvEnNoTorque()
 int RMS::rmsInvForward20()
 {
     uint8_t payload[] = { TORQUE_SCALE_LWR(1), 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0 };
-    sem_wait(&this->can.canSem);
-    int ret = this->can.canSend(RMS_INV_FW_20_ID, payload, 8);
-    sem_post(&this->can.canSem);
+    sem_wait(&this->can->canSem);
+    int ret = this->can->canSend(RMS_INV_FW_20_ID, payload, 8);
+    sem_post(&this->can->canSem);
     return ret;
 }
 
@@ -231,9 +228,9 @@ int RMS::rmsInvForward20()
 int RMS::rmsInvForward30()
 {
     uint8_t payload[] = { TORQUE_SCALE_LWR(1), 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0 };
-    sem_wait(&this->can.canSem);
-    int ret = this->can.canSend(RMS_INV_FW_30_ID, payload, 8);
-    sem_post(&this->can.canSem);
+    sem_wait(&this->can->canSem);
+    int ret = this->can->canSend(RMS_INV_FW_30_ID, payload, 8);
+    sem_post(&this->can->canSem);
     return ret;
 }
 
@@ -241,9 +238,9 @@ int RMS::rmsInvForward30()
 int RMS::rmsCmdNoTorque()
 {
     uint8_t payload[] = { 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0 };
-    sem_wait(&this->can.canSem);
-    int ret = this->can.canSend(RMS_CMD_0_NM_ID, payload, 8);
-    sem_post(&this->can.canSem);
+    sem_wait(&this->can->canSem);
+    int ret = this->can->canSend(RMS_CMD_0_NM_ID, payload, 8);
+    sem_post(&this->can->canSem);
     return ret;
 }
 
@@ -251,18 +248,18 @@ int RMS::rmsCmdNoTorque()
 int RMS::rmsDischarge()
 {
     uint8_t payload[] = { 0x0, 0x0, 0x0, 0x0, 0x1, 0x2, 0x0, 0x0 };
-    sem_wait(&this->can.canSem);
-    int ret = this->can.canSend(RMS_INV_DISCHARGE_ID, payload, 8);
-    sem_post(&this->can.canSem);
+    sem_wait(&this->can->canSem);
+    int ret = this->can->canSend(RMS_INV_DISCHARGE_ID, payload, 8);
+    sem_post(&this->can->canSem);
     return ret;
 }
 
 int RMS::rmsIdleHb()
 {
     uint8_t payload[] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
-    sem_wait(&this->can.canSem);
-    int ret = this->can.canSend(RMS_HB_ID, payload, 8);
-    sem_post(&this->can.canSem);
+    sem_wait(&this->can->canSem);
+    int ret = this->can->canSend(RMS_HB_ID, payload, 8);
+    sem_post(&this->can->canSem);
     return ret;
 }
 
@@ -270,14 +267,14 @@ int RMS::rmsWriteEeprom(uint16_t addr, uint16_t val)
 {
     uint8_t payload[] = { addr & 0xff, (addr >> 8), 0x1, 0x0,
         val & 0xff, (val >> 8), 0x0, 0x0 };
-    return this->can.canSend(RMS_EEPROM_SEND_ID, payload, 8);
+    return this->can->canSend(RMS_EEPROM_SEND_ID, payload, 8);
 }
 
 int RMS::rmsReadEeprom(uint16_t addr)
 {
     uint8_t payload[] = { addr & 0xff, (addr >> 8), 0x0, 0x0,
         0x0, 0x0, 0x0, 0x0 };
-    return this->can.canSend(RMS_EEPROM_SEND_ID, payload, 8);
+    return this->can->canSend(RMS_EEPROM_SEND_ID, payload, 8);
 }
 
 static uint16_t convRmsDataFormat(uint8_t byte1, uint8_t byte2)
@@ -318,9 +315,9 @@ int RMS::rmsSendHbMsg(uint16_t torque)
     uint8_t payload[] = { TORQUE_SCALE_LWR(torque), TORQUE_SCALE_UPR(torque), 0x0, 0x0,
         0x1, 0x1, 0x0, 0x0 };
 
-    sem_wait(&this->can.canSem);
-    int ret = this->can.canSend(RMS_INV_EN_ID, payload, 8);
-    sem_post(&this->can.canSem);
+    sem_wait(&this->can->canSem);
+    int ret = this->can->canSend(RMS_INV_EN_ID, payload, 8);
+    sem_post(&this->can->canSem);
     return ret;
 }
 

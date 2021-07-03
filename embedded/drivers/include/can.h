@@ -25,8 +25,9 @@ static const struct itimerval new_val = {
     { 0, 10000 }
 };
 
-class CANDevice; // Forward declaration
 class CAN;
+class CANDevice;
+
 
 class CANDevice {
     public:
@@ -35,7 +36,7 @@ class CANDevice {
         virtual int begin();
 
         CAN* can;
-        CANDevice(CAN &c);
+        CANDevice(CAN* c);
 };
 
 class CAN {

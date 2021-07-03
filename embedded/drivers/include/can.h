@@ -1,17 +1,18 @@
-#ifndef __CAN_H__
-#define __CAN_H__
+#ifndef _CAN_H__
+#define _CAN_H__
 
 #include <linux/can.h>
 #include <semaphore.h>
 #include <thread>
-#include <net/if.h>
-#include <signal.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <sys/ioctl.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include <unistd.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <cstring>
+#include <vector>
+
+#define NO_FILTER 0
 
 #ifdef USE_VCAN
 #define CAN_INTF "vcan0"
@@ -24,17 +25,31 @@ static const struct itimerval new_val = {
     { 0, 10000 }
 };
 
+class CANDevice; // Forward declaration
+class CAN;
+
+class CANDevice {
+    public:
+        virtual int parser(uint32_t id, uint8_t* data, uint32_t filter);
+        virtual int parser(struct can_frame* can_mesg);
+        virtual int begin();
+
+        CAN* can;
+        CANDevice(CAN &c);
+};
+
 class CAN {
     private:
+        std::vector<CANDevice*> devices;
         static struct sockaddr_can addr;
         static struct ifreq ifr;
         static int socket;
         std::thread canThread;
+        void canLoop();
 
     public:
         sem_t canSem;
-        CAN();
-        void canLoop();
+        CAN(std::vector<CANDevice*> d);
         int begin();
         int canRead(struct can_frame* can_mesg);
         int canSend(uint32_t id, uint8_t* data, uint8_t size);

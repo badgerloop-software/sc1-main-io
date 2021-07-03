@@ -1,34 +1,25 @@
-#include <thread>
 #include "can.h"
-#include <linux/can.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <unistd.h>
-//#include <linux/interrupt.h>
-#include <signal.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-CAN::CAN() {
-    // idk
-}
-
+CAN::CAN(std::vector<CANDevice*> d) : devices(d) {}
 
 void CAN::canLoop() {
-    struct can_frame can_mesg;
+    struct can_frame * can_mesg;
     while (1) {
         sem_wait(&canSem);
-        // TODO
+        if (!this->canRead(can_mesg)) {
+            for (CANDevice* c:this->devices) {
+                if ((*c).parser(can_mesg->can_id, can_mesg->data, NO_FILTER)) {
+                    // printf("didn't get data\n");
+                }
+            }
+        }
         sem_post(&canSem);
         usleep(50);
     }
 }
 
 int CAN::begin() {
+    this->socket = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
     strcpy(this->ifr.ifr_name, CAN_INTF);
 
     if (ioctl(this->socket, SIOCGIFINDEX, &this->ifr) == -1) {
@@ -41,7 +32,6 @@ int CAN::begin() {
     bind(this->socket, (struct sockaddr*)&this->addr, sizeof(this->addr));
 
     canThread = std::thread(&CAN::canLoop, this);
-    
     sem_init(&this->canSem, 0, 1);
     return 0;
 }

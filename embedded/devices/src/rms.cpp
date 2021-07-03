@@ -18,8 +18,7 @@
 /* TODO figure out if heartbeat values may just be torque */
 
 
-RMS::RMS(CAN &c)
-{
+RMS::RMS(CAN &c) {
     this->can = &c;
 }
 
@@ -30,17 +29,6 @@ int RMS::begin() {
     // create CAN thread for this device
     return 0;
 }
-
-void RMS::CANLoop() {
-    struct can_frame can_mesg;
-    while (1) {
-        sem_wait(&this->can->canSem);
-        rx_recv(&can_mesg);
-        sem_post(&this->can->canSem);
-        usleep(50);
-    }
-}
-
 
 void RMS::rx_recv(struct can_frame* can_mesg)
 {

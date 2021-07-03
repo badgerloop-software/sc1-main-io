@@ -20,7 +20,7 @@
 
 #define WR_SUCCESS_BIT 2
 
-class RMS {
+class RMS : private CANDevice {
     private:
         void rx_recv(struct can_frame* can_mesg);
         CAN* can; // can you do the can can
@@ -41,7 +41,7 @@ class RMS {
         int rmsInvEnNoTorque();
     public:
         int parser(uint32_t id, uint8_t* data, uint32_t filter);
-        RMS(CAN &c);
+        RMS(CAN* c);
         int begin();
 
 };

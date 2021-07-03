@@ -15,7 +15,7 @@ fi
 if [ "$1" == "build" ]; then
     $0 clean
     mkdir build && cd build
-    cmake ..
+    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..
 
     if [ $? -ne 0 ]; then
         echo "Awwwww geeeeez rick, CMake failed"

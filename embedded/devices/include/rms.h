@@ -19,13 +19,9 @@
 #define RMS_INV_DISCHARGE_ID 0xC0
 
 #define WR_SUCCESS_BIT 2
-#define NO_FILTER 0
 
 class RMS {
     private:
-        std::thread CANThread;
-        void CANLoop();
-
         void rx_recv(struct can_frame* can_mesg);
         CAN* can; // can you do the can can
 

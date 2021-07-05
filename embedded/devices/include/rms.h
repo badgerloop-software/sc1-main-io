@@ -41,7 +41,7 @@ class RMS : private CANDevice {
         int rmsInvEnNoTorque();
     public:
         int parser(uint32_t id, uint8_t* data, uint32_t filter);
-        RMS(CAN* c);
+        RMS(CAN& c);
         int begin();
 
 };

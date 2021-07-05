@@ -13,7 +13,7 @@
 /* TODO figure out if heartbeat values may just be torque */
 
 
-RMS::RMS(CAN* c) : CANDevice(c) {}
+RMS::RMS(CAN& c) : CANDevice(c) {}
 
 
 int RMS::begin() {

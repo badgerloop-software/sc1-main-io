@@ -1,14 +1,20 @@
 #include "can.h"
 
-CAN::CAN(std::vector<CANDevice*> d) : devices(d) {}
+CANDevice::CANDevice(CAN& c) : can(c)
+{
+}
+
+void CAN::addDevice(CANDevice& d) {
+    this->devices.push_back(d);
+}
 
 void CAN::canLoop() {
     struct can_frame * can_mesg;
     while (1) {
         sem_wait(&canSem);
         if (!this->canRead(can_mesg)) {
-            for (CANDevice* c:this->devices) {
-                if ((*c).parser(can_mesg->can_id, can_mesg->data, NO_FILTER)) {
+            for (CANDevice c:this->devices) {
+                if (c.parser(can_mesg->can_id, can_mesg->data, NO_FILTER)) {
                     // printf("didn't get data\n");
                 }
             }

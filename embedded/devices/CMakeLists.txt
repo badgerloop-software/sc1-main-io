@@ -1,7 +1,6 @@
 project(DevicesLib VERSION 0.1 LANGUAGES CXX)
 
 add_library(devices src/mcp23017.cpp
-    src/can_device.cpp
     src/rms.cpp)
 
 target_include_directories(devices PUBLIC include)

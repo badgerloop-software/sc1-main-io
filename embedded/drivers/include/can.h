@@ -29,19 +29,10 @@ class CAN;
 class CANDevice;
 
 
-class CANDevice {
-    public:
-        virtual int parser(uint32_t id, uint8_t* data, uint32_t filter);
-        virtual int parser(struct can_frame* can_mesg);
-        virtual int begin();
-
-        CAN* can;
-        CANDevice(CAN* c);
-};
 
 class CAN {
     private:
-        std::vector<CANDevice*> devices;
+        std::vector<std::reference_wrapper<CANDevice>> devices;
         static struct sockaddr_can addr;
         static struct ifreq ifr;
         static int socket;
@@ -50,10 +41,21 @@ class CAN {
 
     public:
         sem_t canSem;
-        CAN(std::vector<CANDevice*> d);
+        CAN();
+        void addDevice(CANDevice& d);
         int begin();
         int canRead(struct can_frame* can_mesg);
         int canSend(uint32_t id, uint8_t* data, uint8_t size);
+};
+
+class CANDevice {
+    public:
+        virtual int parser(uint32_t id, uint8_t* data, uint32_t filter);
+        virtual int parser(struct can_frame* can_mesg);
+        virtual int begin();
+
+        CAN& can;
+        CANDevice(CAN& c);
 };
 
 #endif

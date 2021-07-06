@@ -1,11 +1,7 @@
 #include "can.h"
 
-CANDevice::CANDevice(CAN& c) : can(c)
-{
-}
-
-void CAN::addDevice(CANDevice& d) {
-    this->devices.push_back(d);
+CANDevice::CANDevice(CAN* c) : can(c) {
+    c->devices.push_back(this);
 }
 
 void CAN::canLoop() {
@@ -13,8 +9,8 @@ void CAN::canLoop() {
     while (1) {
         sem_wait(&canSem);
         if (!this->canRead(can_mesg)) {
-            for (CANDevice c:this->devices) {
-                if (c.parser(can_mesg->can_id, can_mesg->data, NO_FILTER)) {
+            for (CANDevice* c:this->devices) {
+                if ((*c).parser(can_mesg->can_id, can_mesg->data, NO_FILTER)) {
                     // printf("didn't get data\n");
                 }
             }

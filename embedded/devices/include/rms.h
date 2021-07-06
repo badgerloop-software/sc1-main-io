@@ -1,10 +1,6 @@
 #ifndef _RMS__H__
 #define _RMS__H__
 
-#include <semaphore.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <thread>
 #include "can.h"
 
 #define RMS_EEPROM_SEND_ID 0xC1
@@ -20,11 +16,8 @@
 
 #define WR_SUCCESS_BIT 2
 
-class RMS : private CANDevice {
+class RMS : public CANDevice {
     private:
-        void rx_recv(struct can_frame* can_mesg);
-        CAN* can; // can you do the can can
-
         int rmsEnHeartbeat();
         int rmsClrFaults();
         int rmsInvDis();
@@ -40,9 +33,10 @@ class RMS : private CANDevice {
         int rmsCmdResponseParse(uint8_t* rmsData, uint16_t filter, bool write);
         int rmsInvEnNoTorque();
     public:
-        int parser(uint32_t id, uint8_t* data, uint32_t filter);
-        RMS(CAN& c);
-        int begin();
+        virtual int parser(uint32_t id, uint8_t* data, uint32_t filter);
+        RMS(CAN* c);
+        ~RMS() {};
+        virtual int begin();
 
 };
 #endif

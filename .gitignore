@@ -33,6 +33,10 @@
 
 # Build Artifacts
 out/
+
+# Syntax and Autocomplete
+compile_commands.json
+.clangd
 build/
 
 # Python

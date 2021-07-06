@@ -13,8 +13,7 @@
 /* TODO figure out if heartbeat values may just be torque */
 
 
-RMS::RMS(CAN& c) : CANDevice(c) {}
-
+RMS::RMS(CAN* c) : CANDevice(c) {}
 
 int RMS::begin() {
     /*	initMotor();*/
@@ -23,128 +22,116 @@ int RMS::begin() {
     return 0;
 }
 
-void RMS::rx_recv(struct can_frame* can_mesg)
-{
-
-    if (!this->can->canRead(can_mesg)) { // Checks for a CAN message
-        //	printf("ID: %#X || ", (unsigned int) can_mesg->can_id);
-        //	printf("Data: [%#X.%#X.%#X.%#X.%#X.%#X.%#X.%#X]\n\r", can_mesg->data[0], can_mesg->data[1], can_mesg->data[2], can_mesg->data[3], can_mesg->data[4], can_mesg->data[5], can_mesg->data[6], can_mesg->data[7]);
-        if (parser(can_mesg->can_id, can_mesg->data, NO_FILTER)) {
-            // printf("didn't receive rms data\n");
-        }
+int RMS::parser(uint32_t id, uint8_t* rmsData, uint32_t filter) {
+    if (filter != 0 && filter != id) {
+        return 1;
     }
-}
+    uint16_t val;
+    //uint16_t val2;
+    int16_t temp;
+    switch (id) {
+    case (0xa0):
+//        setRmsIgbtTemp((rmsData[0] | (rmsData[1] << 8)) / 10); //Deg C
+//        setRmsGateDriverBoardTemp((rmsData[6] | (rmsData[7] << 8)) / 10); //Deg C
+/*
+        printf("IGBT: %d\r\n", getRmsIgbtTemp());
+        printf("Gate Driver Board Temp: %d\r\n", getRmsGateDriverBoardTemp());
+*/
+        break;
+    case (0xa1):
+//        setRmsControlBoardTemp((rmsData[0] | (rmsData[1] << 8)) / 10); // Deg C
+/*
+        printf("Control Board Temp: %d\r\n", getRmsControlBoardTemp());
+*/
+        break;
+    case (0xa2):
+        val = (rmsData[4] | rmsData[5] << 8) / 10;
+//        setRmsMotorTemp(val > 300 ? getRmsMotorTemp() : val); //Deg C
+/*
+        printf("Motor Temp: %d\r\n", getRmsMotorTemp());
+*/
+        break;
+    case (0xa3):
+        break;
+    case (0xa4):
+        break;
+    case (0xa5):
+//        setRmsMotorSpeed((rmsData[2] | (rmsData[3] << 8))); //val == 0 ? 0 : 65536 - abs(val) ;//< -10000 || val > 10000 ? getRmsMotorSpeed(): val; // RPM
+//        setRmsElectricalFreq((rmsData[4] | (rmsData[5] << 8)) / 10); //electrical frequency Hz
+/*
+        printf("Motor Speed: %d\r\n", getRmsMotorSpeed());
+        printf("Elect. Freq: %d\r\n", getRmsElectricalFreq());
+*/
+        break;
+    case (0xa6):
+        temp = (rmsData[0] | (rmsData[1] << 8));
 
-// int RMS::parser(uint32_t id, uint8_t* rmsData, uint32_t filter) {
-//     if (filter != 0 && filter != id) {
-//         return 1;
-//     }
-//     uint16_t val;
-//     //uint16_t val2;
-//     int16_t temp;
-//     switch (id) {
-//     case (0xa0):
-//         setRmsIgbtTemp((rmsData[0] | (rmsData[1] << 8)) / 10); //Deg C
-//         setRmsGateDriverBoardTemp((rmsData[6] | (rmsData[7] << 8)) / 10); //Deg C
-// /*
-//         printf("IGBT: %d\r\n", getRmsIgbtTemp());
-//         printf("Gate Driver Board Temp: %d\r\n", getRmsGateDriverBoardTemp());
-// */
-//         break;
-//     case (0xa1):
-//         setRmsControlBoardTemp((rmsData[0] | (rmsData[1] << 8)) / 10); // Deg C
-// /*
-//         printf("Control Board Temp: %d\r\n", getRmsControlBoardTemp());
-// */
-//         break;
-//     case (0xa2):
-//         val = (rmsData[4] | rmsData[5] << 8) / 10;
-//         setRmsMotorTemp(val > 300 ? getRmsMotorTemp() : val); //Deg C
-// /*
-//         printf("Motor Temp: %d\r\n", getRmsMotorTemp());
-// */
-//         break;
-//     case (0xa3):
-//         break;
-//     case (0xa4):
-//         break;
-//     case (0xa5):
-//         setRmsMotorSpeed((rmsData[2] | (rmsData[3] << 8))); //val == 0 ? 0 : 65536 - abs(val) ;//< -10000 || val > 10000 ? getRmsMotorSpeed(): val; // RPM
-//         setRmsElectricalFreq((rmsData[4] | (rmsData[5] << 8)) / 10); //electrical frequency Hz
-// /*
-//         printf("Motor Speed: %d\r\n", getRmsMotorSpeed());
-//         printf("Elect. Freq: %d\r\n", getRmsElectricalFreq());
-// */
-//         break;
-//     case (0xa6):
-//         temp = (rmsData[0] | (rmsData[1] << 8));
-// 
 //         setRmsPhaseACurrent(temp / 10); //> 1000 ? getRmsPhaseACurrent() : val; // Phase A current
-//         temp = (rmsData[6] | (rmsData[7] << 8));
+        temp = (rmsData[6] | (rmsData[7] << 8));
 //         setRmsDcBusCurrent(temp / 10); //< 0 ? getRmsDcBusCurrent() : val2; //DC Bus current
-// /*
-//         printf("Phase A Current: %d\r\n", getRmsPhaseACurrent());
-//         printf("DC Bus Current: %d\r\n", getRmsDcBusCurrent());
-//         printf("Phase B Current: %d\r\n", getRmsPhaseBCurrent()); //FIXME This isnt actually being read in?
-// */
-//         break;
-//     case (0xa7):
-// 
-//         temp = (rmsData[0] | (rmsData[1] << 8));
+/*
+        printf("Phase A Current: %d\r\n", getRmsPhaseACurrent());
+        printf("DC Bus Current: %d\r\n", getRmsDcBusCurrent());
+        printf("Phase B Current: %d\r\n", getRmsPhaseBCurrent()); //FIXME This isnt actually being read in?
+*/
+        break;
+    case (0xa7):
+
+        temp = (rmsData[0] | (rmsData[1] << 8));
 //         setRmsDcBusVoltage(temp / 10.0);
-// 
-//         // setRmsOutputVoltageLn(val2); //Voltage line to netural
-// /*
-//         printf("DC Bus Voltage: %d\r\n", getRmsDcBusVoltage());
-//         printf("Output Voltage line: %d\r\n", getRmsOutputVoltageLn());
-// */
-//         break;
-//     case (0xa8):
-//         break;
-//     case (0xa9):
+
+        // setRmsOutputVoltageLn(val2); //Voltage line to netural
+/*
+        printf("DC Bus Voltage: %d\r\n", getRmsDcBusVoltage());
+        printf("Output Voltage line: %d\r\n", getRmsOutputVoltageLn());
+*/
+        break;
+    case (0xa8):
+        break;
+    case (0xa9):
 //         setRmsLvVoltage((rmsData[6] | (rmsData[7] << 8)) / 100);
-// /*
-//         printf("LV Voltage: %d\r\n", getRmsLvVoltage());
-// */
-//         break;
-// 
-//     case (0xaa):
+/*
+        printf("LV Voltage: %d\r\n", getRmsLvVoltage());
+*/
+        break;
+
+    case (0xaa):
 //         setRmsCanCode1((rmsData[3] << 24) | (rmsData[2] << 16) | (rmsData[1] << 8) | rmsData[0]);
 //         setRmsCanCode2((rmsData[7] << 24) | (rmsData[6] << 16) | (rmsData[5] << 8) | rmsData[4]);
-// /*
-//         printf("CAN Code 1: %lld\r\n", (long long int)getRmsCanCode() 1);
-//         printf("CAN Code 2: %lld\r\n", (long long int)getRmsCanCode() 2);
-// */
-//         break;
-//     case (0xab):
-//         setRmsFaultCode1((rmsData[3] << 24) | (rmsData[2] << 16) | (rmsData[1] << 8) | rmsData[0]);
-//         setRmsFaultCode2((rmsData[7] << 24) | (rmsData[6] << 16) | (rmsData[5] << 8) | rmsData[4]);
-// /*
-//         printf("Fault Code 1: %lld\r\n", (long long int)getRmsFaultCode() 1);
-//         printf("Fault Code 2: %lld\r\n", (long long int)getRmsFaultCode() 2);
-// */
-//         break;
-//     case (0xac):
-//         setRmsCommandedTorque((rmsData[0] | (rmsData[1] << 8))); // > 200 ? getRmsCommandedTorque() : val;
-//         setRmsCommandedTorque(getRmsCommandedTorque() / 10);
-//         setRmsActualTorque((rmsData[2] | (rmsData[3] << 8))); // / 10;
-//         setRmsActualTorque(getRmsActualTorque() / 10);
-// /*
-//         printf("Commanded Torque: %d\r\n", getRmsCommandedTorque());
-//         printf("Actual Torque: %d\r\n", getRmsActualTorque());
-// */
-//         break;
-//     case (0xad):
-//         break;
-//     case (0xae):
-//         break;
-//     case (0xaf):
-//         break;
-//     default:
-//         return 1;
-//     }
-//     return 0;
-// }
+/*
+        printf("CAN Code 1: %lld\r\n", (long long int)getRmsCanCode() 1);
+        printf("CAN Code 2: %lld\r\n", (long long int)getRmsCanCode() 2);
+*/
+        break;
+    case (0xab):
+  //      setRmsFaultCode1((rmsData[3] << 24) | (rmsData[2] << 16) | (rmsData[1] << 8) | rmsData[0]);
+//        setRmsFaultCode2((rmsData[7] << 24) | (rmsData[6] << 16) | (rmsData[5] << 8) | rmsData[4]);
+/*
+        printf("Fault Code 1: %lld\r\n", (long long int)getRmsFaultCode() 1);
+        printf("Fault Code 2: %lld\r\n", (long long int)getRmsFaultCode() 2);
+*/
+        break;
+    case (0xac):
+//        setRmsCommandedTorque((rmsData[0] | (rmsData[1] << 8))); // > 200 ? getRmsCommandedTorque() : val;
+//        setRmsCommandedTorque(getRmsCommandedTorque() / 10);
+//        setRmsActualTorque((rmsData[2] | (rmsData[3] << 8))); // / 10;
+//        setRmsActualTorque(getRmsActualTorque() / 10);
+/*
+        printf("Commanded Torque: %d\r\n", getRmsCommandedTorque());
+        printf("Actual Torque: %d\r\n", getRmsActualTorque());
+*/
+        break;
+    case (0xad):
+        break;
+    case (0xae):
+        break;
+    case (0xaf):
+        break;
+    default:
+        return 1;
+    }
+    return 0;
+}
 
 /* 1 */
 int RMS::rmsEnHeartbeat()

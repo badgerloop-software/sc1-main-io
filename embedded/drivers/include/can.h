@@ -28,34 +28,31 @@ static const struct itimerval new_val = {
 class CAN;
 class CANDevice;
 
+class CANDevice {
+    public:
+        CAN* can;
+        virtual int parser(uint32_t id, uint8_t* data, uint32_t filter) = 0;
+        virtual int begin() = 0;
 
+        CANDevice(CAN* c);
+        virtual ~CANDevice() {}
+};
 
 class CAN {
     private:
-        std::vector<std::reference_wrapper<CANDevice>> devices;
-        static struct sockaddr_can addr;
-        static struct ifreq ifr;
-        static int socket;
+        struct sockaddr_can addr;
+        struct ifreq ifr;
+        int socket;
         std::thread canThread;
         void canLoop();
 
     public:
         sem_t canSem;
-        CAN();
-        void addDevice(CANDevice& d);
+        CAN() {}
+        std::vector<CANDevice*> devices;
         int begin();
         int canRead(struct can_frame* can_mesg);
         int canSend(uint32_t id, uint8_t* data, uint8_t size);
-};
-
-class CANDevice {
-    public:
-        virtual int parser(uint32_t id, uint8_t* data, uint32_t filter);
-        virtual int parser(struct can_frame* can_mesg);
-        virtual int begin();
-
-        CAN& can;
-        CANDevice(CAN& c);
 };
 
 #endif

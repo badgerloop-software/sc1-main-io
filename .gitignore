@@ -37,3 +37,7 @@ build/
 
 # Python
 .env
+
+# VSCode
+
+.vscode/

@@ -18,8 +18,15 @@ RMS::RMS(CAN* c) : CANDevice(c) {}
 int RMS::begin() {
   /*	initMotor();*/
 
-  // create CAN thread for this device
-  return 0;
+  return CANDevice::begin();
+}
+
+int RMS::validMsg(can_frame* can_mesg) {
+  if (can_mesg->can_id >= 0xa0 && can_mesg->can_id <= 0xaf) {
+    this->messages.push(can_mesg);
+    return 0;
+  }
+  return 1;  // not a valid msg
 }
 
 int RMS::parser(uint32_t id, uint8_t* rmsData, uint32_t filter) {

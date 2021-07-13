@@ -35,6 +35,7 @@ class RMS : public CANDevice {
 
  public:
   virtual int parser(uint32_t id, uint8_t* data, uint32_t filter);
+  virtual int validMsg(can_frame* can_mesg);
   RMS(CAN* c);
   ~RMS(){};
   virtual int begin();

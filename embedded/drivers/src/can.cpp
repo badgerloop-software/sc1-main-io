@@ -2,14 +2,31 @@
 
 CANDevice::CANDevice(CAN* c) : can(c) { c->devices.push_back(this); }
 
+void CANDevice::canDeviceLoop() {
+  while (1) {
+    if (this->messages.size()) {
+      can_frame* can_mesg = this->messages.front();
+      this->messages.pop();
+      this->parser(can_mesg->can_id, can_mesg->data, NO_FILTER);
+      usleep(50);
+    }
+  }
+}
+
+int CANDevice::begin() {
+  canDeviceThread = std::thread(&CANDevice::canDeviceLoop, this);
+  return 0;
+}
+
 void CAN::canLoop() {
   struct can_frame* can_mesg;
   while (1) {
     sem_wait(&canSem);
     if (!this->canRead(can_mesg)) {
       for (CANDevice* c : this->devices) {
-        if (!(*c).parser(can_mesg->can_id, can_mesg->data, NO_FILTER)) {
-            break; // success parsing data if 0 returned, else continue to next device
+        if (!(*c).validMsg(can_mesg)) {
+          break;  // validMsg returns 0 if message was valid and added to queue
+                  // else check next device validMsg
         }
       }
     }

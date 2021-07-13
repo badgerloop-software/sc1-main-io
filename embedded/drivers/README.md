@@ -33,4 +33,6 @@ uint8_t read_from_reg(uint8_t reg); // Read data from a specific register
 
 ## CAN Bus
 
-CAN object has a thread parsing the CAN bus it represents. The thread uses the parsing functions of each device in the devices vector. Devices add themselves to the vector when they are passed a CAN object when created.
+A CAN object has a thread parsing its CAN bus. The canLoop thread uses the devices in its devices vector. Devices add themselves to this vector when they are passed a CAN object in their constructor.
+
+Because devices are automatically pushed to a list, the developer need not interact with the CAN object asside from creating it initially in main.

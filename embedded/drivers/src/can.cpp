@@ -8,8 +8,8 @@ void CAN::canLoop() {
     sem_wait(&canSem);
     if (!this->canRead(can_mesg)) {
       for (CANDevice* c : this->devices) {
-        if ((*c).parser(can_mesg->can_id, can_mesg->data, NO_FILTER)) {
-          // printf("didn't get data\n");
+        if (!(*c).parser(can_mesg->can_id, can_mesg->data, NO_FILTER)) {
+            break; // success parsing data if 0 returned, else continue to next device
         }
       }
     }

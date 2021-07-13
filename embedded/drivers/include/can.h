@@ -6,7 +6,6 @@
 #include <semaphore.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <sys/time.h>
 #include <unistd.h>
 
 #include <cstring>
@@ -20,8 +19,6 @@
 #else
 #define CAN_INTF "can0"
 #endif
-
-static const struct itimerval new_val = {{0, 10000}, {0, 10000}};
 
 class CAN;
 class CANDevice;

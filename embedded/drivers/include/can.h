@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 #include <cstring>
+#include <queue>
 #include <thread>
 #include <vector>
 
@@ -24,10 +25,16 @@ class CAN;
 class CANDevice;
 
 class CANDevice {
+ private:
+  std::thread canDeviceThread;
+  void canDeviceLoop();
+
  public:
+  std::queue<can_frame*> messages;
   CAN* can;
   virtual int parser(uint32_t id, uint8_t* data, uint32_t filter) = 0;
-  virtual int begin() = 0;
+  virtual int validMsg(can_frame* can_mesg) = 0;
+  virtual int begin();
 
   CANDevice(CAN* c);
   virtual ~CANDevice() {}

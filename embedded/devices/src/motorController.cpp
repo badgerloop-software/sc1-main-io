@@ -73,7 +73,7 @@ int MotorController::parser(uint32_t id, uint8_t* motorControllerData,
 int MotorController::motorControllerEnHeartbeat() {
   uint8_t payload[] = {0x92, 0x0, 0x1, 0x0, 0x1, 0x0, 0x0, 0x0};
   sem_wait(&this->can->canSem);
-  int ret = this->can->canSend(MotorController_HB_ID, payload, 8);
+  int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);
   return ret;
 }
@@ -91,7 +91,7 @@ int MotorController::motorControllerClrFaults() {
 int MotorController::motorControllerInvDis() {
   uint8_t payload[] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
   sem_wait(&this->can->canSem);
-  int ret = this->can->canSend(MotorController_INV_DIS_ID, payload, 8);
+  int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);
   return ret;
 }
@@ -101,7 +101,7 @@ int MotorController::motorControllerInvEn() {
   uint8_t payload[] = {
       40 /*TORQUE_SCALE_LWR(1)*/, 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0};
   sem_wait(&this->can->canSem);
-  int ret = this->can->canSend(MotorController_INV_EN_ID, payload, 8);
+  int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);
   return ret;
 }
@@ -109,7 +109,7 @@ int MotorController::motorControllerInvEn() {
 int MotorController::motorControllerInvEnNoTorque() {
   uint8_t payload[] = {0x0, 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0};
   sem_wait(&this->can->canSem);
-  int ret = this->can->canSend(MotorController_INV_EN_ID, payload, 8);
+  int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);
   return ret;
 }
@@ -118,7 +118,7 @@ int MotorController::motorControllerInvEnNoTorque() {
 int MotorController::motorControllerInvForward20() {
   uint8_t payload[] = {TORQUE_SCALE_LWR(1), 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0};
   sem_wait(&this->can->canSem);
-  int ret = this->can->canSend(MotorController_INV_FW_20_ID, payload, 8);
+  int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);
   return ret;
 }
@@ -127,7 +127,7 @@ int MotorController::motorControllerInvForward20() {
 int MotorController::motorControllerInvForward30() {
   uint8_t payload[] = {TORQUE_SCALE_LWR(1), 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0};
   sem_wait(&this->can->canSem);
-  int ret = this->can->canSend(MotorController_INV_FW_30_ID, payload, 8);
+  int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);
   return ret;
 }
@@ -136,7 +136,7 @@ int MotorController::motorControllerInvForward30() {
 int MotorController::motorControllerCmdNoTorque() {
   uint8_t payload[] = {0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0};
   sem_wait(&this->can->canSem);
-  int ret = this->can->canSend(MotorController_CMD_0_NM_ID, payload, 8);
+  int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);
   return ret;
 }
@@ -145,7 +145,7 @@ int MotorController::motorControllerCmdNoTorque() {
 int MotorController::motorControllerDischarge() {
   uint8_t payload[] = {0x0, 0x0, 0x0, 0x0, 0x1, 0x2, 0x0, 0x0};
   sem_wait(&this->can->canSem);
-  int ret = this->can->canSend(MotorController_INV_DISCHARGE_ID, payload, 8);
+  int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);
   return ret;
 }
@@ -153,7 +153,7 @@ int MotorController::motorControllerDischarge() {
 int MotorController::motorControllerIdleHb() {
   uint8_t payload[] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
   sem_wait(&this->can->canSem);
-  int ret = this->can->canSend(MotorController_HB_ID, payload, 8);
+  int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);
   return ret;
 }
@@ -212,7 +212,7 @@ int MotorController::motorControllerSendHbMsg(uint16_t torque) {
                        0x0};
 
   sem_wait(&this->can->canSem);
-  int ret = this->can->canSend(MotorController_INV_EN_ID, payload, 8);
+  int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);
   return ret;
 }

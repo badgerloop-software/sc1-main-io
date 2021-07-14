@@ -1,5 +1,12 @@
 #include "can.h"
 
+#include <stdio.h>       // for printf
+#include <sys/ioctl.h>   // for ioctl, SIOCGIFINDEX
+#include <sys/socket.h>  // for bind, recv, send, socket, MSG_DONTWAIT
+#include <unistd.h>      // for usleep
+
+#include <cstring>  // for strcpy
+
 CANDevice::CANDevice(CAN* c) : can(c) { c->devices.push_back(this); }
 
 void CANDevice::canDeviceLoop() {

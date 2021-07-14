@@ -1,13 +1,14 @@
 #include "i2c.h"
 
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
+#include <errno.h>      // for EIO, EINVAL, ENODEV
+#include <fcntl.h>      // for open
+#include <stdio.h>      // for sprintf
+#include <sys/ioctl.h>  // for ioctl
+#include <unistd.h>     // for close, read, write
 
-#include <iostream>
+#include <iostream>  // for operator<<, cerr, ostream
 
-#include "i2c-dev.h"
+#include "i2c-dev.h"  // for i2c_smbus_write_byte, I2C_SLAVE
 
 /* Also need deconsturctor to close file descriptor */
 I2c::I2c(int bus, int addr, int mode) {

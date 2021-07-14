@@ -4,15 +4,8 @@
 #include "can.h"
 
 #define MotorController_EEPROM_SEND_ID 0xC1
-#define MotorController_HB_ID 0xC0
 #define MotorController_CLR_FAULTS_ID 0xC1
-#define MotorController_INV_DIS_ID 0xC0
-#define MotorController_INV_EN_ID 0xC0
-#define MotorController_INV_FW_10_ID 0xC0
-#define MotorController_INV_FW_20_ID 0xC0
-#define MotorController_INV_FW_30_ID 0xC0
-#define MotorController_CMD_0_NM_ID 0xC0
-#define MotorController_INV_DISCHARGE_ID 0xC0
+#define COMMAND_MESSAGE_ID 0xC0
 
 #define WR_SUCCESS_BIT 2
 

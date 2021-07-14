@@ -33,21 +33,21 @@ int set_state(int pin, uint8_t value) // Sets a specific pin a value (0 or 1)
 TODO...
 
 
-## CANDevices (RMS)
+## CANDevices (MotorController)
 
 Devices that use the CAN Bus
 
 ### Setup
 
-Create a CANDevice object, like RMS. The constructor accepts a CAN object, and adds itself to the CAN object's devices vector
+Create a CANDevice object, like MotorController. The constructor accepts a CAN object, and adds itself to the CAN object's devices vector
 
 ```c++
 CAN c;
-RMS rms(&c);
+MotorController motorController(&c);
 ```
 
 ### Usage
 ```c++
-rms.begin(); // begin the CANDevice
-rms.parser(uint32_t id, uint8_t* rmsData, uint32_t filter); // parse the can message
+motorController.begin(); // begin the CANDevice
+motorController.parser(uint32_t id, uint8_t* motorControllerData, uint32_t filter); // parse the can message
 ```

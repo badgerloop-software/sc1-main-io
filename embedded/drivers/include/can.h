@@ -1,17 +1,14 @@
 #ifndef _CAN_H__
 #define _CAN_H__
 
-#include <linux/can.h>
-#include <net/if.h>
-#include <semaphore.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <unistd.h>
+#include <linux/can.h>  // for can_frame (ptr only), sockaddr_can
+#include <net/if.h>     // for ifreq
+#include <semaphore.h>  // for sem_t
+#include <stdint.h>     // for uint32_t, uint8_t
 
-#include <cstring>
-#include <queue>
-#include <thread>
-#include <vector>
+#include <queue>   // for queue
+#include <thread>  // for thread
+#include <vector>  // for vector
 
 #define NO_FILTER 0
 

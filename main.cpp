@@ -1,10 +1,10 @@
-#include <unistd.h>
+#include <unistd.h>  // for usleep, sleep
 
-#include <iostream>
+#include <iostream>  // for operator<<, basic_ostream::operator<<
 
-#include "i2c.h"
-#include "mcp23017.h"
-#include "motorController.h"
+#include "can.h"              // for CAN
+#include "mcp23017.h"         // for Mcp23017, MCP_NUM_PINS, morty_directions
+#include "motorController.h"  // for MotorController
 
 int main() {
   CAN c;

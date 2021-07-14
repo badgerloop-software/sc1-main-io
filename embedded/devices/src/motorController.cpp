@@ -1,5 +1,11 @@
 #include "motorController.h"
 
+#include <linux/can.h>  // for can_frame
+#include <semaphore.h>  // for sem_post, sem_wait
+#include <stdio.h>      // for fprintf, stderr
+
+#include <queue>  // for queue
+
 #define TORQUE_SCALE_LWR(x) \
   (((x)&0xFF) * 10) /* Converts Nm to the value the MotorController wants */
 #define TORQUE_SCALE_UPR(x) (((x) >> 8) * 10)

@@ -7,9 +7,13 @@ This set of guidelines will detail what you should know before contributing, as 
 ### Know where to get help!
 Always feel free to reach out on Slack, the #controls channel is a great place to start.
 ### Get familiar with the repository!
-Take a look at the [readme](README.md) if you haven't already. It details the structure of the repository as well as how to set up your build environment.
+Take a look at the [README](README.md) if you haven't already. It details the structure of the repository as well as how to set up your build environment.
 ### Take a look at the style guide!
 We use [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.html) for this repository, and our pre-commit formatter enforces this guide.
+### Some more things you should know
+For this repository, we want to try to write object oriented code as much as possible to provide an easier transition from the CS curriculum at UW-Madison.
+
+We also like to make sure our code is well documented, not only in the sources themselves, but in the repository as well. Take a look at our [devices](embedded/devices) folder for an example of our in-repo README documentation.
 ## How do I contribute?
 ### You found a bug
 Open an issue! Describe it well, and, if you think you can fix it, keep on reading!

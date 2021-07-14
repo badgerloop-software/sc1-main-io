@@ -36,7 +36,7 @@ Our driver and device source code is located in [embedded](embedded).
 [Devices](embedded/devices) contains device specific code to manage devices like the motor controller and IO expanders.
 
 ## Contributing
-Check out our [contributing page](CONTRIBUTING.md)!
+Check out our [CONTRIBUTING](CONTRIBUTING.md) document to see how you can start getting involved!
 
 ## Testing
 TODO...

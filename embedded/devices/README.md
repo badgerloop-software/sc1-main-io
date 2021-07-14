@@ -49,5 +49,5 @@ MotorController motorController(&c);
 ### Usage
 ```c++
 motorController.begin(); // begin the CANDevice
-motorController.parser(uint32_t id, uint8_t* motorControllerData, uint32_t filter); // parse the can message
+motorController.validMsg(can_frame* can_mesg); // parse the can message
 ```

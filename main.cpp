@@ -4,11 +4,11 @@
 
 #include "i2c.h"
 #include "mcp23017.h"
-#include "rms.h"
+#include "motorController.h"
 
 int main() {
   CAN c;
-  RMS rms(&c);
+  MotorController motorController(&c);
   Mcp23017 rick = Mcp23017(2, 0x20);
   Mcp23017 morty = Mcp23017(2, 0x21);
 

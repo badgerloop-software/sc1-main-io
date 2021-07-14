@@ -4,13 +4,6 @@
   (((x)&0xFF) * 10) /* Converts Nm to the value the MotorController wants */
 #define TORQUE_SCALE_UPR(x) (((x) >> 8) * 10)
 
-/* The following send functions are a series of cryptic steps
- * that just magically make the MotorController work.
- * If you question them too hard you may burst into flames (along with the motor
- * controller, so dont do it). The important part is that they
- * are sent at the proper time and in the listed order. Timing information
- * will be coming a little later */
-
 /* TODO figure out if heartbeat values may just be torque */
 
 MotorController::MotorController(CAN* c) : CANDevice(c) {}
@@ -38,126 +31,37 @@ int MotorController::parser(uint32_t id, uint8_t* motorControllerData,
   // uint16_t val2;
   int16_t temp;
   switch (id) {
-    case (0xa0):
-      //        setRmsIgbtTemp((motorControllerData[0] | (motorControllerData[1]
-      //        << 8)) / 10); //Deg C
-      //        setRmsGateDriverBoardTemp((motorControllerData[6] |
-      //        (motorControllerData[7] << 8)) / 10); //Deg C
-      /*
-              printf("IGBT: %d\r\n", getRmsIgbtTemp());
-              printf("Gate Driver Board Temp: %d\r\n",
-         getRmsGateDriverBoardTemp());
-      */
+    case (0xa0):  // Temperatures #1
       break;
-    case (0xa1):
-      //        setRmsControlBoardTemp((motorControllerData[0] |
-      //        (motorControllerData[1] << 8)) / 10);
-      //        // Deg C
-      /*
-              printf("Control Board Temp: %d\r\n", getRmsControlBoardTemp());
-      */
+    case (0xa1):  // Temperatures #2
       break;
-    case (0xa2):
-      val = (motorControllerData[4] | motorControllerData[5] << 8) / 10;
-      //        setRmsMotorTemp(val > 300 ? getRmsMotorTemp() : val); //Deg C
-      /*
-              printf("Motor Temp: %d\r\n", getRmsMotorTemp());
-      */
+    case (0xa2):  // Temperatures #3
       break;
-    case (0xa3):
+    case (0xa3):  // Analog Inputs Voltages
       break;
-    case (0xa4):
+    case (0xa4):  // Digital Inputs Voltages
       break;
-    case (0xa5):
-      //        setRmsMotorSpeed((motorControllerData[2] |
-      //        (motorControllerData[3] << 8))); //val == 0 ? 0 : 65536 -
-      //        abs(val) ;//< -10000 || val > 10000 ? getRmsMotorSpeed(): val;
-      //        // RPM setRmsElectricalFreq((motorControllerData[4] |
-      //        (motorControllerData[5] << 8)) / 10); //electrical frequency Hz
-      /*
-              printf("Motor Speed: %d\r\n", getRmsMotorSpeed());
-              printf("Elect. Freq: %d\r\n", getRmsElectricalFreq());
-      */
+    case (0xa5):  // Motor Position Information
       break;
-    case (0xa6):
-      temp = (motorControllerData[0] | (motorControllerData[1] << 8));
-
-      //         setRmsPhaseACurrent(temp / 10); //> 1000 ?
-      //         getRmsPhaseACurrent() : val; // Phase A current
-      temp = (motorControllerData[6] | (motorControllerData[7] << 8));
-      //         setRmsDcBusCurrent(temp / 10); //< 0 ? getRmsDcBusCurrent() :
-      //         val2; //DC Bus current
-      /*
-              printf("Phase A Current: %d\r\n", getRmsPhaseACurrent());
-              printf("DC Bus Current: %d\r\n", getRmsDcBusCurrent());
-              printf("Phase B Current: %d\r\n", getRmsPhaseBCurrent()); //FIXME
-         This isnt actually being read in?
-      */
+    case (0xa6):  // Current Information
       break;
-    case (0xa7):
-
-      temp = (motorControllerData[0] | (motorControllerData[1] << 8));
-      //         setRmsDcBusVoltage(temp / 10.0);
-
-      // setRmsOutputVoltageLn(val2); //Voltage line to netural
-      /*
-              printf("DC Bus Voltage: %d\r\n", getRmsDcBusVoltage());
-              printf("Output Voltage line: %d\r\n", getRmsOutputVoltageLn());
-      */
+    case (0xa7):  // Voltage Information
       break;
-    case (0xa8):
+    case (0xa8):  // Flux Information
       break;
-    case (0xa9):
-      //         setRmsLvVoltage((motorControllerData[6] |
-      //         (motorControllerData[7] << 8)) / 100);
-      /*
-              printf("LV Voltage: %d\r\n", getRmsLvVoltage());
-      */
+    case (0xa9):  // Internal Voltages
       break;
-
-    case (0xaa):
-      //         setRmsCanCode1((motorControllerData[3] << 24) |
-      //         (motorControllerData[2] << 16) | (motorControllerData[1] << 8)
-      //         | motorControllerData[0]);
-      //         setRmsCanCode2((motorControllerData[7] << 24) |
-      //         (motorControllerData[6] << 16) | (motorControllerData[5] << 8)
-      //         | motorControllerData[4]);
-      /*
-              printf("CAN Code 1: %lld\r\n", (long long int)getRmsCanCode() 1);
-              printf("CAN Code 2: %lld\r\n", (long long int)getRmsCanCode() 2);
-      */
+    case (0xaa):  // Internal States
       break;
-    case (0xab):
-      //      setRmsFaultCode1((motorControllerData[3] << 24) |
-      //      (motorControllerData[2] << 16) | (motorControllerData[1] << 8) |
-      //      motorControllerData[0]);
-      //        setRmsFaultCode2((motorControllerData[7] << 24) |
-      //        (motorControllerData[6] << 16) | (motorControllerData[5] << 8) |
-      //        motorControllerData[4]);
-      /*
-              printf("Fault Code 1: %lld\r\n", (long long int)getRmsFaultCode()
-         1); printf("Fault Code 2: %lld\r\n", (long long int)getRmsFaultCode()
-         2);
-      */
+    case (0xab):  // Fault Codes
       break;
-    case (0xac):
-      //        setRmsCommandedTorque((motorControllerData[0] |
-      //        (motorControllerData[1] << 8))); // > 200 ?
-      //        getRmsCommandedTorque() : val;
-      //        setRmsCommandedTorque(getRmsCommandedTorque() / 10);
-      //        setRmsActualTorque((motorControllerData[2] |
-      //        (motorControllerData[3] << 8))); // / 10;
-      //        setRmsActualTorque(getRmsActualTorque() / 10);
-      /*
-              printf("Commanded Torque: %d\r\n", getRmsCommandedTorque());
-              printf("Actual Torque: %d\r\n", getRmsActualTorque());
-      */
+    case (0xac):  // Torque & Timer Information
       break;
-    case (0xad):
+    case (0xad):  // Modulation Index & Flux Weaking Output Information
       break;
-    case (0xae):
+    case (0xae):  // Firmware Information
       break;
-    case (0xaf):
+    case (0xaf):  // Diagnostic Data
       break;
     default:
       return 1;
@@ -265,7 +169,7 @@ int MotorController::motorControllerReadEeprom(uint16_t addr) {
   return this->can->canSend(MotorController_EEPROM_SEND_ID, payload, 8);
 }
 
-static uint16_t convRmsDataFormat(uint8_t byte1, uint8_t byte2) {
+static uint16_t convMotorControllerDataFormat(uint8_t byte1, uint8_t byte2) {
   return byte1 | (byte2 << 8);
 }
 
@@ -279,8 +183,8 @@ int MotorController::motorControllerCmdResponseParse(
           printf(" %#X", motorControllerData[i]);
       printf("\n");
   */
-  uint16_t paramAddr =
-      convRmsDataFormat(motorControllerData[0], motorControllerData[1]);
+  uint16_t paramAddr = convMotorControllerDataFormat(motorControllerData[0],
+                                                     motorControllerData[1]);
   if (paramAddr == 0) {
     fprintf(stderr, "MotorController did not recognize that message\n");
     return -1;
@@ -294,7 +198,8 @@ int MotorController::motorControllerCmdResponseParse(
     return 0;
   }
 
-  return convRmsDataFormat(motorControllerData[4], motorControllerData[5]);
+  return convMotorControllerDataFormat(motorControllerData[4],
+                                       motorControllerData[5]);
 }
 int MotorController::motorControllerSendHbMsg(uint16_t torque) {
   uint8_t payload[] = {TORQUE_SCALE_LWR(torque),

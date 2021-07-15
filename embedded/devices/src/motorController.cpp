@@ -122,7 +122,7 @@ int MotorController::motorControllerInvEnNoTorque() {
 
 /* 5 */
 int MotorController::motorControllerInvForward20() {
-  uint8_t payload[] = {TORQUE_SCALE_LWR(1), 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0};
+  uint8_t payload[] = {TORQUE_SCALE_LWR(20), 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0};
   sem_wait(&this->can->canSem);
   int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);

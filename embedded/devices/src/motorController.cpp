@@ -131,7 +131,7 @@ int MotorController::motorControllerInvForward20() {
 
 /* 6 not even going to bother setting these high ones because I am too scared */
 int MotorController::motorControllerInvForward30() {
-  uint8_t payload[] = {TORQUE_SCALE_LWR(1), 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0};
+  uint8_t payload[] = {TORQUE_SCALE_LWR(30), 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0};
   sem_wait(&this->can->canSem);
   int ret = this->can->canSend(COMMAND_MESSAGE_ID, payload, 8);
   sem_post(&this->can->canSem);

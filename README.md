@@ -28,9 +28,15 @@ If your code fails a pre-commit check, you may need to re-run `git add` to add t
 
 To manually run the linter run `./bloop-dev lint`
 
+## Repository Structure
+Our driver and device source code is located in [embedded](embedded).
+
+[Drivers](embedded/drivers) contains code that manages communication like i2c and CAN.
+
+[Devices](embedded/devices) contains device specific code to manage devices like the motor controller and IO expanders.
 
 ## Contributing
-TODO...
+Check out our [CONTRIBUTING](CONTRIBUTING.md) document to see how you can start getting involved!
 
 ## Testing
 TODO...

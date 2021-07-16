@@ -2,13 +2,11 @@
 
 #include <iostream>  // for operator<<, basic_ostream::operator<<
 
-#include "can.h"              // for CAN
-#include "mcp23017.h"         // for Mcp23017, MCP_NUM_PINS, morty_directions
-#include "motorController.h"  // for MotorController
+#include "can.h"       // for CAN
+#include "mcp23017.h"  // for Mcp23017, MCP_NUM_PINS, morty_directions
 
 int main() {
   CAN c;
-  MotorController motorController(&c);
   Mcp23017 rick = Mcp23017(2, 0x20);
   Mcp23017 morty = Mcp23017(2, 0x21);
 

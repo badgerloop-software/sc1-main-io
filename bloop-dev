@@ -123,7 +123,5 @@ elif [ "$1" == "lint" ]; then
     $PRE_COMMIT run -a
 
 elif [ "$1" == "autocode" ]; then
-    echo "HERE"
     $PYTHON $ROOT_DIR/autocoding/autocode.py
-
 fi

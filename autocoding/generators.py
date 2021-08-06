@@ -47,8 +47,8 @@ import util
 #                 if "[" in field.attrib["type"]:
 #                     fieldType = fieldType.split("[")[0]
 #                     isArray = True
-#                  headers += fieldType + " get" + util.capitalize(struct.attrib["id"]) + util.capitalize(field.attrib["id"]) + "();\n"
-#                  headers += "void set" + util.capitalize(struct.attrib["id"]) + util.capitalize(field.attrib["id"]) + "(" + fieldType + " val);\n\n"
+#                 headers += fieldType + " get" + util.capitalize(struct.attrib["id"]) + util.capitalize(field.attrib["id"]) + "();\n"
+#                 headers += "void set" + util.capitalize(struct.attrib["id"]) + util.capitalize(field.attrib["id"]) + "(" + fieldType + " val);\n\n"
 
 #                 headers += (
 #                     fieldType

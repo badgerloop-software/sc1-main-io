@@ -13,14 +13,14 @@ This will
 - Install build dependecies
 - Setup pre-commit
 
-## Build Instructions
-TODO...
+## Setup Instructions
+Run `./bloop-dev setup` to set up the build environment
 
 ### Local Build Instructions
-TODO...
+Run `./bloop-dev build` to build the application using the local toolchain
 
 ### Cross Compilation
-TODO...
+Run `./bloop-dev cross` to build the application for executtion on the Beaglebone Black
 
 ### Pre-Commit and Linting
 

@@ -9,7 +9,7 @@ PYTHON=$PYBIN/python
 
 
 if [ $# -eq 0 ]; then
-    echo "Usage $0 {clean, build}"
+    echo "Usage $0 {clean, build, cross, setup, lint, autocode}"
     exit 1
 fi
 

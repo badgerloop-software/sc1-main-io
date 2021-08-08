@@ -41,3 +41,6 @@ __pycache__/
 
 # VSCode
 .vscode/
+
+# Auto generated code
+embedded/data/include/data.h

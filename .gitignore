@@ -41,3 +41,7 @@ build/
 
 # Python
 .env
+__pycache__/
+
+# VSCode
+.vscode/

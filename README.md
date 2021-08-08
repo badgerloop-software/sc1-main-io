@@ -1,4 +1,6 @@
 # Badgerloop Firmware Repository
+*Authors: Eric Udlis, Ben Everson, Marco Kurzynski*
+
 The staging ground for a complete pod-embedded refactor (not rewrite!)
 
 ## Setup
@@ -40,4 +42,3 @@ Check out our [CONTRIBUTING](CONTRIBUTING.md) document to see how you can start 
 
 ## Testing
 TODO...
-

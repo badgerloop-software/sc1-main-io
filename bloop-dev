@@ -1,8 +1,11 @@
 #!/bin/bash
 
-PYTHON_ENV=$(pwd)/.env
+
+ROOT_DIR=$(dirname $0)
+PYTHON_ENV=$ROOT_DIR/.env
 PYBIN=$PYTHON_ENV/bin
 PRE_COMMIT=$PYBIN/pre-commit
+PYTHON=$PYBIN/python
 
 
 if [ $# -eq 0 ]; then
@@ -21,7 +24,7 @@ if [ "$1" == "build" ]; then
         echo "Awwwww geeeeez rick, CMake failed"
         exit 1
     fi
-    
+
     make
 
     if [ $? -ne 0 ]; then
@@ -30,21 +33,21 @@ if [ "$1" == "build" ]; then
     fi
     cat <<'EOF'
         ___
-    . -^   `--,      
-   /# =========`-_   
-  /# (--====___====\ 
- /#   .- --.  . --.| 
+    . -^   `--,
+   /# =========`-_
+  /# (--====___====\
+ /#   .- --.  . --.|
 /##   |  * ) (   * ),
 |##   \    /\ \   / |
 |###   ---   \ ---  |
 |####      ___)    #|
 |######           ##|
- \##### ---------- / 
-  \####           (  
-   `\###          |  
-     \###         |  
-      \##        |   
-       \###.    .)   
+ \##### ---------- /
+  \####           (
+   `\###          |
+     \###         |
+      \##        |
+       \###.    .)
         `======/
 EOF
 
@@ -68,7 +71,7 @@ elif [ "$1" == "cross" ]; then
         echo "Awwwww geeeeez rick, CMake failed"
         exit 1
     fi
-    
+
     make
 
     if [ $? -ne 0 ]; then
@@ -77,21 +80,21 @@ elif [ "$1" == "cross" ]; then
     fi
     cat <<'EOF'
         ___
-    . -^   `--,      
-   /# =========`-_   
-  /# (--====___====\ 
- /#   .- --.  . --.| 
+    . -^   `--,
+   /# =========`-_
+  /# (--====___====\
+ /#   .- --.  . --.|
 /##   |  * ) (   * ),
 |##   \    /\ \   / |
 |###   ---   \ ---  |
 |####      ___)    #|
 |######           ##|
- \##### ---------- / 
-  \####           (  
-   `\###          |  
-     \###         |  
-      \##        |   
-       \###.    .)   
+ \##### ---------- /
+  \####           (
+   `\###          |
+     \###         |
+      \##        |
+       \###.    .)
         `======/
 EOF
 
@@ -118,4 +121,7 @@ elif [ "$1" == "setup" ]; then
 
 elif [ "$1" == "lint" ]; then
     $PRE_COMMIT run -a
+
+elif [ "$1" == "autocode" ]; then
+    $PYTHON $ROOT_DIR/autocoding/autocode.py
 fi

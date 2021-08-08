@@ -1,0 +1,2 @@
+# Don't show auto-generated files in diffs
+embedded/data/include/data.h linguist-generated

@@ -5,3 +5,13 @@ repos:
     -   id: clang-format         # formatter for C/C++ code based on a style guide
         args: ["-style=Google"]
     -   id: cppcheck             # static analyzer for C/C++ code
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+-   repo: https://github.com/psf/black
+    rev: 19.3b0
+    hooks:
+    -   id: black

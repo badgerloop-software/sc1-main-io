@@ -30,4 +30,3 @@ int write_data(uint8_t, uint8_t val); // Write data to a register
 int read_data(uint8_t *buff, int size); //Read data from a device
 uint8_t read_from_reg(uint8_t reg); // Read data from a specific register
 ```
-

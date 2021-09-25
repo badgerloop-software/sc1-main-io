@@ -16,10 +16,10 @@ For this repository, we want to try to write object oriented code as much as pos
 We also like to make sure our code is well documented, not only in the sources themselves, but in the repository as well. Take a look at our [devices](embedded/devices) folder for an example of our in-repo README documentation.
 ## How do I contribute?
 ### You found a bug
-Open an issue! Describe it well, and, if you think you can fix it, keep on reading!
+Open an issue in Jira! Describe it well, and, if you think you can fix it, keep on reading!
 ### You want to write some code, but don't know where to start
-Take a look at the issues tab and feel free to work on any unassigned issues. Let someone know so we can get it assigned to you!
+Take a look at Jira and feel free to work on any unassigned issues. Let someone know so we can get it assigned to you!
 
 Feel free to reach out on Teams if you are looking for something to do as well.
 ### You've wrote some code
-Push your remote branch and open a pull request! Again, make sure you describe it well! When you feel like things are in a good state assign it to someone for review. If you aren't sure who to assign it to, again, please reach out on Teams!
+Push your remote branch and open a pull request! Ensure you follow branch and commit naming conventions listed [here](https://support.atlassian.com/jira-software-cloud/docs/reference-issues-in-your-development-work/). Again, make sure you describe it well! When you feel like things are in a good state assign it to someone for review. If you aren't sure who to assign it to, again, please reach out on Teams!

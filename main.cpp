@@ -4,6 +4,7 @@
 
 #include "i2c.h"
 #include "mcp23017.h"
+#include "StateMachine.h"
 
 int main() {
     bool hitEStop = false;

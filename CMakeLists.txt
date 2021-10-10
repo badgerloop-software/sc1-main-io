@@ -15,6 +15,7 @@ execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/bloop-dev autocode)
 
 add_subdirectory(embedded/devices)
 add_subdirectory(embedded/drivers)
+add_subdirectory(embedded/FSM)
 
 IF(TEST)
     ADD_DEFINITIONS(-DTEST)
@@ -24,7 +25,7 @@ ELSE()
 ENDIF()
 
 set(libraries devices
-    drivers)
+    drivers FSM)
 
 add_executable(badgerloop ${dependecies})
 target_link_libraries(badgerloop PRIVATE ${libraries})

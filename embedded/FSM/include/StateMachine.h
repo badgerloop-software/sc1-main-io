@@ -8,16 +8,17 @@ class Transition {
   State nextState;
 
  public:
-  Transition(State nextState, int *func());
+  Transition(State nextState, State *transitionEval());
   State trigger();
 };
 
 class State {
  private:
+  int numTransitions = 0;
   State getNextState();
 
  public:
-  int addTransition();
+  int addTransition(Transition newTransition);
   Transition transitions[MAX_TRANSITIONS];
 };
 
@@ -25,7 +26,7 @@ class StateMachine {
  public:
   StateMachine(State startState);
   State currentState;
-  State goToNextState();
+  void goToNextState();
 };
 
 #endif

@@ -2,9 +2,9 @@
 
 // Transition methods
 
-Transition::Transition(State nextState, State *transitionEval()) {
+Transition::Transition(State nextState, State *triggerFunc()) {
     this->nextState = nextState;
-    this->trigger = transitionEval;
+    this->trigger = triggerFunc;
 }
 
 // State methods
@@ -22,7 +22,7 @@ State State::getNextState() {
     return this; // Return the current State if no transitions returned a next State
 }
 
-int State::addTransition(Transition newTransition) {
+void State::addTransition(Transition newTransition) {
     this->transitions[this->numTransitions] = newTransition;
     this->numTransitions++;
 }

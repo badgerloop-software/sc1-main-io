@@ -8,7 +8,7 @@ class Transition {
   State nextState;
 
  public:
-  Transition(State nextState, State *transitionEval());
+  Transition(State nextState, State *triggerFunc());
   State trigger();
 };
 
@@ -18,7 +18,7 @@ class State {
   State getNextState();
 
  public:
-  int addTransition(Transition newTransition);
+  void addTransition(Transition newTransition);
   Transition transitions[MAX_TRANSITIONS];
 };
 

@@ -2,37 +2,38 @@
 
 // Transition methods
 
-Transition::Transition(State nextState, State *triggerFunc()) {
-    this->nextState = nextState;
-    this->trigger = triggerFunc;
+Transition::Transition(State* (*triggerFunc)(void)) {
+  this->trigger = triggerFunc;
 }
 
 // State methods
 
-State State::getNextState() {
-    State stepState;
+State* State::getNextState() {
+  State* stepState;
 
-    for(int i = 0; i < sizeof(this->transitions); i++) {
-        stepState = this->transitions[i]->trigger();
-        if(stepState != NULL) {
-            return stepState;
-        }
+  for (int i = 0; i < sizeof(this->transitions); i++) {
+    Transition* transition = this->transitions[i];
+    stepState = transition->trigger();
+    if (stepState != 0) {
+      return stepState;
     }
+  }
 
-    return this; // Return the current State if no transitions returned a next State
+  return this;  // Return the current State if no transitions returned a next
+                // State
 }
 
-void State::addTransition(Transition newTransition) {
-    this->transitions[this->numTransitions] = newTransition;
-    this->numTransitions++;
+void State::addTransition(Transition* newTransition) {
+  this->transitions[this->numTransitions] = newTransition;
+  this->numTransitions++;
 }
 
 // StateMachine methods
 
-StateMachine::StateMachine(State startState) {
-    this->currentState = startState;
+StateMachine::StateMachine(State* startState) {
+  this->currentState = startState;
 }
 
 void StateMachine::goToNextState() {
-    this->currentState = this->currentState->getNextState();
+  this->currentState = this->currentState->getNextState();
 }

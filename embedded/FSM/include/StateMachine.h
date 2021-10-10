@@ -3,29 +3,28 @@
 
 #define MAX_TRANSITIONS 100
 
-class Transition {
- private:
-  State nextState;
+class State;
 
+class Transition {
  public:
-  Transition(State nextState, State *triggerFunc());
-  State trigger();
+  Transition(State* (*triggerFunc)(void));
+  State* (*trigger)(void);
 };
 
 class State {
  private:
   int numTransitions = 0;
-  State getNextState();
 
  public:
-  void addTransition(Transition newTransition);
-  Transition transitions[MAX_TRANSITIONS];
+  State* getNextState();
+  void addTransition(Transition* newTransition);
+  Transition* transitions[MAX_TRANSITIONS];
 };
 
 class StateMachine {
  public:
-  StateMachine(State startState);
-  State currentState;
+  StateMachine(State* startState);
+  State* currentState;
   void goToNextState();
 };
 

@@ -83,7 +83,7 @@ uint8_t I2c::read_from_reg(uint8_t reg) {
 
   rc = this->write_byte(reg);
   if (rc) return 0xFF;
-
+  usleep(1000);
   rc = this->read_data(buff, 1);
   if (rc < 0) return 0xFF;
   return buff[0];

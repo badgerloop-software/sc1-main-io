@@ -27,8 +27,10 @@ class Mcp23017 : private I2c {
 
  public:
   Mcp23017(int bus, int addr);
-  int begin(const uint8_t directions[]);
+  int begin();
   uint8_t get_state(int pin);
   int set_state(int pin, uint8_t val);
+  int test_read_from_reg(uint8_t reg);
+  int test_write_data(uint8_t reg, uint8_t val);
 };
 #endif

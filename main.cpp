@@ -5,43 +5,23 @@
 #include "i2c.h"
 #include "mcp23017.h"
 
-int main() {
-  Mcp23017 rick = Mcp23017(2, 0x20);
-  Mcp23017 morty = Mcp23017(2, 0x21);
-
-  rick.begin(rick_directions);
-  morty.begin(morty_directions);
-
-  std::cout << "Rick\n";
-  for (int i = 0; i < MCP_NUM_PINS; i++) {
-    rick.set_state(i, 1);
-    usleep(1000);
-    std::cout << "Pin " << +i << " val " << (int)rick.get_state(i) << std::endl;
+int main(int argc, char *argv[]) {
+  Mcp23017 mcps[2] = {Mcp23017(2, 0x24), Mcp23017(2, 0x25)};
+  if (argc<2) {
+      fprintf(stderr, "Pass value to write\n");
+      exit(1);
   }
 
-  sleep(2);
 
-  for (int i = 0; i < MCP_NUM_PINS; i++) {
-    rick.set_state(i, 0);
-    usleep(1000);
-    std::cout << "Pin " << +i << " val " << (int)rick.get_state(i) << std::endl;
-  }
-
-  std::cout << "Morty\n";
-  for (int i = 0; i < MCP_NUM_PINS; i++) {
-    morty.set_state(i, 1);
-    usleep(1000);
-    std::cout << "Pin " << +i << " val " << (int)morty.get_state(i)
-              << std::endl;
-  }
-
-  sleep(2);
-
-  for (int i = 0; i < MCP_NUM_PINS; i++) {
-    morty.set_state(i, 0);
-    usleep(1000);
-    std::cout << "Pin " << +i << " val " << (int)morty.get_state(i)
-              << std::endl;
+  int val = atoi(argv[1]);
+  for (int i = 0; i<2; i++) {
+    Mcp23017 device = mcps[i];
+    device.begin();
+    std::cout << "write...\n";
+    device.test_write_data(0x00, val);
+    sleep(1);
+    std::cout << "hopefully " << val << "...\n" <<
+        device.test_read_from_reg(0x00) << std::endl;
   }
 
   return 0;

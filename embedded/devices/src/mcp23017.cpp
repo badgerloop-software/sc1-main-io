@@ -8,6 +8,13 @@
 
 Mcp23017::Mcp23017(int bus, int addr) : I2c(bus, addr, O_RDWR) {}
 
+int Mcp23017::test_write_data(uint8_t reg, uint8_t val) {
+  return this->write_data(reg, val);
+}
+int Mcp23017::test_read_from_reg(uint8_t reg) {
+  return this->read_from_reg(reg);
+}
+
 int Mcp23017::clear_settings() {
   /* Reset dir regs */
   if (this->write_data(MCP_DIRA_REG, 0xFF) ||
@@ -22,7 +29,7 @@ int Mcp23017::clear_settings() {
   return 0;
 }
 
-int Mcp23017::begin(const uint8_t directions[]) {
+int Mcp23017::begin() {
   int rc;
 
   if (!this->is_open()) {
@@ -30,21 +37,21 @@ int Mcp23017::begin(const uint8_t directions[]) {
     if (rc) return rc;
   }
 
-  rc = this->clear_settings();
-  if (rc) {
-    std::cerr << "Error clearing settings\n";
-    return rc;
-  }
-
-  for (int i = 0; i < MCP_NUM_PINS; i++) this->set_dir(i, directions[i]);
-
-  for (int i = 0; i < MCP_NUM_PINS; i++) {
-    if (this->get_dir(i) != directions[i]) {
-      std::cerr << "Error setting direction of pin " << i << "\n";
-      return -EIO;
-    }
-  }
-  return 0;
+//  rc = this->clear_settings();
+//  if (rc) {
+//    std::cerr << "Error clearing settings\n";
+//    return rc;
+//  }
+//
+//  for (int i = 0; i < MCP_NUM_PINS; i++) this->set_dir(i, directions[i]);
+//
+//  for (int i = 0; i < MCP_NUM_PINS; i++) {
+//    if (this->get_dir(i) != directions[i]) {
+//      std::cerr << "Error setting direction of pin " << i << "\n";
+//      return -EIO;
+//    }
+//  }
+//  return 0;
 }
 
 uint8_t Mcp23017::get_dir(int pin) {

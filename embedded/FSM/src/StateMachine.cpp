@@ -1,5 +1,7 @@
 #include "StateMachine.h"
 
+#include <stdio.h>
+
 // Transition methods
 
 Transition::Transition(State* (*triggerFunc)(void)) {
@@ -11,7 +13,7 @@ Transition::Transition(State* (*triggerFunc)(void)) {
 State* State::getNextState() {
   State* stepState;
 
-  for (int i = 0; i < sizeof(this->transitions); i++) {
+  for (int i = 0; i < this->numTransitions; i++) {
     Transition* transition = this->transitions[i];
     stepState = transition->trigger();
     if (stepState != 0) {

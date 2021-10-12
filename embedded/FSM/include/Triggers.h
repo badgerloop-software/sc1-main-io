@@ -10,5 +10,9 @@ State* eStopTrigger();
 State* state1To3Trigger();
 State* state1To2Trigger();
 State* state1To1Trigger();
+State* state2To3Trigger();
+State* state2To1Trigger();
+State* state3To2Trigger();
+State* state3To3Trigger();
 
 #endif

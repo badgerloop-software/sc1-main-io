@@ -18,7 +18,7 @@ add_subdirectory(embedded/drivers)
 
 IF(TEST)
     ADD_DEFINITIONS(-DTEST)
-    set(dependecies main.cpp)
+    set(dependecies tests.cpp)
 ELSE()
      set(dependecies main.cpp)
 ENDIF()

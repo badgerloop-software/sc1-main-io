@@ -6,7 +6,7 @@
 // Test functions go here
 int func() {
   // initialize the device
-  Mcp23017 dev = Mcp23017(2, 0x00)
+  Mcp23017 dev = Mcp23017(2, 0x24)
       // begin the device dev.begin(array of 16 bits)
       if (dev.begin(arr)) return 1;
   // write one output to bank a, and one to bank b

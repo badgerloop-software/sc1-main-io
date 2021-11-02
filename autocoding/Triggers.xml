@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extern id = "hitEStop" type = "bool"></extern>
-<extern id = "devInput1" type = "int"></extern>
-<extern id = "devInput2" type = "int"></extern>
-<trigger currState = "1", nextState = "3">
-    <conditon val1 = "devInput1", val2 = "devInput2", operator = "<"/>
-</trigger>
-<trigger currState = "1", nextState = "2">
-    <conditon val1 = "devInput1", val2 = "devInput2", operator = "="/>
-</trigger>
-<trigger currState = "1", nextState = "1">
-    <conditon val1 = "devInput1", val2 = "devInput2", operator = ">"/>
-</trigger>
-<trigger currState = "2", nextState = "3">
-    <conditon val1 = "devInput1", val2 = "devInput2", operator = "<"/>
-</trigger>
-<trigger currState = "2", nextState = "1">
-    <conditon val1 = "devInput1", val2 = "devInput2", operator = ">="/>
-</trigger>
-<trigger currState = "3", nextState = "2">
-    <conditon val1 = "devInput1", val2 = "devInput2", operator = "=="/>
-</trigger>
-<trigger currState = "3", nextState = "3">
-    <conditon val1 = "devInput1", val2 = "devInput2", operator = "!="/>
-</trigger>
+<node>
+    <extern id = "hitEStop" type = "bool"></extern>
+    <extern id = "devInput1" type = "int"></extern>
+    <extern id = "devInput2" type = "int"></extern>
+    <trigger currState = "1" nextState = "3">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = "&lt;" />
+    </trigger>
+    <trigger currState = "1" nextState = "2">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = "=" />
+    </trigger>
+    <trigger currState = "1" nextState = "1">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = ">" />
+    </trigger>
+    <trigger currState = "2" nextState = "3">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = "&lt;" />
+    </trigger>
+    <trigger currState = "2" nextState = "1">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = ">=" />
+    </trigger>
+    <trigger currState = "3" nextState = "2">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = "==" />
+    </trigger>
+    <trigger currState = "3" nextState = "3">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = "!=" />
+    </trigger>
+</node>

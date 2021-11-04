@@ -26,7 +26,7 @@ ENDIF()
 set(libraries devices
     drivers)
 
-add_executable(badgerloop main.cpp ${dependecies})
+add_executable(badgerloop ${dependecies})
 target_link_libraries(badgerloop PRIVATE ${libraries})
 
 if( MATCHES "Linux")

@@ -1,7 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<struct id="data" init="initData" comment="Top of the great hierarchy of our descending data tree.">
+<!--<struct id="data" init="initData" comment="Top of the great hierarchy of our descending data tree.">
 <field id="sampleInt" type="int"/>
 	<struct pointer="true" id="sampleSubsytem" init="initSample" comment="Sample pointer to a subsystem remove this">
 		<field id="sampleSubSensor" type="double"/>
 	</struct>
-</struct>
+</struct>-->
+<node>
+    <extern id = "hitEStop" type = "bool" initVal = "false" ></extern>
+    <extern id = "devInput1" type = "int" initVal = "0" ></extern>
+    <extern id = "devInput2" type = "int" initVal = "0" ></extern>
+    <trigger currState = "1" nextState = "3">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = "&lt;" />
+    </trigger>
+    <trigger currState = "1" nextState = "2">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = "=" />
+    </trigger>
+    <trigger currState = "1" nextState = "1">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = ">" />
+    </trigger>
+    <trigger currState = "2" nextState = "3">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = "&lt;" />
+    </trigger>
+    <trigger currState = "2" nextState = "1">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = ">=" />
+    </trigger>
+    <trigger currState = "3" nextState = "2">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = "==" />
+    </trigger>
+    <trigger currState = "3" nextState = "3">
+        <conditon val1 = "devInput1" val2 = "devInput2" operator = "!=" />
+    </trigger>
+</node>

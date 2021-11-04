@@ -90,17 +90,51 @@ def generateDataHeader(data):
     return out + "\n" + headers + "\n\n\n"
 
 
-def generateTriggersHeader(Triggers):
+def generateTriggersHeader(data):
     out = ""
-    for extern in Triggers.iter("extern"):
-        out += "extern " + extern.attrib["type"] + " " + extern.attrib["id"] + ";\n"
+    for field in data.iter("extern"):
+        out += "extern " + field.attrib["type"] + " " + field.attrib["id"] + ";\n"
     out += "State* eStopTrigger();\n"
-    for trigger in Triggers.iter("trigger"):
+    for field in data.iter("trigger"):
+        out += (
+            "State* state"
+            + field.attrib["currState"]
+            + "To"
+            + field.attrib["nextState"]
+            + "Trigger();\n"
+        )
+    return out
+
+
+def generateTriggers(data):
+    out = ""
+    for extern in data.iter("extern"):
+        out += (
+            extern.attrib["type"]
+            + " "
+            + extern.attrib["id"]
+            + " = "
+            + extern.attrib["initVal"]
+            + ";\n"
+        )
+    out += "State* eStopTrigger() { return hitEStop ? &eStop : 0; }"
+    for trigger in data.iter("trigger"):
         out += (
             "State* state"
             + trigger.attrib["currState"]
             + "To"
             + trigger.attrib["nextState"]
-            + "Trigger();\n"
+            + "Trigger() "
         )
+        for cond in trigger:
+            out += (
+                "{ return ("
+                + cond.attrib["val1"]
+                + " "
+                + cond.attrib["operator"]
+                + cond.attrib["val2"]
+                + ") ? &state"
+                + trigger.attrib["nextState"]
+                + " : 0; }\n"
+            )
     return out

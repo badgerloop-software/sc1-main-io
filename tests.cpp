@@ -28,6 +28,7 @@ int main() {
   serial.writeString("mcp23017");
 
   // Test calls go here
+  int func();
 
   serial.closeDevice();
   return 0;

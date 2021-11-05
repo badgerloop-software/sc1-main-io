@@ -6,12 +6,17 @@
 // Test functions go here
 int func() {
   // initialize the device
-  Mcp23017 dev = Mcp23017(2, 0x24)
-      // begin the device dev.begin(array of 16 bits)
-      if (dev.begin(arr)) return 1;
+  Mcp23017 dev = Mcp23017(2, 0x24);
+  // begin the device dev.begin(array of 16 bits)
+  dev.begin(rick_directions);
+  if (dev.begin(rick_directions)) return 1;
   // write one output to bank a, and one to bank b
+  dev.set_state(3, 00001000);
+  dev.set_state(11, 00101010);
 
   // read from pin that was written to
+  dev.get_state(3);
+  dev.get_state(11);
 
   return 0;
 }

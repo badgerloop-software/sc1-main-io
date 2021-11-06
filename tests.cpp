@@ -1,7 +1,6 @@
 #include <stdio.h>
 
 #include <iostream>
-using namespace std;
 
 #include "mcp23017.h"
 #include "serial.h"
@@ -12,15 +11,21 @@ int mcp23017_test() {
                                          0, 1, 0, 0, 0, 1, 1, 1};
   // initialize the device
   Mcp23017 dev = Mcp23017(2, 0x24);
+
   // begin the device dev.begin(array of 16 bits)
   if (dev.begin(test_array)) return 1;
-  // write one output to bank a, and one to bank b
-  // and read from pin that was written to
-  dev.set_state(3, 0);
-  if (dev.get_state(3) != 1) return 1;
 
-  dev.set_state(11, 0);
+  // set two outputs on bank a, and two on bank b
+  // and read from pin each time it is written
+  dev.set_state(3, 1);
+  if (dev.get_state(3) != 1) return 1;
+  dev.set_state(2, 0);
+  if (dev.get_state(2) != 0) return 1;
+
+  dev.set_state(11, 1);
   if (dev.get_state(11) != 1) return 1;
+  dev.set_state(9, 0);
+  if (dev.get_state(9) != 0) return 1;
 
   return 0;
 }

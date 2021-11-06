@@ -1,8 +1,7 @@
 #ifndef __mcp__h__
 #define __mcp__h__
-#include <stdint.h>
-
 #include "i2c.h"
+#include "stdint.h"
 
 #define MCP_DIRA_REG 0x00
 #define MCP_DIRB_REG 0x01
@@ -19,6 +18,7 @@ static const uint8_t rick_directions[16] = {0, 0, 0, 0, 0, 0, 0, 0,
 
 static const uint8_t morty_directions[16] = {0, 0, 0, 0, 0, 0, 0, 0,
                                              0, 0, 0, 0, 0, 0, 0, 0};
+
 class Mcp23017 : private I2c {
  private:
   int clear_settings();

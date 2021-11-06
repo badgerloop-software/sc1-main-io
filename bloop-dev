@@ -18,7 +18,11 @@ fi
 if [ "$1" == "build" ]; then
     $0 clean
     mkdir build && cd build
-    cmake ..
+    if [ "$2" == "test" ]; then
+        cmake -DTEST=ON -Wno-dev ..
+    else
+        cmake ..
+    fi
 
     if [ $? -ne 0 ]; then
         echo "Awwwww geeeeez rick, CMake failed"
@@ -65,7 +69,11 @@ elif [ "$1" == "cross" ]; then
 
 	rm /tmp/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
     fi
-    cmake -DCMAKE_TOOLCHAIN_FILE=./toolchains/beaglebone.cmake ..
+    if [ "$2" == "test" ]; then
+        cmake -DCMAKE_TOOLCHAIN_FILE=./toolchains/beaglebone.cmake -DTEST=ON -Wno-dev ..
+    else
+        cmake -DCMAKE_TOOLCHAIN_FILE=./toolchains/beaglebone.cmake ..
+    fi
 
     if [ $? -ne 0 ]; then
         echo "Awwwww geeeeez rick, CMake failed"

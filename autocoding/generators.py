@@ -92,10 +92,10 @@ def generateDataHeader(data):
 
 def generateTriggersHeader(data):
     out = ""
-    for field in data.iter("extern"):
+    for field in data.iter("extern"):  # look through node to declare externs
         out += "extern " + field.attrib["type"] + " " + field.attrib["id"] + ";\n"
     out += "State* eStopTrigger();\n"
-    for field in data.iter("trigger"):
+    for field in data.iter("trigger"):  # look through node for triggers
         out += (
             "State* state"
             + field.attrib["currState"]
@@ -108,7 +108,9 @@ def generateTriggersHeader(data):
 
 def generateTriggers(data):
     out = ""
-    for extern in data.iter("extern"):
+    for extern in data.iter(
+        "extern"
+    ):  # look through node for externs to declare and initialize
         out += (
             extern.attrib["type"]
             + " "
@@ -117,8 +119,9 @@ def generateTriggers(data):
             + extern.attrib["initVal"]
             + ";\n"
         )
-    out += "State* eStopTrigger() { return hitEStop ? &eStop : 0; }"
-    for trigger in data.iter("trigger"):
+    out += "State* eStopTrigger() { return hitEStop ? &eStop : 0; }\n"
+    for trigger in data.iter("trigger"):  # look through node for triggers
+
         out += (
             "State* state"
             + trigger.attrib["currState"]
@@ -126,15 +129,30 @@ def generateTriggers(data):
             + trigger.attrib["nextState"]
             + "Trigger() "
         )
-        for cond in trigger:
-            out += (
-                "{ return ("
-                + cond.attrib["val1"]
-                + " "
-                + cond.attrib["operator"]
-                + cond.attrib["val2"]
-                + ") ? &state"
-                + trigger.attrib["nextState"]
-                + " : 0; }\n"
-            )
+        condCount = 0
+        allConditions = ""
+        for (
+            cond
+        ) in trigger:  # look thorugh triggers for conditons; & all the conditions
+            if cond.tag == "condition":
+                if condCount > 0:
+                    allConditions += "&&"
+                allConditions += (
+                    "("
+                    + cond.attrib["val1"]
+                    + " "
+                    + cond.attrib["operator"]
+                    + " "
+                    + cond.attrib["val2"]
+                    + ")"
+                )
+                condCount += 1
+        out += (
+            "{ return "
+            + allConditions
+            + " ? &state"
+            + trigger.attrib["nextState"]
+            + " : 0; }\n"
+        )
+
     return out

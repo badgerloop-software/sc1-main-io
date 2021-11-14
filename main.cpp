@@ -12,5 +12,6 @@ int main() {
   char buff[1];
 
   serial.writeString("Hello world");
+
   return 0;
 }

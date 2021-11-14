@@ -65,14 +65,12 @@ int Mcp23017::set_dir(int pin, uint8_t dir) {
   uint8_t current_status;
   uint8_t dirReg;
   int rc;
-
   if (pin >= MCP_NUM_PINS) return -EINVAL;
 
   dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
   pin = GET_REL_PIN(pin);
 
   current_status = this->read_from_reg(dirReg);
-
   if (dir)
     rc = this->write_data(dirReg, current_status | (1 << pin));
   else

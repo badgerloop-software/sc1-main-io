@@ -53,6 +53,9 @@ int I2c::write_byte(uint8_t reg) {
     std::cerr << "I2C write byte error\n";
     return -EIO;
   }
+#ifdef TEST
+  usleep(500000);
+#endif
 
   return 0;
 }
@@ -66,6 +69,9 @@ int I2c::write_data(uint8_t reg, uint8_t val) {
     std::cerr << "I2C write data error\n";
     return -EIO;
   }
+#ifdef TEST
+  usleep(500000);
+#endif
   return 0;
 }
 
@@ -74,6 +80,9 @@ int I2c::read_data(uint8_t *buff, int size) {
     std::cerr << "I2C read data error\n";
     return -EIO;
   }
+#ifdef TEST
+  usleep(500000);
+#endif
   return 0;
 }
 
@@ -83,9 +92,6 @@ uint8_t I2c::read_from_reg(uint8_t reg) {
 
   rc = this->write_byte(reg);
   if (rc) return 0xFF;
-#ifdef TEST
-  usleep(1000);
-#endif
   rc = this->read_data(buff, 1);
   if (rc < 0) return 0xFF;
   return buff[0];

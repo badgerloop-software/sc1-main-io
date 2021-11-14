@@ -54,7 +54,6 @@ int I2c::write_byte(uint8_t reg) {
     return -EIO;
   }
 #ifdef TEST
-  printf("sleep\n");
   usleep(500000);
 #endif
 
@@ -71,7 +70,6 @@ int I2c::write_data(uint8_t reg, uint8_t val) {
     return -EIO;
   }
 #ifdef TEST
-  printf("sleep\n");
   usleep(500000);
 #endif
   return 0;
@@ -83,7 +81,6 @@ int I2c::read_data(uint8_t *buff, int size) {
     return -EIO;
   }
 #ifdef TEST
-  printf("sleep\n");
   usleep(500000);
 #endif
   return 0;

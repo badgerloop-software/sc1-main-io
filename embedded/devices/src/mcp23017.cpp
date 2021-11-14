@@ -65,22 +65,17 @@ int Mcp23017::set_dir(int pin, uint8_t dir) {
   uint8_t current_status;
   uint8_t dirReg;
   int rc;
-  printf("Setting pin %d to %d", pin, dir);
   if (pin >= MCP_NUM_PINS) return -EINVAL;
 
   dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
   pin = GET_REL_PIN(pin);
 
   current_status = this->read_from_reg(dirReg);
-  printf("current status = 0x%2x\n", current_status);
-  if (dir) {
-    printf("Writing 0x%2x\n", current_status | (1 << pin));
+  if (dir)
     rc = this->write_data(dirReg, current_status | (1 << pin));
-
-  } else {
-    printf("Writing 0x%2x\n", current_status & ~(1 << pin));
+  else
     rc = this->write_data(dirReg, current_status & ~(1 << pin));
-  }
+
   return rc;
 }
 

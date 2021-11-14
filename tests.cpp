@@ -37,7 +37,7 @@ int main() {
   serial.writeString("mcp23017");
 
   // Test calls go here
-  if (!mcp23017_test()) {
+  if (mcp23017_test()) {
     std::cout << "MCP23017 test failed/n";
     return 1;
   }

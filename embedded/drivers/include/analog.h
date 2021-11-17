@@ -6,6 +6,7 @@ class Analog {
  private:
   int fd;
   uint16_t scale;
+  int pin;
 
  public:
   Analog(int pin, int scale);

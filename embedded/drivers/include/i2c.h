@@ -1,5 +1,6 @@
 #ifndef __i2c_h__
 #define __i2c_h__
+#include <fcntl.h>
 #include <stdint.h>
 class I2c {
  private:

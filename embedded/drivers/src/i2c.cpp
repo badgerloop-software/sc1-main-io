@@ -96,3 +96,14 @@ uint8_t I2c::read_from_reg(uint8_t reg) {
   if (rc < 0) return 0xFF;
   return buff[0];
 }
+
+int I2c::read_bytes_from_reg(uint8_t reg, uint8_t *buff, int nBytes) {
+  int rc;
+  int i;
+
+  rc = this->write_byte(reg);
+  if (rc) return rc;
+  rc = this->read_data(buff, nBytes);
+  if (rc) return rc;
+  return 0;
+}

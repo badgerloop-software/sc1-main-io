@@ -4,9 +4,12 @@
 
 #include <iostream>
 
+#define INA_NUM_CHANNELS 0x3
+#define INA_DEVID 0x5449
+
 /* Register address offsets */
 #define INA_CONFIG_REG 0x0
-#define INA_NUM_CHANNELS 0x3
+#define INA_DEVID_REG 0xFE
 
 /* Register Bit offsets */
 #define INA_CONFIG_RST 1 << 15
@@ -26,24 +29,31 @@ Ina3221::Ina3221(int bus, int addr, float shunt1, float shunt2, float shunt3)
 
 int Ina3221::begin() {
   int rc;
+  uint16_t devid;
 
   rc = this->open_i2c();
-  if (!rc) return rc;
+  if (rc) return rc;
+
+  // Read device register
+  rc = read_bytes_from_reg(INA_DEVID_REG, (uint8_t *)&devid, 2);
+  if (rc) return rc;
+
+  if (devid != INA_DEVID) {
+    std::cout << "Did not read correct device ID\n";
+    return -EIO;
+  }
 
   // Initiate POR
   rc = write_data(INA_CONFIG_REG, INA_CONFIG_RST);
-  if (!rc) return rc;
 
-  // Wait for POR to finish
-  while (read_from_reg(INA_CONFIG_REG) & INA_CONFIG_RST) {
-  };
-  return 0;
+  return rc;
 }
 
 float Ina3221::readVoltage(int channel) {
   uint16_t voltage_from_reg;
   int reg;
   float voltage;
+  int rc;
 
   if (channel < 1 || channel > INA_NUM_CHANNELS) {
     std::cout << "Channel out of range\n";
@@ -51,7 +61,8 @@ float Ina3221::readVoltage(int channel) {
   }
 
   reg = channel * 2;
-  voltage_from_reg = read_from_reg(reg);
+  rc = read_bytes_from_reg(reg, (uint8_t *)&voltage_from_reg, 2);
+  if (rc) return rc;
 
   // Get actual value from register
   voltage = (float)((voltage_from_reg >> 3) & INA_VOLTAGE_MASK);
@@ -66,6 +77,7 @@ float Ina3221::readCurrent(int channel) {
   uint16_t voltage_from_reg;
   int reg;
   float voltage;
+  int rc;
 
   if (channel < 1 || channel > INA_NUM_CHANNELS) {
     std::cout << "Channel out of range\n";
@@ -73,7 +85,8 @@ float Ina3221::readCurrent(int channel) {
   }
 
   reg = (channel * 2) - 1;
-  voltage_from_reg = read_from_reg(reg);
+  rc = read_bytes_from_reg(reg, (uint8_t *)&voltage_from_reg, 2);
+  if (rc) return rc;
 
   // Get actual value from register
   voltage = (float)((voltage_from_reg >> 3) & INA_VOLTAGE_MASK);

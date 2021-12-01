@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <fstream>
 #include <iostream>
 
 #define NUM_ANALOG_PINS 7
@@ -14,12 +15,12 @@ Analog::Analog(int pin, int scale) {
   this->pin = pin;
 }
 
-Analog::~Analog() {}
+Analog::~Analog() { close(this->fd); }
 
 bool Analog::begin() {
   char filePath[49];
 
-  if (this->pin < 0 && this->pin >= NUM_ANALOG_PINS) {
+  if (this->pin < 0 || this->pin >= NUM_ANALOG_PINS) {
     std::cout << "Pin number not in range\n";
     return false;
   }
@@ -32,6 +33,12 @@ bool Analog::begin() {
   return true;
 }
 
-bool Analog::isOpen() { return true; }
+bool Analog::isOpen() { return this->fd > 0; }
 
-float Analog::read() { return 0; }
+float Analog::readPin() {
+  uint16_t val;
+
+  read(this->fd, &val, 2);
+
+  return (1.8 / (float)4096) * (float)val;
+}

@@ -13,7 +13,7 @@ class Analog {
   ~Analog();
   bool begin();
   bool isOpen();
-  float read();
+  float readPin();
 };
 
 #endif

@@ -1,6 +1,6 @@
 project(DriversLib VERSION 0.1 LANGUAGES CXX)
 
-add_library(drivers src/i2c.cpp src/serial.cpp src/analog.cpp src/gpio.cpp)
+add_library(drivers src/i2c.cpp src/serial.cpp src/analog.cpp src/gpio.cpp src/can.cpp)
 
 target_include_directories(drivers PUBLIC include)
 

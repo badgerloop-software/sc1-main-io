@@ -1,6 +1,6 @@
 #include "bms.h"
-
-int bmsClearFaults(void)  // send CAN info
+Bms::Bms(Can canBus) { this->canBus = canBus; }
+int Bms::bmsClearFaults(void)  // send CAN info
 {
   uint16_t can_id = 0x7e3;
   uint8_t TxData[8];          // TODO: find out why this is diff
@@ -15,17 +15,17 @@ int bmsClearFaults(void)  // send CAN info
   TxData[6] = 0x00;
   TxData[7] = 0x00;
 
-  canSend(can_id, TxData, length);
+  this->canBus.canSend(can_id, TxData, length);
 
   return 0;
 }
 
-int bmsParseMsg()  // read CAN bus
+int Bms::bmsParseMsg()  // read CAN bus
 {
   struct can_frame frame;
-  canRead(*frame);  // read CAN bus to get id
+  this->canBus.canRead(&frame);  // read CAN bus to get id
   uint32_t id = frame.can_id;
-  uint8_t* msg = *frame;
+  uint8_t* msg = (frame.data);
 
   switch (id) {
     case 0x6B0:
@@ -39,12 +39,10 @@ int bmsParseMsg()  // read CAN bus
     case 0x6B1:
       setBmsPackDCL(msg[1] | msg[0] << 8);
       setBmsHighTemp(msg[4]);
-      /*			setBmsCellMinVoltage((msg[7] | (msg[6] << 8)) /
-       * 10000.0;)*/
+
       break;
     case 0x653:
-      /*			printf("ID: 0x%3lx\r\n", (long unsigned int)
-       * id);*/
+
       setBmsRelayStatus(msg[1] | msg[0] << 8);
       setBmsRelayStatus(msg[0]);
       setBmsInputVoltage((msg[2] | (msg[3] << 8)) / 10);
@@ -53,23 +51,10 @@ int bmsParseMsg()  // read CAN bus
 
       setBmsPackCCL(msg[0] | (msg[1] << 8));
       setBmsPackDCL(msg[2] | (msg[3] << 8));
-      /*			setBmsCellMaxVoltage(msg[4] | (msg[5] << 8));*/
-      /*			setBmsCellMaxVoltage(getBmsCellMaxVoltage() /
-       * 10000);*/
-      /*			setBmsCellMinVoltage(msg[6] | (msg[7] << 8));*/
-      /*			setBmsCellMinVoltage(getBmsCellMinVoltage() /
-       * 10000);*/
+
       break;
     case 0x651:
-      /*			setBmsCellMaxVoltage(msg[2] | (msg[3] << 8));*/
-      /*			setBmsCellMinVoltage(msg[0] | (msg[1] << 8));*/
-      /*			setBmsCellAvgVoltage(msg[5] | (msg[4] << 8));*/
-      /*			setBmsCellAvgVoltage(getBmsCellAvgVoltage() /
-       * 1000);*/
-      /*          setBmsCellMaxVoltage(getBmsCellMaxVoltage() / 1000);*/
-      /*          setBmsCellMinVoltage(getBmsCellMinVoltage() / 1000);*/
-      /*			setBmsCellMaxVoltage /= 1000;*/
-      /*			setBmsCellMinVoltage /= 1000;*/
+
       setBmsMaxCells(msg[6]);
       setBmsNumCells(msg[7]);
       break;
@@ -89,7 +74,7 @@ int bmsParseMsg()  // read CAN bus
       break;
     case 0x6b2:
       setBmsCellMinVoltage(((msg[0] << 8) | msg[1]) / 10000.0);
-      /*            setBmsCellMaxVoltage(((msg[2] << 8) | msg[3]) / 10000)*/
+
       setBmsAvgTemp(msg[2]);
       setBmsImdStatus(msg[3]);
       break;
@@ -97,7 +82,7 @@ int bmsParseMsg()  // read CAN bus
       break;
     case 0x36:
       if (msg[0] >= 0 && msg[0] < 72)
-        cells[msg[0]] = (msg[2] | (msg[1] << 8)) / 10000.0;
+        this->cells[msg[0]] = (msg[2] | (msg[1] << 8)) / 10000.0;
       break;
 
     default:

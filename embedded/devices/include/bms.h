@@ -2,9 +2,12 @@
 #include <pthread.h>
 
 #include "can.h"
+#define NUM_CELLS 72
 
 class Bms {
  private:
+  Can canBus;
+  float cells[NUM_CELLS];
   pthread_mutex_t bmsMutex;
   float packCurrent;
   float packVoltage;
@@ -29,7 +32,7 @@ class Bms {
   uint8_t numCells;
 
  public:
-  Bms();
+  Bms(Can canBus);
   int bmsClearFaults(void);  // write function
   int bmsParseMsg();         // read function
 

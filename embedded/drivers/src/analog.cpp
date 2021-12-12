@@ -36,9 +36,15 @@ bool Analog::begin() {
 bool Analog::isOpen() { return this->fd > 0; }
 
 float Analog::readPin() {
-  uint16_t val;
+  char raw[4];
+  float val;
 
-  read(this->fd, &val, 2);
+  // need to read this as a char array for some reason
+  read(this->fd, &raw[0], 4);
+  val = atof(raw);
 
-  return (1.8 / (float)4096) * (float)val;
+  // reset the file pointer to start from the beginning on next read
+  lseek(this->fd, 0, SEEK_SET);
+
+  return (1.8 / 4096.0) * val;
 }

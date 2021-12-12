@@ -6,6 +6,16 @@
 
 mppt::mppt(Can canBus) { this->canBus = canBus; }
 
+int mppt::sendMode(uint8_t mode) {
+  return this->canBus.canSend(ID + 8, &mode, 1);
+}
+int mppt::sendMaxOutputVoltage(float maxOutputVoltage) {
+  return this->canBus.canSend(ID + 10, (uint8_t*)&maxOutputVoltage, 4);
+}
+int mppt::sendMaxInputCurrent(float maxInputCurrent) {
+  return this->canBus.canSend(ID + 11, (uint8_t*)maxInputCurrent, 4);
+}
+
 int mppt::mpptParseMsg() {
   struct can_frame frame;
   this->canBus.canRead(&frame);

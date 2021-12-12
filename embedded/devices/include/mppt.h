@@ -30,6 +30,10 @@ class mppt {
   mppt(Can canBus);
   int mpptParseMsg();
 
+  int sendMode(uint8_t mode);
+  int sendMaxOutputVoltage(float maxOutputVoltage);
+  int sendMaxInputCurrent(float maxInputCurrent);
+
   float getInputVoltage();
   void setInputVoltage(float val);
 

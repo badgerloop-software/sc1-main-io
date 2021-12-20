@@ -3,11 +3,11 @@
 
 #include "can.h"
 
-class mppt {
+class Mppt {
  private:
   Can canBus;
 
-  pthread_mutex_t mpptMutex;
+  pthread_mutex_t MpptMutex;
   float inputVoltage;
   float inputCurrent;
   float outputVoltage;
@@ -27,8 +27,8 @@ class mppt {
   float powerConnectorTemp;
 
  public:
-  mppt(Can canBus);
-  int mpptParseMsg();
+  Mppt(Can canBus);
+  int MpptParseMsg();
 
   int sendMode(uint8_t mode);
   int sendMaxOutputVoltage(float maxOutputVoltage);

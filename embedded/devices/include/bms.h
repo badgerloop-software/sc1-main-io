@@ -2,7 +2,7 @@
 #include <pthread.h>
 
 #include "can.h"
-#define NUM_CELLS 72
+#define NUM_CELLS 30
 
 class Bms {
  private:

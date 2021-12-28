@@ -34,16 +34,22 @@ TODO...
 
 ## MPPT
 MPPT = Maximum Power Point Tracking
+
 MPPT optimizes voltage conversion between solar array and battery to minimize power loss.
+
 [Definition](https://www.solar-electric.com/learning-center/mppt-solar-charge-controllers.html/)
+
 [Datasheet](https://www.prohelion.com/wp-content/uploads/2021/02/Elmar_Solar_MPPT_Race_2021.pdf)
 
 ### Setup
 create a new MPPT by creating a new object. This creates a Can object that accesses the CAN Bus.
 ### Usage
 Functions:
+
 getters (tell you what the value currently is)
+
 setters (change the values)
+
 send functions (send values to the device through the CAN Bus)
 
 ```c++

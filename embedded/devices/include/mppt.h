@@ -3,7 +3,9 @@
 
 #include "can.h"
 
-class Mppt {
+class Mppt {  // Mppt = Maximum Power Point Tracking. MPPT optimizes voltage
+              // conversion between solar array and battery to minimize power
+              // loss.
  private:
   Can canBus;
 

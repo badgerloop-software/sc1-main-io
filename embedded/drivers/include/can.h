@@ -2,11 +2,13 @@
 #define __CAN_H__
 
 #include <linux/can.h>
+#include <pthread.h>
 #include <stdint.h>
 
 class Can {
  private:
   int sock;
+  pthread_mutex_t canMutex;
 
  public:
   Can();

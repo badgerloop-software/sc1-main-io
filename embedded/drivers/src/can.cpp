@@ -38,7 +38,9 @@ Reads from CAN bus
 Returns number of bytes read
 */
 int Can::canRead(struct can_frame *msg) {
+  pthread_mutex_lock(&this->canMutex);
   int size = recv(this->sock, msg, sizeof(struct can_frame), MSG_DONTWAIT);
+  pthread_mutex_unlock(&this->canMutex);
 
   return size;
 }
@@ -58,7 +60,9 @@ int Can::canSend(uint16_t id, uint8_t *data, int size) {
     msg.data[i] = data[i];
   }
 
+  pthread_mutex_lock(&this->canMutex);
   send(this->sock, &msg, sizeof(struct can_frame), MSG_DONTWAIT);
+  pthread_mutex_unlock(&this->canMutex);
 
   return 0;
 }

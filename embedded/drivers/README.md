@@ -64,3 +64,33 @@ float readPin();
 ### The scale factor
 
 Since the BBB adc has a 1.8 volt maximum threshold, the voltage output from devices that exceed this range will need to be divided down by some factor. The `scale` variable represents this factor.
+## CAN
+
+### Initializing a New CAN device
+
+Call the `init` function to open communication on the `can0` interface.
+
+Note: This is the only interface available through this class, as we are only utilizing this interface for this project.
+
+```c++
+Can canBus1;
+canBus1->init();
+```
+
+### Sending CAN messages
+
+To send a CAN message, use the `Can::canSend` function.
+This function takes the message's ID, the message's data, and the size of the data as parameters.
+
+```c++
+int canSend(uint16_t id, uint8_t *data, int size);
+```
+
+### Receiving CAN messages
+
+Too receive a CAN message, use the `Can::canRead` function.
+This function takes a pointer to a pre-allocated can frame and fills it with the received message.
+
+```c++
+int canRead(struct can_frame *msg);
+```

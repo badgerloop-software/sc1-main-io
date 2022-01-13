@@ -14,6 +14,10 @@ int Can::init() {
   struct ifreq ifr;
   struct sockaddr_can addr;
 
+  if (this->isInit) {
+    return 0;
+  }
+
   this->sock = socket(PF_CAN, SOCK_RAW, CAN_RAW);
   strcpy(ifr.ifr_name, CAN_INTERFACE);
 
@@ -29,6 +33,8 @@ int Can::init() {
     std::cout << "ERROR: Error binding address to socket\n";
     return -EIO;
   }
+
+  this->isInit = true;
 
   return 0;
 }

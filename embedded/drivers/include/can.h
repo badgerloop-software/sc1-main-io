@@ -8,6 +8,7 @@
 class Can {
  private:
   int sock;
+  bool isInit = false;
   pthread_mutex_t canMutex;
 
  public:

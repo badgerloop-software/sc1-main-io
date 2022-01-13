@@ -2,15 +2,15 @@
 #define __ANALOG_H__
 #include <stdint.h>
 
-class Analog {
+class AnalogPin {
  private:
   int fd;
-  float scale;
+  float scale_factor;
   int pin;
 
  public:
-  Analog(int pin, float scale);
-  ~Analog();
+  AnalogPin(int pin, float scale_factor);
+  ~AnalogPin();
   bool begin();
   bool isOpen();
   float readPin();

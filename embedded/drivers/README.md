@@ -31,23 +31,31 @@ int read_data(uint8_t *buff, int size); //Read data from a device
 uint8_t read_from_reg(uint8_t reg); // Read data from a specific register
 ```
 
-## Analog class
+## AnalogPin class
 
 This class represents a single analog pin on the Beaglebone Black.
 
 ### Getting started
 
-To create a new analog pin object, call the constructor `Analog::Analog`. This constructor takes the pin's number as well as a scale factor to multiply the measured voltage by.
+To create a new analog pin object, call the constructor `AnalogPin::AnalogPin`. This constructor takes the pin's number as well as a scale factor to multiply the measured voltage by.
 
 ```c++
-Analog::Analog(int pin, float scale)
+AnalogPin::AnalogPin(int pin, float scale)
 ```
 
 Then, call the `Analog::begin` function to initialize the resources required to read from the analog pin.
 
+Example:
+```c++
+AnalogPin potentiometerIn = AnalogPin(7, 1.0);
+if (!potentiometerIn.begin()) {
+    printf("Potentiometer in pin failed to begin!\n\r");
+}
+```
+
 ### Reading a pin
 
-To read from an analog pin, call the `Analog::readPin` function. This will read the raw value from the BBB ADC and convert it into a voltage. This voltage is then multiplied by the devices scale factor.
+To read from an analog pin, call the `AnalogPin::readPin` function. This will read the raw value from the BBB ADC and convert it into a voltage. This voltage is then multiplied by the devices scale factor.
 
 ```c++
 float readPin();

@@ -9,21 +9,29 @@
 
 #define NUM_ANALOG_PINS 7
 #define PIN_FILE_PATH "/sys/bus/iio/devices/iio:device0/in_voltage%d_raw"
+#define BBB_ADC_RANGE 1.8
+#define BBB_ADC_RESOLUTION 4096.0
 
-Analog::Analog(int pin, float scale) {
-  this->scale = scale;
+AnalogPin::AnalogPin(int pin, float scale_factor) {
+  this->scale_factor = scale_factor;
   this->pin = pin;
 }
 
-Analog::~Analog() { close(this->fd); }
+AnalogPin::~AnalogPin() { close(this->fd); }
 
-bool Analog::begin() {
+bool AnalogPin::begin() {
   char filePath[49];
 
   if (this->pin < 0 || this->pin >= NUM_ANALOG_PINS) {
     std::cout << "Pin number not in range\n";
     return false;
   }
+
+  if (this->scale_factor <= 0) {
+    std::cout << "Scale Factor must be positive\n";
+    return false;
+  }
+
   sprintf(filePath, PIN_FILE_PATH, this->pin);
   this->fd = open(filePath, O_RDONLY);
   if (!this->isOpen()) {
@@ -33,9 +41,9 @@ bool Analog::begin() {
   return true;
 }
 
-bool Analog::isOpen() { return this->fd > 0; }
+bool AnalogPin::isOpen() { return this->fd > 0; }
 
-float Analog::readPin() {
+float AnalogPin::readPin() {
   char raw[4];
   float val;
 
@@ -46,5 +54,5 @@ float Analog::readPin() {
   // reset the file pointer to start from the beginning on next read
   lseek(this->fd, 0, SEEK_SET);
 
-  return (1.8 / 4096.0) * val * this->scale;
+  return (BBB_ADC_RANGE / BBB_ADC_RESOLUTION) * val * this->scale_factor;
 }

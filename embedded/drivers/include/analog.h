@@ -5,11 +5,11 @@
 class Analog {
  private:
   int fd;
-  uint16_t scale;
+  float scale;
   int pin;
 
  public:
-  Analog(int pin, int scale);
+  Analog(int pin, float scale);
   ~Analog();
   bool begin();
   bool isOpen();

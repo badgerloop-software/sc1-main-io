@@ -10,7 +10,7 @@
 #define NUM_ANALOG_PINS 7
 #define PIN_FILE_PATH "/sys/bus/iio/devices/iio:device0/in_voltage%d_raw"
 
-Analog::Analog(int pin, int scale) {
+Analog::Analog(int pin, float scale) {
   this->scale = scale;
   this->pin = pin;
 }
@@ -46,5 +46,5 @@ float Analog::readPin() {
   // reset the file pointer to start from the beginning on next read
   lseek(this->fd, 0, SEEK_SET);
 
-  return (1.8 / 4096.0) * val;
+  return (1.8 / 4096.0) * val * this->scale;
 }

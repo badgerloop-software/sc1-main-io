@@ -8,9 +8,13 @@
 #include <iostream>
 
 #define NUM_ANALOG_PINS 7
-#define PIN_FILE_PATH "/sys/bus/iio/devices/iio:device0/in_voltage%d_raw"
 #define BBB_ADC_RANGE 1.8
 #define BBB_ADC_RESOLUTION 4096.0
+
+#define PIN_FILE_PATH "/sys/bus/iio/devices/iio:device0/in_voltage%d_raw"
+
+/* Copies the filepath to a given pin into a specified buffer */
+#define PIN_NUMBER_TO_FILEPATH(buff, pin) (sprintf(buff, PIN_FILE_PATH, pin))
 
 AnalogPin::AnalogPin(int pin, float scale_factor) {
   this->scale_factor = scale_factor;
@@ -32,7 +36,7 @@ bool AnalogPin::begin() {
     return false;
   }
 
-  sprintf(filePath, PIN_FILE_PATH, this->pin);
+  PIN_NUMBER_TO_FILEPATH(filePath, this->pin);
   this->fd = open(filePath, O_RDONLY);
   if (!this->isOpen()) {
     std::cout << "Failed to open file\n";
@@ -48,7 +52,7 @@ float AnalogPin::readPin() {
   float val;
 
   // need to read this as a char array for some reason
-  read(this->fd, &raw[0], 4);
+  read(this->fd, raw, 4);
   val = atof(raw);
 
   // reset the file pointer to start from the beginning on next read

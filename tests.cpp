@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "gpio.h"
 #include "mcp23017.h"
 #include "serial.h"
 #include "tca6416.h"
@@ -29,6 +30,57 @@ int mcp23017_test() {
   if (dev.get_state(9) != 0) return 1;
 
   return 0;
+}
+int gpio_test(Serial serial) {
+  int returnCondition = 0;
+  // initialize the pins
+  Gpio inputTest = Gpio(0, 1);  // pin number is currently a dummy number
+  inputTest.begin();
+  Gpio outputTest = Gpio(1, 0);
+  outputTest.begin();
+  char read[50];  // char array to read messages from the Pi
+  // input 1 test
+  if (inputTest.setValue(1) != 0) {  // set the pin on BBB
+    std::cout << "Error setting input pin to 1\n";
+    returnCondition = 1;
+  }
+  serial.writeString("read gpio pin 1");  // tell Pi the pin is set
+  if (serial.readString(read, 50) != 0 ||
+      strcmp(read, "y") != 0) {  // read message from Pi
+    std::cout << "Pi did not read pin set to 1 correctly\n";
+    returnCondition = 1;
+  }
+  // input 0 test
+  if (inputTest.setValue(0) != 0) {
+    std::cout << "Error setting input pin to 0\n";
+    returnCondition = 1;
+  }
+  serial.writeString("read gpio pin 0");
+  if (serial.readString(read, 50) != 0 || strcmp(read, "y") != 0) {
+    std::cout << "Pi did not read pin set to 0 correctly\n";
+    returnCondition = 1;
+  }
+  // output 1 test
+  serial.writeString("set a pin to 1");
+  if (serial.readString(read, 50) != 0 || strcmp(read, "set") != 0) {
+    std::cout << "Pi did not set the pin correctly\n";
+    returnCondition = 1;
+  }
+  if (outputTest.getValue() != 1) {
+    std::cout << "Did not get 1 from output pin\n";
+    returnCondition = 1;
+  }
+  // output 0 test
+  serial.writeString("set a pin to 0");
+  if (serial.readString(read, 50) != 0 || strcmp(read, "set") != 0) {
+    std::cout << "Pi did not set the pin correctly\n";
+    returnCondition = 1;
+  }
+  if (outputTest.getValue() != 0) {
+    std::cout << "Did not get 0 from output pin\n";
+    returnCondition = 1;
+  }
+  return returnCondition;
 }
 
 int tca6416_test() {
@@ -133,12 +185,19 @@ int tca6416_test() {
 int main() {
   Serial serial = Serial();
   if (serial.openDevice(4, 9600) != 1) std::cout << "error\n";
-  std::cout << "Begnning MCP23017 tests\n";
+  std::cout << "Beginning MCP23017 tests\n";
   serial.writeString("mcp23017");
 
   // Test calls go here
   if (mcp23017_test()) {
-    std::cout << "MCP23017 test failed/n";
+    std::cout << "MCP23017 test failed\n";
+    return 1;
+  }
+
+  std::cout << "Beginning GPIO tests\n";
+  serial.writeString("gpio");
+  if (gpio_test(serial)) {
+    std::cout << "GPIO test failed\n";
     return 1;
   }
   std::cout << "MCP23017 tests passed\n";

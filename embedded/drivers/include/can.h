@@ -5,6 +5,33 @@
 #include <pthread.h>
 #include <stdint.h>
 
+template <typename T>
+struct mutexVar {
+ private:
+  pthread_mutex_t mutex;
+  volatile T value = -1;
+
+ public:
+  /* volatile cannot be memcpy'd
+   * so memcpy to a tmp var
+   * then set the volatile
+   */
+  void setValue(T data) {
+    pthread_mutex_lock(&mutex);
+    value = data;
+    pthread_mutex_unlock(&mutex);
+  }
+  /* reading a variable
+   * doesn't require a
+   * mutex lock and unlock
+   *
+   * but the value is private
+   * so it can only be changed
+   * via setValue, utilizing the mutex
+   */
+  T getValue(void) { return value; }
+};
+
 class Can {
  private:
   int sock;

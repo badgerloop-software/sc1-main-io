@@ -20,8 +20,10 @@ Gpio::Gpio(int pinNumber, bool direction) {
   this->direction = direction;
 }
 
-void Gpio::begin() {
-  this->pinNumberSize = 1;  // find the size of the pin number. Either 1 or 2
+// exports the pin (creates pin file) and sets the direction.
+int Gpio::begin() {
+  this->pinNumberSize =
+      1;  // find the size(number of digits) of the pin number.
   if (this->pinNumber > 9) {
     this->pinNumberSize++;
   }
@@ -29,12 +31,12 @@ void Gpio::begin() {
   int fd = open("/sys/class/gpio/export", O_WRONLY);  // set up the pin file
   if (fd == -1) {
     std::cout << "Unable to open /sys/class/gpio/export";
-    return;
+    return -1;
   }
   if (write(fd, std::to_string(this->pinNumber), pinNumberSize) !=
       pinNumberSize) {
     std::cout << "Error writing to /sys/class/gpio/export";
-    return;
+    return -1;
   }
   close(fd);
 
@@ -44,66 +46,78 @@ void Gpio::begin() {
   if (fd == -1) {
     std::cout << "Unable to open /sys/class/gpio/gpio" +
                      std::to_string(this->pinNumber) + "/direction";
-    return;
+    return -1;
   }
   if (direction) {  // input
     char* in = "in";
     if (write(fd, in, 2) != 2) {
       std::cout << "Error writing to /sys/class/gpio/gpio" +
                        std::to_string(this->pinNumber) + "/direction";
-      return;
+      return -1;
     }
   } else {  // output
     char* out = "out";
     if (write(fd, out, 3) != 3) {
       std::cout << "Error writing to /sys/class/gpio/gpio" +
                        std::to_string(this->pinNumber) + "/direction";
-      return;
+      return -1;
     }
   }
   close(fd);
+  return 0;  // no errors encountered
 }
-void Gpio::unexport() {
+
+// close the pin
+int Gpio::unexport() {
   int fd = open("/sys/class/gpio/unexport", O_WRONLY);
   if (fd == -1) {
     std::cout << "Unable to open /sys/class/gpio/unexport";
-    return;
+    return -1;
   }
   if (write(fd, std::to_string(this->pinNumber), pinNumberSize) !=
       pinNumberSize) {
     std::cout << "Error writing to /sys/class/gpio/unexport";
-    return;
+    return -1;
   }
   close(fd);
+  return 0;
 }
 
-void Gpio::setValue(bool value) {  // OUTPUT
-  if (this->direction) {           // don't write value if it's an input
-    return;
+// set the value of an OUTPUT pin
+// return -1 if error or if it's an input pin.
+// return 0 if no errors.
+int Gpio::setValue(bool value) {
+  if (this->direction) {  // don't write value if it's an input
+    return -1;
   }
   int fd = open("/sys/class/gpio/gpio" + std::to_string(pinNumber) + "/value",
                 O_WRONLY);
   if (fd == -1) {
     std::cout << "Unable to open /sys/class/gpio/gpio" +
                      std::to_string(this->pinNumber) + "/value";
-    return;
+    return -1;
   }
   if (value) {
     if (write(fd, "1", 1) != 1) {
       std::cout << "Error writing to /sys/class/gpio/gpio" +
                        std::to_string(this->pinNumber) + "/value";
-      return;
+      return -1;
     }
   } else {
     if (write(fd, "0", 1) != 1) {
       std::cout << "Error writing to /sys/class/gpio/gpio" +
                        std::to_string(this->pinNumber) + "/value";
-      return;
+      return -1;
     }
   }
   close(fd);
+  return 0;
 }
-int Gpio::getValue() {     // returns -1 if pin is output OR if error
+
+// get the value of an INPUT pin
+// return -1 if error or if it's an output pin
+// return 0 or 1 depending on the input pin value.
+int Gpio::getValue() {
   if (!this->direction) {  // don't read value if it's an output
     return -1;
   }
@@ -115,7 +129,7 @@ int Gpio::getValue() {     // returns -1 if pin is output OR if error
     return -1;
   }
   this->value = read(fd, "1", 1);
-  if (this_ > value != 1) {
+  if (this->value != 1) {
     std::cout << "Error reading from /sys/class/gpio/gpio" +
                      std::to_string(this->pinNumber) + "/value";
     return -1;

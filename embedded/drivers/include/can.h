@@ -9,7 +9,7 @@ template <typename T>
 struct mutexVar {
  private:
   pthread_mutex_t mutex;
-  volatile T value = -1;
+  T value = -1;
 
  public:
   /* volatile cannot be memcpy'd
@@ -29,7 +29,13 @@ struct mutexVar {
    * so it can only be changed
    * via setValue, utilizing the mutex
    */
-  T getValue(void) { return value; }
+  T getValue(void) {
+    T data;
+    pthread_mutex_lock(&mutex);
+    data = value;
+    pthread_mutex_unlock(&mutex);
+    return data;
+  }
 };
 
 class Can {

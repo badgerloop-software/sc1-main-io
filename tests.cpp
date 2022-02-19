@@ -112,6 +112,8 @@ int main() {
 
   serial.writeString("tca6416");
   if (tca6416_test()) {
+    std::cout << "TCA6416 test failed/n";
+    return -1;
   }
 
   serial.closeDevice();

@@ -31,7 +31,72 @@ int mcp23017_test() {
   return 0;
 }
 
-int tca6416_test() {}
+int tca6416_test() {
+  static const uint8_t test_array[16] = {0, 1, 0, 0, 1, 0, 1, 1,
+                                         0, 1, 0, 0, 0, 1, 1, 1};
+  // initialize the device
+  Tca6416 dev = Tca6416(2, 0x24);
+
+  // begin the device - dev
+  if (dev.begin(test_array)) return -1;
+
+  // set state and check
+  // get to make sure written properly
+
+  // testing for pin 7 on bank 0
+  if (!dev.set_state(0, 7, 0)) {  // if successfully set then, return would be 0
+    if (dev.get_state(0, 7) != 0) return -1;  // then go to check if get works
+  } else {
+    return -1;
+  }
+  if (!dev.set_state(0, 7, 1)) {  // if successfully set then, return would be 0
+    if (dev.get_state(0, 7) != 1) return -1;  // then go to check if get works
+  } else {
+    return -1;
+  }
+
+  // testing for pin 3 on bank 0
+  if (!dev.set_state(0, 3, 1)) {
+    if (dev.get_state(0, 3) != 1) return -1;
+    return -1;
+  }
+  if (!dev.set_state(0, 3, 0)) {
+    if (dev.get_state(0, 3) != 0) return -1;
+  } else {
+    return -1;
+  }
+
+  // testing for pin 4 on bank 1
+  if (!dev.set_state(1, 4, 1)) {
+    if (dev.get_state(1, 4) != 1) return -1;
+    return -1;
+  }
+  if (!dev.set_state(1, 4, 0)) {
+    if (dev.get_state(1, 4) != 0) return -1;
+  } else {
+    return -1;
+  }
+
+  // testing for pin 6 on bank 1
+  if (!dev.set_state(1, 6, 0)) {
+    if (dev.get_state(1, 6) != 0) return -1;
+    return -1;
+  }
+  if (!dev.set_state(1, 6, 1)) {
+    if (dev.get_state(1, 6) != 1) return -1;
+  } else {
+    return -1;
+  }
+
+  // make sure to check that just default settings are not being applied by
+  // setting then verifying by get and then set again and verify checking for
+  // not being set to default means changing the value twice, 1 to 0 to 1
+
+  // pin 0,7 has val = 1 i.e input
+  // pin 0,3 has val = 0 i.e output
+
+  return 0;
+}
 
 int main() {
   Serial serial = Serial();

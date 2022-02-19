@@ -4,6 +4,7 @@
 
 #include "mcp23017.h"
 #include "serial.h"
+#include "tca6416.h"
 
 // Test functions go here
 int mcp23017_test() {
@@ -30,6 +31,8 @@ int mcp23017_test() {
   return 0;
 }
 
+int tca6416_test() {}
+
 int main() {
   Serial serial = Serial();
   if (serial.openDevice(4, 9600) != 1) std::cout << "error\n";
@@ -40,6 +43,10 @@ int main() {
   if (mcp23017_test()) {
     std::cout << "MCP23017 test failed/n";
     return 1;
+  }
+
+  serial.writeString("tca6416");
+  if (tca6416_test()) {
   }
 
   serial.closeDevice();

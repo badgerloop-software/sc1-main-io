@@ -34,9 +34,9 @@ int mcp23017_test() {
 int gpio_test(Serial serial) {
   int returnCondition = 0;
   // initialize the pins
-  Gpio inputTest = Gpio(0, 1);  // pin number is currently a dummy number
+  Gpio inputTest(0, 1);  // pin number is currently a dummy number
   inputTest.begin();
-  Gpio outputTest = Gpio(1, 0);
+  Gpio outputTest(1, 0);
   outputTest.begin();
   char read[50];  // char array to read messages from the Pi
   // input 1 test

@@ -88,6 +88,34 @@ int tca6416_test() {
     return -1;
   }
 
+  // test for invalid constructor input
+  static const uint8_t invalid_array[16] = {0, 1, -1, 0, 1, 0, 1, 1,
+                                            0, 1, 0,  0, 3, 1, 1, 2};
+
+  Tca6416 inv = Tca6416(2, 0x24);
+
+  if (!inv.begin(invalid_array)) {  // return should be not zero, if it is,
+                                    // return -1 for error
+    return -1;
+  }
+
+  // testing for invalid input to set_state
+  // test for invalid pin number
+  if (!dev.set_state(0, 8, 1)) {
+    return -1;
+  }
+
+  // test for invalid value
+  if (!dev.set_state(0, 2, 3)) {
+    return -1;
+  }
+
+  // test for invalid inputs to get_state
+  // test for invalid pin number
+  if (!dev.get_state(0, 9)) {
+    return -1;
+  }
+
   // make sure to check that just default settings are not being applied by
   // setting then verifying by get and then set again and verify checking for
   // not being set to default means changing the value twice, 1 to 0 to 1

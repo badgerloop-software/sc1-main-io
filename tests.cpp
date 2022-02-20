@@ -7,6 +7,9 @@
 #include "serial.h"
 #include "tca6416.h"
 
+#define OUTPUT_PIN_NUM 0  // dummy pin numbers
+#define INPUT_PIN_NUM 1
+
 // Test functions go here
 int mcp23017_test() {
   static const uint8_t test_array[16] = {0, 1, 0, 0, 1, 0, 1, 1,
@@ -34,9 +37,9 @@ int mcp23017_test() {
 int gpio_test(Serial serial) {
   int returnCondition = 0;
   // initialize the pins
-  Gpio inputTest(0, 1);  // pin number is currently a dummy number
+  Gpio inputTest(INPUT_PIN_NUM, 1);  // pin number is currently a dummy number
   inputTest.begin();
-  Gpio outputTest(1, 0);
+  Gpio outputTest(OUTPUT_PIN_NUM, 0);
   outputTest.begin();
   char read[50];  // char array to read messages from the Pi
   // input 1 test

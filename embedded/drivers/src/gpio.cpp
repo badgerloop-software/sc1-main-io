@@ -10,11 +10,11 @@
 #include <unistd.h>
 
 #include <iostream>
-#define NUM_GPIO_PINS 32  // dummy number right now
+#define NUM_GPIO_PINS 117  // pin numbers are between 27 and 117
 
 Gpio::Gpio(int pinNumber, bool direction) {
-  if (pinNumber < 0 ||
-      pinNumber >= NUM_GPIO_PINS) {  // make sure pin number is valid
+  if (pinNumber < 27 ||
+      pinNumber > NUM_GPIO_PINS) {  // make sure pin number is valid
     return;
   }
   this->pinNumber = pinNumber;
@@ -23,10 +23,10 @@ Gpio::Gpio(int pinNumber, bool direction) {
 
 // exports the pin (creates pin file) and sets the direction.
 int Gpio::begin() {
-  this->pinNumberSize =
-      1;  // find the size(number of digits) of the pin number.
-  if (this->pinNumber > 9) {
-    this->pinNumberSize++;
+  // find the size(number of digits) of the pin number. Either 2 or 3
+  this->pinNumberSize = 2;
+  if (this->pinNumber > 99) {
+    this->pinNumberSize = 3;
   }
 
   int fd = open("/sys/class/gpio/export", O_WRONLY);  // set up the pin file
@@ -85,6 +85,8 @@ int Gpio::unexport() {
   close(fd);
   return 0;
 }
+// destructor. Calls unexport()
+Gpio::~Gpio() { this->unexport(); }
 
 // set the value of an OUTPUT pin
 // return -1 if error or if it's an input pin.

@@ -7,10 +7,28 @@
 #define INA_DEVID 0x5449
 #define INA_GET_VBUS_REG(channel) (channel * 2)
 #define INA_GET_CURR_REG(channel) ((channel * 2) - 1)
+#define INA_GET_WARN_REG(channel) ((channel * 2) + 6)
+#define INA_GET_CRIT_REG(channel) ((channel * 2) + 5)
 
 /* Register address offsets */
 #define INA_CONFIG_REG 0x0
 #define INA_DEVID_REG 0xFE
+#define INA_PV_UPPER_REG 0x10
+#define INA_PV_LOWER_REG 0x11
+
+/* Tresholds */
+
+// These are all currentyl defaults
+#define INA_CH1_CRIT_LIM 0x7ff8
+#define INA_CH2_CRIT_LIM 0x7ff8
+#define INA_CH3_CRIT_LIM 0x7ff8
+
+#define INA_CH1_WARN_LIM 0x7ff8
+#define INA_CH2_WARN_LIM 0x7ff8
+#define INA_CH3_WARN_LIM 0x7ff8
+
+#define INA_PV_LOWER_LIM 0x2328
+#define INA_PV_UPPER_LIM 0x2710
 
 /* Register Bit offsets */
 #define INA_CONFIG_RST 0x8000
@@ -54,7 +72,36 @@ int Ina3221::begin() {
   }
 
   // Initiate POR
-  rc = write_data<uint16_t>(INA_CONFIG_REG, INA_CONFIG_RST);
+  rc = (INA_CONFIG_REG, INA_CONFIG_RST);
+
+  if (rc) return rc;
+
+  // set thresholds
+  uint16_t temp = INA_CH1_CRIT_LIM;
+  rc = this->write_data<uint16_t>(INA_GET_CRIT_REG(1), temp);
+  if (rc) return rc;
+  temp = INA_CH2_CRIT_LIM;
+  rc = this->write_data<uint16_t>(INA_GET_CRIT_REG(2), temp);
+  if (rc) return rc;
+  temp = INA_CH3_CRIT_LIM;
+  rc = this->write_data<uint16_t>(INA_GET_CRIT_REG(3), temp);
+  if (rc) return rc;
+
+  temp = INA_CH1_WARN_LIM;
+  rc = this->write_data<uint16_t>(INA_GET_WARN_REG(1), temp);
+  if (rc) return rc;
+  temp = INA_CH2_WARN_LIM;
+  rc = this->write_data<uint16_t>(INA_GET_WARN_REG(2), temp);
+  if (rc) return rc;
+  temp = INA_CH3_WARN_LIM;
+  rc = this->write_data<uint16_t>(INA_GET_WARN_REG(3), temp);
+  if (rc) return rc;
+
+  temp = INA_PV_LOWER_LIM;
+  rc = this->write_data<uint16_t>(INA_PV_LOWER_REG, temp);
+  if (rc) return rc;
+  temp = INA_PV_UPPER_LIM;
+  rc = this->write_data<uint16_t>(INA_PV_UPPER_REG, temp);
 
   return rc;
 }

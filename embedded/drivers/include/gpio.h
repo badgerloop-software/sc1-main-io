@@ -14,4 +14,5 @@ class Gpio {
   int unexport();
   int setValue(bool value);
   int getValue();
+  ~Gpio();
 };

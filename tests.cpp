@@ -89,8 +89,8 @@ int tca6416_test() {
   }
 
   // test for invalid constructor input
-  static const uint8_t invalid_array[16] = {0, 1, -1, 0, 1, 0, 1, 1,
-                                            0, 1, 0,  0, 3, 1, 1, 2};
+  static const uint8_t invalid_array[16] = {0, 1, 1, 0, 1, 0, 1, 1,
+                                            0, 1, 0, 0, 3, 1, 1, 2};
 
   Tca6416 inv = Tca6416(2, 0x24);
 

@@ -1,28 +1,26 @@
 #include "tca6416.h"
 
+#include <errno.h>
+#include <fcntl.h>
+
+#include <iostream>
+
 Tca6416::Tca6416(int bus, int addr) : I2c(bus, addr, O_RDWR) {}
 
-private:
 int Tca6416::clear_settings() {
   /*Reset the configuration registers*/
-  if (this->write_data(TCA_CFG0_REG, 0x01) ||
-      this->write_data(TCA_CFG1_REG, 0x01))
+  if (this->write_data(TCA_CFG0_REG, 0xFF) ||
+      this->write_data(TCA_CFG1_REG, 0xFF))
     return -1;
 
   /*Reset the output registers*/
-  if (this->write_data(TCA_OUT0_REG, 0x01) ||
-      this->write_data(TCA_OUT1_REG, 0x01))
-    return -1;
-
-  /*Reset the input register*/
-  if (this->write_data(TCA_IN0_REG, 0xFF) ||
-      this->write_data(TCA_IN1_REG, 0xFF))
+  if (this->write_data(TCA_OUT0_REG, 0xFF) ||
+      this->write_data(TCA_OUT1_REG, 0xFF))
     return -1;
 
   return 0;
 }
 
-private:
 int Tca6416::set_dir(bool bank, int pin, uint8_t dir) {
   uint8_t current_status;
   uint8_t dirReg;
@@ -48,7 +46,6 @@ int Tca6416::set_dir(bool bank, int pin, uint8_t dir) {
   return rc;
 }
 
-private:
 uint8_t Tca6416::get_dir(bool bank, int pin) {
   uint8_t current_status;
   uint8_t dirReg;
@@ -71,7 +68,7 @@ uint8_t Tca6416::get_dir(bool bank, int pin) {
 
 int Tca6416::begin(const uint8_t directions[]) {
   int rc;
-  if (!this->isOpen()) {
+  if (!this->is_open()) {
     rc = this->open_i2c();
     if (rc) return rc;
   }
@@ -105,18 +102,24 @@ int Tca6416::begin(const uint8_t directions[]) {
   return 0;
 }
 
-uint8_t TCA6416::get_state(bool bank, int pin) {
+uint8_t Tca6416::get_state(bool bank, int pin) {
   uint8_t current_status;
   uint8_t stateReg;
+  uint8_t dir;
 
-  if (pin >= TCA_NUM_PINS_PER_BANK || pin < 0) return -EIO;
-
-  // set stateReg to the correct register **Ask Ben if TCA_IN are the right
-  // register to use here
+  if (pin >= TCA_NUM_PINS_PER_BANK || pin < 0) return -EINVAL;
+  dir = get_dir(bank, pin);
+  // set stateReg to the correct register
   if (bank) {
-    stateReg = TCA_IN1_REG;
+    if (dir)
+      stateReg = TCA_IN1_REG;
+    else
+      stateReg = TCA_OUT1_REG;
   } else {
-    stateReg = TCA_IN0_REG;
+    if (dir)
+      stateReg = TCA_IN0_REG;
+    else
+      stateReg = TCA_OUT0_REG;
   }
 
   current_status = this->read_from_reg(stateReg);
@@ -124,14 +127,14 @@ uint8_t TCA6416::get_state(bool bank, int pin) {
   return ((current_status >> pin) & 1);
 }
 
-uint8_t TCA6416::set_state(bool bank, int pin, uint8_t val) {
+int Tca6416::set_state(bool bank, int pin, uint8_t val) {
   uint8_t current_status;
   uint8_t current_dir;
   uint8_t stateReg;
   uint8_t dirReg;
   int rc;
 
-  if (pin >= TCA_NUM_PINS_PER_BANK || pin < 0) return -EIO;
+  if (pin >= TCA_NUM_PINS_PER_BANK || pin < 0) return -EINVAL;
 
   // set the correct registers based on bank
   if (bank) {

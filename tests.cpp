@@ -139,8 +139,10 @@ int main() {
   }
 
   serial.writeString("tca6416");
+  usleep(10000);  // delay to allow device to change
+  std::cout << "Beginning TCA tests\n";
   if (tca6416_test()) {
-    std::cout << "TCA6416 test failed/n";
+    std::cout << "TCA6416 test failed\n";
     return -1;
   }
 

@@ -32,8 +32,8 @@ int mcp23017_test() {
 }
 
 int tca6416_test() {
-  static const uint8_t test_array[16] = {0, 1, 0, 0, 1, 0, 1, 1,
-                                         0, 1, 0, 0, 0, 1, 1, 1};
+  static const uint8_t test_array[16] = {0, 1, 0, 0, 1, 0, 1, 0,
+                                         0, 1, 0, 0, 0, 1, 0, 1};
   // initialize the device
   Tca6416 dev = Tca6416(2, 0x24);
 
@@ -58,8 +58,10 @@ int tca6416_test() {
   // testing for pin 3 on bank 0
   if (!dev.set_state(0, 3, 1)) {
     if (dev.get_state(0, 3) != 1) return -1;
+  } else {
     return -1;
   }
+
   if (!dev.set_state(0, 3, 0)) {
     if (dev.get_state(0, 3) != 0) return -1;
   } else {
@@ -69,6 +71,7 @@ int tca6416_test() {
   // testing for pin 4 on bank 1
   if (!dev.set_state(1, 4, 1)) {
     if (dev.get_state(1, 4) != 1) return -1;
+  } else {
     return -1;
   }
   if (!dev.set_state(1, 4, 0)) {
@@ -80,6 +83,7 @@ int tca6416_test() {
   // testing for pin 6 on bank 1
   if (!dev.set_state(1, 6, 0)) {
     if (dev.get_state(1, 6) != 0) return -1;
+  } else {
     return -1;
   }
   if (!dev.set_state(1, 6, 1)) {
@@ -89,8 +93,8 @@ int tca6416_test() {
   }
 
   // test for invalid constructor input
-  static const uint8_t invalid_array[16] = {0, 1, 1, 0, 1, 0, 1, 1,
-                                            0, 1, 0, 0, 3, 1, 1, 2};
+  static const uint8_t invalid_array[16] = {0, 10, 1, 0, 1, 0, 1, 1,
+                                            0, 1,  0, 0, 3, 1, 1, 2};
 
   Tca6416 inv = Tca6416(2, 0x24);
 
@@ -137,6 +141,7 @@ int main() {
     std::cout << "MCP23017 test failed/n";
     return 1;
   }
+  std::cout << "MCP23017 tests passed\n";
 
   serial.writeString("tca6416");
   usleep(10000);  // delay to allow device to change
@@ -145,6 +150,7 @@ int main() {
     std::cout << "TCA6416 test failed\n";
     return -1;
   }
+  std::cout << "TCA6416 tests passed\n";
 
   serial.closeDevice();
   return 0;

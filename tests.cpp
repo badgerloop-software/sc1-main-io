@@ -7,8 +7,8 @@
 #include "serial.h"
 #include "tca6416.h"
 
-#define OUTPUT_PIN_NUM 0  // dummy pin numbers
-#define INPUT_PIN_NUM 1
+#define OUTPUT_PIN_NUM 26  // dummy pin numbers
+#define INPUT_PIN_NUM 44
 
 // Test functions go here
 int mcp23017_test() {

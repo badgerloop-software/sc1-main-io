@@ -29,30 +29,11 @@ int Gpio::begin() {
     this->pinNumberSize = 3;
   }
   // check if the pin has been exported
-  std::string filePathString =
+  std::string dirString =
       "/sys/class/gpio/gpio" + std::to_string(pinNumber) + "/direction";
-  const char* filePath = filePathString.c_str();
-  int check = open(filePath, O_WRONLY);
-  if (check != -1) {
-    std::cout << "Pin has already been exported";
-    close(check);
-  } else {                                              // export the pin
-    int fd = open("/sys/class/gpio/export", O_WRONLY);  // set up the pin file
-    if (fd == -1) {
-      std::cout << "Unable to open /sys/class/gpio/export";
-      return -1;
-    }
-    if (write(fd, std::to_string(this->pinNumber).c_str(),
-              this->pinNumberSize) != this->pinNumberSize) {
-      std::cout << "Error writing to /sys/class/gpio/export";
-      return -1;
-    }
-    close(fd);
-  }
-  std::string filePathString =
-      "/sys/class/gpio/gpio" + std::to_string(this->pinNumber) + "/direction";
-  const char* filePath = filePathString.c_str();
-  int fd = open(filePath, O_WRONLY);  // set up direction
+  const char* dirPath = dirString.c_str();
+
+  int fd = open(dirPath, O_WRONLY);  // set up direction
   if (fd == -1) {
     std::cout << "Unable to open /sys/class/gpio/gpio" +
                      std::to_string(this->pinNumber) + "/direction";
@@ -78,24 +59,6 @@ int Gpio::begin() {
   close(fd);
   return 0;  // no errors encountered
 }
-
-// close the pin
-int Gpio::unexport() {
-  int fd = open("/sys/class/gpio/unexport", O_WRONLY);
-  if (fd == -1) {
-    std::cout << "Unable to open /sys/class/gpio/unexport";
-    return -1;
-  }
-  if (write(fd, std::to_string(this->pinNumber).c_str(), this->pinNumberSize) !=
-      this->pinNumberSize) {
-    std::cout << "Error writing to /sys/class/gpio/unexport";
-    return -1;
-  }
-  close(fd);
-  return 0;
-}
-// destructor. Calls unexport()
-Gpio::~Gpio() { this->unexport(); }
 
 // set the value of an OUTPUT pin
 // return -1 if error or if it's an input pin.

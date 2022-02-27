@@ -10,9 +10,7 @@ class Gpio {
 
  public:
   Gpio(int pinNumber, bool direction);
-  int begin();  // exports pin and sets the direction
-  int unexport();
+  int begin();  // sets the direction
   int setValue(bool value);
   int getValue();
-  ~Gpio();
 };

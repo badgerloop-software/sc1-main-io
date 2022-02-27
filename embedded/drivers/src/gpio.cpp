@@ -10,11 +10,20 @@
 #include <unistd.h>
 
 #include <iostream>
-#define NUM_GPIO_PINS 117  // pin numbers are between 27 and 117
+#define NUM_GPIO_PINS 117  // highest possible pin number
 
 Gpio::Gpio(int pinNumber, bool direction) {
   if (pinNumber < 0 ||
       pinNumber > NUM_GPIO_PINS) {  // make sure pin number is valid
+    return;
+  }
+  // check if there's a pin with the same number already
+  std::string filePathString =
+      "/sys/class/gpio/gpio" + std::to_string(pinNumber) + "/direction";
+  const char* filePath = filePathString.c_str();
+  int fd = open(filePath, O_WRONLY);
+  if (fd != -1) {
+    std::cout << "Pin with this number already exists";
     return;
   }
   this->pinNumber = pinNumber;

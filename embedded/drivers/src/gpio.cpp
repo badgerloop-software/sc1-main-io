@@ -17,15 +17,6 @@ Gpio::Gpio(int pinNumber, bool direction) {
       pinNumber > NUM_GPIO_PINS) {  // make sure pin number is valid
     return;
   }
-  // check if there's a pin with the same number already
-  std::string filePathString =
-      "/sys/class/gpio/gpio" + std::to_string(pinNumber) + "/direction";
-  const char* filePath = filePathString.c_str();
-  int fd = open(filePath, O_WRONLY);
-  if (fd != -1) {
-    std::cout << "Pin with this number already exists";
-    return;
-  }
   this->pinNumber = pinNumber;
   this->direction = direction;
 }
@@ -37,22 +28,31 @@ int Gpio::begin() {
   if (this->pinNumber > 99) {
     this->pinNumberSize = 3;
   }
-
-  int fd = open("/sys/class/gpio/export", O_WRONLY);  // set up the pin file
-  if (fd == -1) {
-    std::cout << "Unable to open /sys/class/gpio/export";
-    return -1;
+  // check if the pin has been exported
+  std::string filePathString =
+      "/sys/class/gpio/gpio" + std::to_string(pinNumber) + "/direction";
+  const char* filePath = filePathString.c_str();
+  int check = open(filePath, O_WRONLY);
+  if (check != -1) {
+    std::cout << "Pin has already been exported";
+    close(check);
+  } else {                                              // export the pin
+    int fd = open("/sys/class/gpio/export", O_WRONLY);  // set up the pin file
+    if (fd == -1) {
+      std::cout << "Unable to open /sys/class/gpio/export";
+      return -1;
+    }
+    if (write(fd, std::to_string(this->pinNumber).c_str(),
+              this->pinNumberSize) != this->pinNumberSize) {
+      std::cout << "Error writing to /sys/class/gpio/export";
+      return -1;
+    }
+    close(fd);
   }
-  if (write(fd, std::to_string(this->pinNumber).c_str(), this->pinNumberSize) !=
-      this->pinNumberSize) {
-    std::cout << "Error writing to /sys/class/gpio/export";
-    return -1;
-  }
-  close(fd);
   std::string filePathString =
       "/sys/class/gpio/gpio" + std::to_string(this->pinNumber) + "/direction";
   const char* filePath = filePathString.c_str();
-  fd = open(filePath, O_WRONLY);  // set up direction
+  int fd = open(filePath, O_WRONLY);  // set up direction
   if (fd == -1) {
     std::cout << "Unable to open /sys/class/gpio/gpio" +
                      std::to_string(this->pinNumber) + "/direction";

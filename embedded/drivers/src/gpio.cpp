@@ -13,7 +13,7 @@
 #define NUM_GPIO_PINS 117  // pin numbers are between 27 and 117
 
 Gpio::Gpio(int pinNumber, bool direction) {
-  if (pinNumber < 27 ||
+  if (pinNumber < 0 ||
       pinNumber > NUM_GPIO_PINS) {  // make sure pin number is valid
     return;
   }

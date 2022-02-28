@@ -113,12 +113,10 @@ int Gpio::getValue() {
                      std::to_string(this->pinNumber) + "/value";
     return -1;
   }
-  std::string oneString = "1";
-  char value;
-  read(fd, &value, 1);
+  char value[1];
+  read(fd, value, 1);
   close(fd);
-  const char* valueCompare = &value;
-  if (strcmp(valueCompare, "1") == 0) {
+  if (strncmp(value, "1", 1) == 0) {
     return 1;
   } else {
     return 0;

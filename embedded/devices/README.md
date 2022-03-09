@@ -31,3 +31,27 @@ int set_state(int pin, uint8_t value) // Sets a specific pin a value (0 or 1)
 ### Corresponding Tests and Examples
 
 TODO...
+
+## MPPT
+MPPT = Maximum Power Point Tracking
+
+The MPPT  device optimizes voltage conversion between the solar array and battery to minimize power loss.
+
+[Definition](https://www.solar-electric.com/learning-center/mppt-solar-charge-controllers.html/)
+
+[Datasheet](https://www.prohelion.com/wp-content/uploads/2021/02/Elmar_Solar_MPPT_Race_2021.pdf)
+
+### Setup
+Create a new MPPT by calling the constructor and passing it a CAN object. This allows the MPPT device to interface with a specific CAN bus.
+
+```c++
+Mppt dev = Mppt(can);
+```
+### Usage
+Functions:
+
+getters (tell you what the value currently is)
+
+setters (change the values)
+
+send functions (send values to the device through the CAN Bus)

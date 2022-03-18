@@ -5,6 +5,8 @@
 
 #include "i2c.h"
 
+#define INA_NUM_CHANNELS 0x3
+
 class Ina3221 : private I2c {
  private:
   float shunts[3];

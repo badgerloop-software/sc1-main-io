@@ -4,7 +4,6 @@
 
 #include <iostream>
 
-#define INA_NUM_CHANNELS 0x3
 #define INA_DEVID 0x5449
 #define INA_GET_VBUS_REG(channel) (channel * 2)
 #define INA_GET_CURR_REG(channel) ((channel * 2) - 1)
@@ -14,7 +13,7 @@
 #define INA_DEVID_REG 0xFE
 
 /* Register Bit offsets */
-#define INA_CONFIG_RST 1 << 15
+#define INA_CONFIG_RST 0x8000
 #define INA_VOLTAGE_MASK 0x0FFF
 #define INA_VOLTAGE_SIGN 0x8000
 
@@ -50,12 +49,12 @@ int Ina3221::begin() {
   if (rc) return rc;
 
   if (devid != INA_DEVID) {
-    std::cout << "Did not read correct device ID\n";
+    std::cout << "Did not read correct device ID, read: " << devid << "\n";
     return -EIO;
   }
 
   // Initiate POR
-  rc = write_data(INA_CONFIG_REG, INA_CONFIG_RST);
+  rc = write_data<uint16_t>(INA_CONFIG_REG, INA_CONFIG_RST);
 
   return rc;
 }

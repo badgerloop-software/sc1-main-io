@@ -60,21 +60,6 @@ int I2c::write_byte(uint8_t reg) {
   return 0;
 }
 
-int I2c::write_data(uint8_t reg, uint8_t val) {
-  uint8_t buff[2];
-  buff[0] = reg;
-  buff[1] = val;
-
-  if (write(this->fd, buff, 2) != 2) {
-    std::cerr << "I2C write data error\n";
-    return -EIO;
-  }
-#ifdef TEST
-  usleep(500000);
-#endif
-  return 0;
-}
-
 int I2c::read_data(uint8_t *buff, int size) {
   if (read(this->fd, buff, size) != size) {
     std::cerr << "I2C read data error\n";

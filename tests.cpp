@@ -3,10 +3,10 @@
 #include <iostream>
 
 #include "gpio.h"
+#include "ina3221.h"
 #include "mcp23017.h"
 #include "serial.h"
 #include "tca6416.h"
-#include "ina3221.h"
 
 #define OUTPUT_PIN_NUM 26  // dummy pin numbers
 #define INPUT_PIN_NUM 44

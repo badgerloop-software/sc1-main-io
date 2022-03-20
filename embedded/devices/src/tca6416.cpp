@@ -9,13 +9,13 @@ Tca6416::Tca6416(int bus, int addr) : I2c(bus, addr, O_RDWR) {}
 
 int Tca6416::clear_settings() {
   /*Reset the configuration registers*/
-  if (this->write_data(TCA_CFG0_REG, 0xFF) ||
-      this->write_data(TCA_CFG1_REG, 0xFF))
+  if (this->write_data<uint8_t>(TCA_CFG0_REG, 0xFF) ||
+      this->write_data<uint8_t>(TCA_CFG1_REG, 0xFF))
     return -1;
 
   /*Reset the output registers*/
-  if (this->write_data(TCA_OUT0_REG, 0xFF) ||
-      this->write_data(TCA_OUT1_REG, 0xFF))
+  if (this->write_data<uint8_t>(TCA_OUT0_REG, 0xFF) ||
+      this->write_data<uint8_t>(TCA_OUT1_REG, 0xFF))
     return -1;
 
   return 0;
@@ -39,9 +39,9 @@ int Tca6416::set_dir(bool bank, int pin, uint8_t dir) {
 
   /*Write the value of dir to the correct pin*/
   if (dir) {
-    rc = this->write_data(dirReg, current_status | (1 << pin));
+    rc = this->write_data<uint8_t>(dirReg, current_status | (1 << pin));
   } else {
-    rc = this->write_data(dirReg, current_status & ~(1 << pin));
+    rc = this->write_data<uint8_t>(dirReg, current_status & ~(1 << pin));
   }
   return rc;
 }
@@ -150,9 +150,9 @@ int Tca6416::set_state(bool bank, int pin, uint8_t val) {
   current_status = this->read_from_reg(stateReg);
 
   if (val)
-    rc = this->write_data(stateReg, current_status | (1 << pin));
+    rc = this->write_data<uint8_t>(stateReg, current_status | (1 << pin));
   else
-    rc = this->write_data(stateReg, current_status & ~(1 << pin));
+    rc = this->write_data<uint8_t>(stateReg, current_status & ~(1 << pin));
 
   return rc;
 }

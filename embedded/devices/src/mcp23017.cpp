@@ -10,13 +10,13 @@ Mcp23017::Mcp23017(int bus, int addr) : I2c(bus, addr, O_RDWR) {}
 
 int Mcp23017::clear_settings() {
   /* Reset dir regs */
-  if (this->write_data(MCP_DIRA_REG, 0xFF) ||
-      this->write_data(MCP_DIRB_REG, 0xFF))
+  if (this->write_data<uint8_t>(MCP_DIRA_REG, 0xFF) ||
+      this->write_data<uint8_t>(MCP_DIRB_REG, 0xFF))
     return -EIO;
 
   /* Reset GPIO regs */
-  if (this->write_data(MCP_GPIOA_REG, 0x00) ||
-      this->write_data(MCP_GPIOB_REG, 0x00))
+  if (this->write_data<uint8_t>(MCP_GPIOA_REG, 0x00) ||
+      this->write_data<uint8_t>(MCP_GPIOB_REG, 0x00))
     return -EIO;
 
   return 0;
@@ -72,9 +72,9 @@ int Mcp23017::set_dir(int pin, uint8_t dir) {
 
   current_status = this->read_from_reg(dirReg);
   if (dir)
-    rc = this->write_data(dirReg, current_status | (1 << pin));
+    rc = this->write_data<uint8_t>(dirReg, current_status | (1 << pin));
   else
-    rc = this->write_data(dirReg, current_status & ~(1 << pin));
+    rc = this->write_data<uint8_t>(dirReg, current_status & ~(1 << pin));
 
   return rc;
 }
@@ -112,9 +112,9 @@ int Mcp23017::set_state(int pin, uint8_t val) {
   current_status = this->read_from_reg(stateReg);
 
   if (val)
-    rc = this->write_data(stateReg, current_status | (1 << pin));
+    rc = this->write_data<uint8_t>(stateReg, current_status | (1 << pin));
   else
-    rc = this->write_data(stateReg, current_status & ~(1 << pin));
+    rc = this->write_data<uint8_t>(stateReg, current_status & ~(1 << pin));
 
   return rc;
 }

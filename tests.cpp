@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "gpio.h"
+#include "ina3221.h"
 #include "mcp23017.h"
 #include "serial.h"
 #include "tca6416.h"
@@ -134,6 +135,21 @@ int tca6416_test() {
   return 0;
 }
 
+int ina3221_test() {
+  Ina3221 dev(2, 0x24, 1e3, 2e3, 3e3);
+  if (dev.begin()) return 1;
+
+  for (int i = 1; i <= INA_NUM_CHANNELS; i++) {
+    float voltage = dev.readVoltage(i);
+    float current = dev.readCurrent(i);
+    if ((voltage < 0) || (current < 0)) return 1;
+    std::cout << "Read Voltage Ch " << i << " : " << voltage << " V\n";
+    std::cout << "Read Current Ch " << i << " : " << current << " A\n";
+  }
+
+  return 0;
+}
+
 int gpio_test(Serial serial) {
   int returnCondition = 0;
   // initialize the pins
@@ -220,6 +236,13 @@ int main() {
   if (gpio_test(serial)) {
     std::cout << "GPIO test failed\n";
     return 1;
+  }
+
+  std::cout << "Begnning INA3221 tests\n";
+  //  serial.writeString("ina3221");
+  if (ina3221_test()) {
+    std::cout << "INA3221 test failed\n";
+    return -1;
   }
 
   std::cout << "GPIO test passed\n";

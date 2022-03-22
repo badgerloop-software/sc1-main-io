@@ -15,6 +15,7 @@ constexpr uint8_t BIT7 = bit(7);
 inline uint8_t d2bcd(uint8_t dec) {
   return ((dec / 10 % 10) << 4) | (dec % 10);
 }
+inline uint8_t bcd2d(uint8_t bcd) { return ((bcd >> 4) * 10 + (bcd & 0xF)); }
 
 /*
  * REAL TIME CLOCK REGISTERS

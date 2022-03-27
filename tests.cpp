@@ -215,7 +215,10 @@ int gpio_test(Serial serial) {
 int main() {
 
   Can canbus;
-  canbus.init();
+  if (canbus.init()) {
+    std::cout << "ERROR init canbus\n";
+    return -EIO;
+  }
   Mppt DUT(&canbus);
   while (true) {
     DUT.sendMaxOutputVoltage(5.5);

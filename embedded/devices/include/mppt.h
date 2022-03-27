@@ -7,7 +7,7 @@ class Mppt {  // Mppt = Maximum Power Point Tracking. MPPT optimizes voltage
               // conversion between solar array and battery to minimize power
               // loss.
  private:
-  Can canBus;
+  Can* canBus;
   pthread_mutex_t MpptMutex;
   mutexVar<float> inputVoltage;
   mutexVar<float> inputCurrent;
@@ -28,7 +28,7 @@ class Mppt {  // Mppt = Maximum Power Point Tracking. MPPT optimizes voltage
   mutexVar<float> powerConnectorTemp;
 
  public:
-  Mppt(Can canBus);
+  Mppt(Can* canBus);
   int MpptParseMsg();
 
   int sendMode(uint8_t mode);

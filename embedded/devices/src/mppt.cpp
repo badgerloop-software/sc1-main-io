@@ -4,22 +4,22 @@
 #include <cstring>
 #include <iostream>
 
-Mppt::Mppt(Can canBus) { this->canBus = canBus; }
+Mppt::Mppt(Can* c) : canBus(c) {}
 
 int Mppt::sendMode(uint8_t mode) {
-  return this->canBus.canSend(MPPT_BASE_ID + 8, &mode, 1);
+  return this->canBus->canSend(MPPT_BASE_ID + 8, &mode, 1);
 }
 int Mppt::sendMaxOutputVoltage(float maxOutputVoltage) {
-  return this->canBus.canSend(MPPT_BASE_ID + 10, (uint8_t*)&maxOutputVoltage,
+  return this->canBus->canSend(MPPT_BASE_ID + 10, (uint8_t*)&maxOutputVoltage,
                               4);
 }
 int Mppt::sendMaxInputCurrent(float maxInputCurrent) {
-  return this->canBus.canSend(MPPT_BASE_ID + 11, (uint8_t*)&maxInputCurrent, 4);
+  return this->canBus->canSend(MPPT_BASE_ID + 11, (uint8_t*)&maxInputCurrent, 4);
 }
 
 int Mppt::MpptParseMsg() {
   struct can_frame frame;
-  this->canBus.canRead(&frame);
+  this->canBus->canRead(&frame);
   uint32_t id = frame.can_id;
   uint8_t* msg = frame.data;
   uint8_t temp;

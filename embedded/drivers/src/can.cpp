@@ -10,6 +10,8 @@
 
 #define CAN_INTERFACE "can0"
 
+Can::Can() {}
+
 int Can::init() {
   struct ifreq ifr;
   struct sockaddr_can addr;

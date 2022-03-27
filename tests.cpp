@@ -7,6 +7,7 @@
 #include "mcp23017.h"
 #include "serial.h"
 #include "tca6416.h"
+#include "mppt.h"
 
 #define OUTPUT_PIN_NUM 26  // dummy pin numbers
 #define INPUT_PIN_NUM 44
@@ -212,41 +213,51 @@ int gpio_test(Serial serial) {
 }
 
 int main() {
-  Serial serial = Serial();
-  if (serial.openDevice(4, 9600) != 1) std::cout << "error\n";
-  std::cout << "Beginning MCP23017 tests\n";
-  serial.writeString("mcp23017\n");
 
-  // Test calls go here
-  if (mcp23017_test()) {
-    std::cout << "MCP23017 test failed\n";
-    return 1;
+  Can canbus;
+  canbus.init();
+  Mppt DUT(&canbus);
+  while (true) {
+    DUT.sendMaxOutputVoltage(5.5);
   }
 
-  serial.writeString("tca6416\n");
-  usleep(10000);  // delay to allow device to change
-  std::cout << "Beginning TCA tests\n";
-  if (tca6416_test()) {
-    std::cout << "TCA6416 test failed\n";
-    return -1;
-  }
-  std::cout << "TCA6416 tests passed\n";
 
-  std::cout << "Beginning GPIO tests\n";
-  if (gpio_test(serial)) {
-    std::cout << "GPIO test failed\n";
-    return 1;
-  }
 
-  std::cout << "Begnning INA3221 tests\n";
-  //  serial.writeString("ina3221");
-  if (ina3221_test()) {
-    std::cout << "INA3221 test failed\n";
-    return -1;
-  }
+  //Serial serial = Serial();
+  //if (serial.openDevice(4, 9600) != 1) std::cout << "error\n";
+  //std::cout << "Beginning MCP23017 tests\n";
+  //serial.writeString("mcp23017\n");
 
-  std::cout << "GPIO test passed\n";
+  //// Test calls go here
+  //if (mcp23017_test()) {
+  //  std::cout << "MCP23017 test failed\n";
+  //  return 1;
+  //}
 
-  serial.closeDevice();
+  //serial.writeString("tca6416\n");
+  //usleep(10000);  // delay to allow device to change
+  //std::cout << "Beginning TCA tests\n";
+  //if (tca6416_test()) {
+  //  std::cout << "TCA6416 test failed\n";
+  //  return -1;
+  //}
+  //std::cout << "TCA6416 tests passed\n";
+
+  //std::cout << "Beginning GPIO tests\n";
+  //if (gpio_test(serial)) {
+  //  std::cout << "GPIO test failed\n";
+  //  return 1;
+  //}
+
+  //std::cout << "Begnning INA3221 tests\n";
+  ////  serial.writeString("ina3221");
+  //if (ina3221_test()) {
+  //  std::cout << "INA3221 test failed\n";
+  //  return -1;
+  //}
+
+  //std::cout << "GPIO test passed\n";
+
+  //serial.closeDevice();
   return 0;
 }

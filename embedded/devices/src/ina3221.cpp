@@ -125,7 +125,7 @@ float Ina3221::readVoltage(int channel) {
   if (rc) return rc;
 
   // Get actual value from register
-  voltage = (int)((voltage_from_reg >> 3) & INA_VOLTAGE_MASK);
+  voltage = (int)((voltage_from_reg)&INA_VOLTAGE_MASK);
 
   // Preserve signedness
   if (voltage_from_reg & INA_VOLTAGE_SIGN) voltage *= -1;
@@ -152,7 +152,7 @@ float Ina3221::readCurrent(int channel) {
   if (rc) return rc;
 
   // Get actual value from register
-  voltage = (int)((voltage_from_reg >> 3) & INA_VOLTAGE_MASK);
+  voltage = (int)((voltage_from_reg)&INA_VOLTAGE_MASK);
 
   // Preserve signedness
   if (voltage_from_reg & INA_VOLTAGE_SIGN) voltage *= -1;

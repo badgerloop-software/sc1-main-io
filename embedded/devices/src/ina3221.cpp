@@ -36,8 +36,8 @@
 #define INA_VOLTAGE_SIGN 0x8000
 
 /* Calculations */
-#define INA_BVOLTAGE_MULT .008
-#define INA_SVOLTAGE_MULT .00004
+#define INA_BVOLTAGE_MULT (.008 / 8)
+#define INA_SVOLTAGE_MULT (.00004 / 8)
 
 /*
 INA3221 constructor

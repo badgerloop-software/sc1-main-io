@@ -51,9 +51,10 @@ int main() {
   test.begin();
   std::cout << "Ina3221" << std::endl;
   for (int i = 0; i < 1000; i++) {
-    std::cout << "channel 1 voltage: " << test.readVoltage(0x1) << std::endl;
-    std::cout << "channel 2 voltage: " << test.readVoltage(0x2) << std::endl;
-    std::cout << "channel 3 voltage: " << test.readVoltage(0x3) << std::endl;
+    // std::cout << "channel 1 voltage: " << test.readVoltage(0x1) << std::endl;
+    // std::cout << "channel 2 voltage: " << test.readVoltage(0x2) << std::endl;
+    // std::cout << "channel 3 voltage: " << test.readVoltage(0x3) << std::endl;
+    std::cout << "channel 3 current: " << test.readCurrent(0x3) << std::endl;
     std::cout << std::endl;
     usleep(1000000);
   }

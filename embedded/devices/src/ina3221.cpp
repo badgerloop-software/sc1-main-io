@@ -36,8 +36,8 @@
 #define INA_VOLTAGE_SIGN 0x8000
 
 /* Calculations */
-#define INA_BVOLTAGE_MULT .008
-#define INA_SVOLTAGE_MULT .00004
+#define INA_BVOLTAGE_MULT (.008 / 8)
+#define INA_SVOLTAGE_MULT (.00004 / 8)
 
 /*
 INA3221 constructor
@@ -110,9 +110,8 @@ int Ina3221::begin() {
 Reads bus voltage for a specified channel. Returns volts.
 */
 float Ina3221::readVoltage(int channel) {
-  uint16_t voltage_from_reg;
+  int16_t voltage_from_reg;
   int reg;
-  float voltage;
   int rc;
 
   if (channel < 1 || channel > INA_NUM_CHANNELS) {
@@ -125,21 +124,18 @@ float Ina3221::readVoltage(int channel) {
   if (rc) return rc;
 
   // Get actual value from register
-  voltage = (float)((voltage_from_reg >> 3) & INA_VOLTAGE_MASK);
+  if (voltage_from_reg & INA_VOLTAGE_SIGN)
+    voltage_from_reg = voltage_from_reg * -1;
 
-  // Preserve signedness
-  if (voltage_from_reg & INA_VOLTAGE_SIGN) voltage *= -1;
-
-  return voltage * INA_BVOLTAGE_MULT;
+  return (float)voltage_from_reg * INA_BVOLTAGE_MULT;
 }
 
 /*
 Reads current for a specific channel. Returns amps.
 */
 float Ina3221::readCurrent(int channel) {
-  uint16_t voltage_from_reg;
+  int16_t voltage_from_reg;
   int reg;
-  float voltage;
   int rc;
 
   if (channel < 1 || channel > INA_NUM_CHANNELS) {
@@ -152,11 +148,10 @@ float Ina3221::readCurrent(int channel) {
   if (rc) return rc;
 
   // Get actual value from register
-  voltage = (float)((voltage_from_reg >> 3) & INA_VOLTAGE_MASK);
-
-  // Preserve signedness
-  if (voltage_from_reg & INA_VOLTAGE_SIGN) voltage *= -1;
+  if (voltage_from_reg & INA_VOLTAGE_SIGN)
+    voltage_from_reg = voltage_from_reg * -1;
 
   // Return voltage divided by shunt resistor
-  return (voltage * INA_SVOLTAGE_MULT) / this->shunts[channel - 1];
+  return ((float)voltage_from_reg * INA_SVOLTAGE_MULT) /
+         this->shunts[channel - 1];
 }

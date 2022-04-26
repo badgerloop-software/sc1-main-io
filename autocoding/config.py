@@ -3,14 +3,13 @@ from pathlib import Path
 
 class Config:
 
-    header_comment: str = (
-        """
+    header_comment: str = """
         /*
          * This is an auto-generated file which is automatically generated whenever the target is built
          */\n\n
         """
-    )
 
+    # Path(__file__).resolve().parent referes to the folder that THIS FILE is in
     xml_target: Path = Path(__file__).resolve().parent / "data.xml"
 
     autocode_placeholder: str = "!!AUTOGENERATE CODE HERE!!"

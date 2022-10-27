@@ -4,6 +4,30 @@
 #include <stdint.h>
 #include "i2c.h"
 
+#define LSM_RESET	1
+#define LSM_DEVICE_ID	01101010
+
+/*Read from register wrapper*/
+#define read_byte(reg) read_from_reg(reg)
+/*Write data wrapper*/
+#define write_byte(reg,val) write_data(reg,val)
+/**
+ * Performs the following operations:
+ * 1) Read the high byte, and typecast it into a 16 bit unsigned int.
+ * 2) Shift said int by 8 bits
+ * 3) And the int with the value from the low byte
+ */
+#define read_two_bytes(regl,regh) ((((uint16_t)read_from_reg(regh))<<8)&((uint16_t)read_from_reg(regl)))
+/**
+ * Performs the following operations
+ * 1) Bitwise and with a mask containing 0000000011111111 to clear the upper bits
+ * 2) Write this to the lower register
+ * 3) Right shift the value with 8 (to clear the lower bits and move the upper bits lower)
+ * 4) Case to uint8_t and write.
+ */
+#define write_two_bytes(regl,regh,val) (write_data(regl,(uint8_t)(val&0x00FF));write_data(regh,(uint8_t)(val>>8)))
+
+
 class Lsm6dsl : private I2c{
 	private:
 	public:

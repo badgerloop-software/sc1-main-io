@@ -17,7 +17,7 @@
  * 2) Shift said int by 8 bits
  * 3) And the int with the value from the low byte
  */
-#define read_two_bytes(regl,regh) ((((uint16_t)read_from_reg(regh))<<8)&((uint16_t)read_from_reg(regl)))
+#define read_two_bytes(regl,regh) ((((uint16_t)read_from_reg(regh))<<8)|((uint16_t)read_from_reg(regl)))
 /**
  * Performs the following operations
  * 1) Bitwise and with a mask containing 0xFF to clear the upper bits

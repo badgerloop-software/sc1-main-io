@@ -2,18 +2,6 @@
 
 #include  <tgmath.h>
 
-#define LSM_RESET 0x00000001
-#define LSM_DEVID 0x01101010
-
-#define LSM_CRTL3_C 0x12
-#define LSM_WHO_AM_I 0x0F
-
-#define XL_GS 0x08
-#define XL_INC_RATE XL_GS/0x0111111111111111 
-
-#define G_FULL_SCALE 0x00 //00 -> 11 250-2000 dps
-#define G_DPS 250 * pow(2,G_FULL_SCALE)
-#define G_INC_RATE (G_DPS/2)/0x0111111111111111
 
 Lsm6dsl::Lsm6dsl(int bus, int addr) : I2c(bus, addr, O_RDWR) {}
 
@@ -25,45 +13,64 @@ Lsm6dsl::Lsm6dsl(int bus, int addr) : I2c(bus, addr, O_RDWR) {}
 // pg 72 for output registers
 // pg 81 for timestamp data
 
+// Just define register val in fsxl and fsg in crtl1 and crtl2
+// Time stamp and frequency just wait until James ben and Noah figure it out
+
+// Still need to add config methods | config ODR -> frequency selection for both full scales
+//CRTL1 and 2 do the math as if its at the default value
+
 int Lsm6dsl::begin(){
 
-    write_data(LSM_CRTL3_C, LSM_RESET); // Reset software
-    if (LSM_DEVID != read_from_reg(0x0F)){
+    write_data(CRTL3_C, RESET); // Reset software
+    if (DEVID != read_from_reg(WHO_AM_I)){
         return 1;
     }
 }
 
 double Lsm6dsl::getGX(){
-    uint16_t val = (read_from_reg(0x23) << 8) | read_from_reg(0x22);
-    return (double)val * G_INC_RATE;
+    uint16_t val = (read_from_reg(OUTX_H_G) << 8) | read_from_reg(OUTX_L_G);
+    return (double)val * ((1<<((int)g_full_scale) * 250.0)/0x7FFF);
 }
 
 double Lsm6dsl::getGY(){
-    uint16_t val = (read_from_reg(0x25) << 8) | read_from_reg(0x24);
-    return (double)val * G_INC_RATE;
+    uint16_t val = (read_from_reg(OUTY_H_G) << 8) | read_from_reg(OUTY_L_G);
+    return (double)val * ((1<<((int)g_full_scale) * 250.0)/0x7FFF);
 }
 
 double Lsm6dsl::getGZ(){
-    uint16_t val = (read_from_reg(0x27) << 8) | read_from_reg(0x26);
-    return (double)val * G_INC_RATE;
+    uint16_t val = (read_from_reg(OUTZ_H_G) << 8) | read_from_reg(OUTZ_L_G);
+    return (double)val * ((1<<((int)g_full_scale) * 250.0)/0x7FFF);
 }
 
 double Lsm6dsl::getXLX(){
-    uint16_t val = (read_from_reg(0x29) << 8) | read_from_reg(0x28);
-    return (double)val * XL_INC_RATE;
+    uint16_t val = (read_from_reg(OUTX_H_XL) << 8) | read_from_reg(OUTX_L_XL);
+    return (double)val * ((double)get_xl_scale(xl_full_scale)/0x7FFF);
 }
 
 double Lsm6dsl::getXLY(){
-    uint16_t val = (read_from_reg(0x2B) << 8) | read_from_reg(0x2A);
-    return (double)val * XL_INC_RATE;
+    uint16_t val = (read_from_reg(OUTY_H_XL) << 8) | read_from_reg(OUTY_L_XL);
+    return (double)val * ((double)get_xl_scale(xl_full_scale)/0x7FFF);
 }
 
 double Lsm6dsl::getXLZ(){
-    uint16_t val = (read_from_reg(0x2D) << 8) | read_from_reg(0x2C);
-    return (double)val * XL_INC_RATE;
+    uint16_t val = (read_from_reg(OUTZ_H_XL) << 8) | read_from_reg(OUTZ_L_XL);
+    return (double)val * ((double)get_xl_scale(xl_full_scale)/0x7FFF);
 }
 
+int Lsm6dsl::setRangeG(uint8_t select){
+    this->g_full_scale=select;
+    return write_data(CTRL2_G, (read_from_reg(CTRL2_G) & 0xF3) | select << 2);
+}
 
+int get_xl_scale(int x){
+    int a[] = {4, 32, 8, 16};
+    return a[x];
+}
+
+int Lsm6dsl::setRangeXL(uint8_t select){
+    this->xl_full_scale=select;
+    return write_data(CTRL1_XL, (read_from_reg(CTRL2_G) & 0xF3) | select << 2);
+}
 
 
 

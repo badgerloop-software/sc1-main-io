@@ -3,7 +3,9 @@
 #include <iostream>
 
 #include "gpio.h"
+#include "i2c.h"
 #include "ina3221.h"
+#include "lsm6dsl.h"
 #include "mcp23017.h"
 #include "serial.h"
 #include "tca6416.h"
@@ -148,6 +150,27 @@ int ina3221_test() {
   }
 
   return 0;
+}
+
+// CRTL5_C
+// https://replit.com/join/kpywugnjjr-jessewolf1
+//^ This tests the math to see that it works. There is no register that I could
+// find on the data sheet that lets you simulate data
+int lsm6dsl_test() {
+  Lsm6dsl dev = Lsm6dsl(2, 0x6A);
+  if (dev.begin()) return 1;
+
+  while (true) {
+    std::cout << "Read Gyro X " << dev.getGX() << " degrees/s\n";
+    std::cout << "Read Gyro Y " << dev.getGY() << " degrees/s\n";
+    std::cout << "Read Gyro Z " << dev.getGZ() << " degrees/s\n\n";
+
+    std::cout << "Read Accelerometer X " << dev.getXLX() << " m/s/s\n";
+    std::cout << "Read Accelerometer Y " << dev.getXLY() << " m/s/s\n";
+    std::cout << "Read Accelerometer Z " << dev.getXLZ() << " m/s/s\n";
+
+    usleep(250000);
+  }
 }
 
 int gpio_test(Serial serial) {

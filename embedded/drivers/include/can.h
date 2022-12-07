@@ -45,7 +45,7 @@ class Can {
   pthread_mutex_t canMutex;
 
  public:
-  Can();
+  Can(){};
   int init();
   int canRead(struct can_frame *msg);
   int canSend(uint16_t id, uint8_t *data, int size);

@@ -46,7 +46,7 @@ char Serial::openDevice(int devNum, const unsigned int Bauds) {
   // Structure with the device's options
   struct termios options;
   char device[20];
-  sprintf(device, "/dev/ttyS%d", devNum);
+  sprintf(device, "/dev/ttyO%d", devNum);
 
   // Open device
   fd = open(device, O_RDWR | O_NOCTTY | O_NDELAY);

@@ -4,7 +4,7 @@
 ROOT_DIR=$(dirname $0)
 PYTHON_ENV=$ROOT_DIR/.env
 PYBIN=$PYTHON_ENV/bin
-PRE_COMMIT=pre-commit
+PRE_COMMIT=$PYBIN/pre-commit
 PYTHON=$PYBIN/python
 
 

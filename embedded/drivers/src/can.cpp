@@ -8,22 +8,24 @@
 
 #include <iostream>
 
-#define CAN_INTERFACE "can0"
+/*
+Initialize canbus
+Returns 0 on success, -1 on failure
+*/
+int Can::init(const char *can_i) {
+  if (this->isInit) return 0;
 
-int Can::init() {
+  lock_guard<mutex> l(mu);
+
   struct ifreq ifr;
   struct sockaddr_can addr;
 
-  if (this->isInit) {
-    return 0;
-  }
-
   this->sock = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-  strcpy(ifr.ifr_name, CAN_INTERFACE);
+  strcpy(ifr.ifr_name, can_i);
 
   if (ioctl(this->sock, SIOCGIFINDEX, &ifr)) {
     std::cout << "ERROR: Could not locate CAN bus";
-    return -EIO;
+    return -1;
   }
 
   addr.can_family = AF_CAN;
@@ -31,44 +33,55 @@ int Can::init() {
 
   if (!bind(this->sock, (struct sockaddr *)&addr, sizeof(addr))) {
     std::cout << "ERROR: Error binding address to socket\n";
-    return -EIO;
+    return -1;
   }
 
   this->isInit = true;
+
+  t = thread(&Can::loop, this);
 
   return 0;
 }
 
 /*
 Reads from CAN bus
-Returns number of bytes read
+Returns number of bytes read or -1 on failure
 */
-int Can::canRead(struct can_frame *msg) {
-  pthread_mutex_lock(&this->canMutex);
-  int size = recv(this->sock, msg, sizeof(struct can_frame), MSG_DONTWAIT);
-  pthread_mutex_unlock(&this->canMutex);
-
-  return size;
+int Can::read(struct can_frame *msg) {
+  lock_guard<mutex> l(mu);
+  return recv(this->sock, msg, sizeof(struct can_frame), MSG_DONTWAIT);
 }
 
 /*
-Writes a CAN frame to the CAN bus.
-Each frame has 1 id and byte array of data that is size bytes long
+Sends a CAN frame to the CAN bus.
+Returns number of bytes sent or -1 on failure
 */
-int Can::canSend(uint16_t id, uint8_t *data, int size) {
+int Can::send(int id, uint8_t *data, uint8_t size) {
   struct can_frame msg;
-  int i;
 
-  msg.can_dlc = size;
+  msg.len = size > CAN_MAX_DLEN ? CAN_MAX_DLEN : size;
   msg.can_id = id;
 
-  for (i = 0; i < size; i++) {
-    msg.data[i] = data[i];
-  }
+  memcpy(msg.data, data, msg.len);
 
-  pthread_mutex_lock(&this->canMutex);
-  send(this->sock, &msg, sizeof(struct can_frame), MSG_DONTWAIT);
-  pthread_mutex_unlock(&this->canMutex);
+  lock_guard<mutex> l(mu);
+  return ::send(this->sock, &msg, sizeof(struct can_frame), MSG_DONTWAIT);
+}
 
-  return 0;
+void Can::add(CanDevice *c) {
+  lock_guard<mutex> l(mu);
+  devices.push_back(c);
+}
+
+void Can::loop() {
+  struct can_frame msg;
+  while (isInit && read(&msg))
+    for (CanDevice *d : devices)
+      if (d->parse(msg) == 0) break;
+  isInit = false;
+}
+
+Can::~Can() {
+  isInit = false;
+  t.join();
 }

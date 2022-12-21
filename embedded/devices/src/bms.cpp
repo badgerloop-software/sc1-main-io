@@ -1,5 +1,7 @@
 #include "bms.h"
-Bms::Bms(Can canBus) { this->canBus = canBus; }
+
+Bms::Bms(Can &canBus) : CanDevice(canBus) {}
+
 int Bms::bmsClearFaults(void)  // send CAN info
 {
   uint16_t can_id = 0x7e3;
@@ -15,7 +17,7 @@ int Bms::bmsClearFaults(void)  // send CAN info
   TxData[6] = 0x00;
   TxData[7] = 0x00;
 
-  this->canBus.canSend(can_id, TxData, length);
+  bus.send(can_id, TxData, length);
 
   return 0;
 }
@@ -23,9 +25,9 @@ int Bms::bmsClearFaults(void)  // send CAN info
 int Bms::bmsParseMsg()  // read CAN bus
 {
   struct can_frame frame;
-  this->canBus.canRead(&frame);  // read CAN bus to get id
+  bus.read(&frame);  // read CAN bus to get id
   uint32_t id = frame.can_id;
-  uint8_t* msg = (frame.data);
+  uint8_t *msg = (frame.data);
 
   switch (id) {
     case 0x6B0:
@@ -74,7 +76,7 @@ int Bms::bmsParseMsg()  // read CAN bus
       break;
     case 0x36:
       if (msg[0] >= 0 && msg[0] < 72)
-        this->cells[msg[0]] = (msg[2] | (msg[1] << 8)) / 10000.0;
+        cells[msg[0]] = (msg[2] | (msg[1] << 8)) / 10000.0;
       break;
 
     default:

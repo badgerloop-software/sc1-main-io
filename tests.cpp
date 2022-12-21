@@ -5,6 +5,7 @@
 #include "gpio.h"
 #include "ina3221.h"
 #include "mcp23017.h"
+#include "mppt.h"
 #include "serial.h"
 #include "tca6416.h"
 
@@ -211,7 +212,18 @@ int gpio_test(Serial serial) {
   return returnCondition;
 }
 
+int mppt_test() {
+  Can c;
+  if (c.init() == -EIO) return -EIO;
+  Mppt m(&c);
+  m.sendMaxOutputCurrent(6);
+  return 0;
+}
+
 int main() {
+  std::cout << "Beginning mppt tests\n";
+  mppt_test();
+  /*
   Serial serial = Serial();
   if (serial.openDevice(4, 9600) != 1) std::cout << "error\n";
   std::cout << "Beginning MCP23017 tests\n";
@@ -248,5 +260,6 @@ int main() {
   std::cout << "GPIO test passed\n";
 
   serial.closeDevice();
+  */
   return 0;
 }

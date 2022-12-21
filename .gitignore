@@ -44,3 +44,7 @@ __pycache__/
 
 # Auto generated code
 embedded/data/include/data.h
+
+# editor assist
+compile_commands.json
+build/compile_commands.json

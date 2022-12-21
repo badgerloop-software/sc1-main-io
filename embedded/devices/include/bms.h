@@ -1,14 +1,10 @@
-#include <linux/can.h>
-#include <pthread.h>
-
 #include "can.h"
 #define NUM_CELLS 30
 
-class Bms {
+class Bms : CanDevice {
  private:
-  Can canBus;
   float cells[NUM_CELLS];
-  pthread_mutex_t bmsMutex;
+  mutex bmsMutex;
   mutexVar<float> packCurrent;
   mutexVar<float> packVoltage;
   mutexVar<int> imdStatus;
@@ -32,7 +28,7 @@ class Bms {
   mutexVar<uint8_t> numCells;
 
  public:
-  Bms(Can canBus);
+  Bms(Can &bus);
   int bmsClearFaults(void);  // write function
   int bmsParseMsg();         // read function
 };

@@ -4,7 +4,7 @@
 ROOT_DIR=$(dirname $0)
 PYTHON_ENV=$ROOT_DIR/.env
 PYBIN=$PYTHON_ENV/bin
-PRE_COMMIT=$PYBIN/pre-commit
+PRE_COMMIT=pre-commit
 PYTHON=$PYBIN/python
 
 
@@ -19,9 +19,9 @@ if [ "$1" == "build" ]; then
     $0 clean
     mkdir build && cd build
     if [ "$2" == "test" ]; then
-        cmake -DTEST=ON -Wno-dev ..
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DTEST=ON -Wno-dev ..
     else
-        cmake ..
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..
     fi
 
     if [ $? -ne 0 ]; then
@@ -58,7 +58,7 @@ EOF
 elif [ "$1" == "cross" ]; then
     $0 clean
     mkdir build && cd build
-    if [ $(arch) == "aarch64" ]; then
+    if [ $(uname -m) == "aarch64" ]; then
 
       if [ ! -d /opt/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf ]; then
   	wget -c \
@@ -73,7 +73,7 @@ elif [ "$1" == "cross" ]; then
       fi
       toolchain='./toolchains/beaglebone_aarch64.cmake'
 
-    elif [ $(arch) == "x86_64" ]; then
+    elif [ $(uname -m) == "x86_64" ]; then
 
       if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
   	wget -c \
@@ -92,9 +92,9 @@ elif [ "$1" == "cross" ]; then
 
 
     if [ "$2" == "test" ]; then
-        cmake -DCMAKE_TOOLCHAIN_FILE=$toolchain -DTEST=ON -Wno-dev ..
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_TOOLCHAIN_FILE=$toolchain -DTEST=ON -Wno-dev ..
     else
-        cmake -DCMAKE_TOOLCHAIN_FILE=$toolchain ..
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_TOOLCHAIN_FILE=$toolchain ..
     fi
 
     if [ $? -ne 0 ]; then

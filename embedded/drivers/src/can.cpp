@@ -59,10 +59,10 @@ Returns number of bytes sent or -1 on failure
 int Can::send(int id, uint8_t *data, uint8_t size) {
   struct can_frame msg;
 
-  msg.len = size > CAN_MAX_DLEN ? CAN_MAX_DLEN : size;
+  msg.can_dlc = size > CAN_MAX_DLEN ? CAN_MAX_DLEN : size;
   msg.can_id = id;
 
-  memcpy(msg.data, data, msg.len);
+  memcpy(msg.data, data, msg.can_dlc);
 
   lock_guard<mutex> l(mu);
   return ::send(this->sock, &msg, sizeof(struct can_frame), MSG_DONTWAIT);

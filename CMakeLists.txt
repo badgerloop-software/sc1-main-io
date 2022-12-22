@@ -16,9 +16,9 @@ execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/bloop-dev autocode)
 
 IF(TEST)
     ADD_DEFINITIONS(-DTEST)
-    set(dependecies tests.cpp)
+    set(dependencies tests.cpp)
 ELSE()
-     set(dependecies main.cpp)
+     set(dependencies main.cpp)
 ENDIF()
 
 add_subdirectory(embedded/devices)
@@ -26,8 +26,8 @@ add_subdirectory(embedded/drivers)
 set(libraries devices
     drivers)
 
-add_executable(badgerloop ${dependecies})
-target_link_libraries(badgerloop PRIVATE ${libraries})
+add_executable(badgerloop ${dependencies})
+target_link_libraries(badgerloop PRIVATE ${libraries} pthread)
 
 if( MATCHES "Linux")
     add_subdirectory(Test)

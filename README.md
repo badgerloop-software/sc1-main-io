@@ -10,7 +10,7 @@ To download all necessary packages run
 $ ./bloop-dev setup
 ```
 This will
-- Install build dependecies
+- Install build dependencies
 - Setup pre-commit
 
 ## Setup Instructions

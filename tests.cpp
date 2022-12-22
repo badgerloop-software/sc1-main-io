@@ -9,7 +9,7 @@
 #include "serial.h"
 #include "tca6416.h"
 
-#define OUTPUT_PIN_NUM 26  // dummy pin numbers
+#define OUTPUT_PIN_NUM 26 // dummy pin numbers
 #define INPUT_PIN_NUM 44
 
 // Test functions go here
@@ -20,19 +20,24 @@ int mcp23017_test() {
   Mcp23017 dev = Mcp23017(2, 0x24);
 
   // begin the device dev.begin(array of 16 bits)
-  if (dev.begin(test_array)) return 1;
+  if (dev.begin(test_array))
+    return 1;
 
   // set two outputs on bank a, and two on bank b
   // and read from pin each time it is written
   dev.set_state(3, 1);
-  if (dev.get_state(3) != 1) return 1;
+  if (dev.get_state(3) != 1)
+    return 1;
   dev.set_state(2, 0);
-  if (dev.get_state(2) != 0) return 1;
+  if (dev.get_state(2) != 0)
+    return 1;
 
   dev.set_state(11, 1);
-  if (dev.get_state(11) != 1) return 1;
+  if (dev.get_state(11) != 1)
+    return 1;
   dev.set_state(9, 0);
-  if (dev.get_state(9) != 0) return 1;
+  if (dev.get_state(9) != 0)
+    return 1;
 
   return 0;
 }
@@ -44,56 +49,65 @@ int tca6416_test() {
   Tca6416 dev = Tca6416(2, 0x24);
 
   // begin the device - dev
-  if (dev.begin(test_array)) return -1;
+  if (dev.begin(test_array))
+    return -1;
 
   // set state and check
   // get to make sure written properly
 
   // testing for pin 7 on bank 0
-  if (!dev.set_state(0, 7, 0)) {  // if successfully set then, return would be 0
-    if (dev.get_state(0, 7) != 0) return -1;  // then go to check if get works
+  if (!dev.set_state(0, 7, 0)) { // if successfully set then, return would be 0
+    if (dev.get_state(0, 7) != 0)
+      return -1; // then go to check if get works
   } else {
     return -1;
   }
-  if (!dev.set_state(0, 7, 1)) {  // if successfully set then, return would be 0
-    if (dev.get_state(0, 7) != 1) return -1;  // then go to check if get works
+  if (!dev.set_state(0, 7, 1)) { // if successfully set then, return would be 0
+    if (dev.get_state(0, 7) != 1)
+      return -1; // then go to check if get works
   } else {
     return -1;
   }
 
   // testing for pin 3 on bank 0
   if (!dev.set_state(0, 3, 1)) {
-    if (dev.get_state(0, 3) != 1) return -1;
+    if (dev.get_state(0, 3) != 1)
+      return -1;
   } else {
     return -1;
   }
 
   if (!dev.set_state(0, 3, 0)) {
-    if (dev.get_state(0, 3) != 0) return -1;
+    if (dev.get_state(0, 3) != 0)
+      return -1;
   } else {
     return -1;
   }
 
   // testing for pin 4 on bank 1
   if (!dev.set_state(1, 4, 1)) {
-    if (dev.get_state(1, 4) != 1) return -1;
+    if (dev.get_state(1, 4) != 1)
+      return -1;
   } else {
     return -1;
   }
   if (!dev.set_state(1, 4, 0)) {
-    if (dev.get_state(1, 4) != 0) return -1;
+    if (dev.get_state(1, 4) != 0)
+      return -1;
   } else {
     return -1;
   }
 
   // testing for pin 6 on bank 1
   if (!dev.set_state(1, 6, 0)) {
-    if (dev.get_state(1, 6) != 0) return -1;
+    if (dev.get_state(1, 6) != 0)
+      return -1;
   } else {
     return -1;
   }
   if (!dev.set_state(1, 6, 1)) {
-    if (dev.get_state(1, 6) != 1) return -1;
+    if (dev.get_state(1, 6) != 1)
+      return -1;
   } else {
     return -1;
   }
@@ -104,8 +118,8 @@ int tca6416_test() {
 
   Tca6416 inv = Tca6416(2, 0x24);
 
-  if (!inv.begin(invalid_array)) {  // return should be not zero, if it is,
-                                    // return -1 for error
+  if (!inv.begin(invalid_array)) { // return should be not zero, if it is,
+                                   // return -1 for error
     return -1;
   }
 
@@ -138,12 +152,14 @@ int tca6416_test() {
 
 int ina3221_test() {
   Ina3221 dev(2, 0x24, 1e3, 2e3, 3e3);
-  if (dev.begin()) return 1;
+  if (dev.begin())
+    return 1;
 
   for (int i = 1; i <= INA_NUM_CHANNELS; i++) {
     float voltage = dev.readVoltage(i);
     float current = dev.readCurrent(i);
-    if ((voltage < 0) || (current < 0)) return 1;
+    if ((voltage < 0) || (current < 0))
+      return 1;
     std::cout << "Read Voltage Ch " << i << " : " << voltage << " V\n";
     std::cout << "Read Current Ch " << i << " : " << current << " A\n";
   }
@@ -154,19 +170,19 @@ int ina3221_test() {
 int gpio_test(Serial serial) {
   int returnCondition = 0;
   // initialize the pins
-  Gpio outputTest(OUTPUT_PIN_NUM, 0);  // pin number is currently a dummy number
+  Gpio outputTest(OUTPUT_PIN_NUM, 0); // pin number is currently a dummy number
   outputTest.begin();
   Gpio inputTest(INPUT_PIN_NUM, 1);
   inputTest.begin();
-  char read[1];  // char array to read messages from the Pi
+  char read[1]; // char array to read messages from the Pi
   // output 1 test
-  if (outputTest.setValue(1) != 0) {  // set the pin on BBB
+  if (outputTest.setValue(1) != 0) { // set the pin on BBB
     std::cout << "Error setting output pin to 1\n";
     returnCondition = 1;
   }
-  serial.writeString("gpio r 1\n");  // tell Pi the pin is set
+  serial.writeString("gpio r 1\n"); // tell Pi the pin is set
   serial.readString(read, 1);
-  if (strcmp(read, "y") != 0) {  // read message from Pi
+  if (strcmp(read, "y") != 0) { // read message from Pi
     std::cout << "read " << strcmp(read, "y") << "\n";
     std::cout << "Pi did not read pin set to 1 correctly\n";
     returnCondition = 1;
@@ -213,9 +229,8 @@ int gpio_test(Serial serial) {
 }
 
 int mppt_test() {
-  Can c;
-  if (c.init() == -EIO) return -EIO;
-  Mppt m(&c);
+  Can c("vcan0");
+  Mppt m(c);
   m.sendMaxOutputCurrent(6);
   return 0;
 }

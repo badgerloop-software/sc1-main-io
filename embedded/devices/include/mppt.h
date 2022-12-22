@@ -4,7 +4,7 @@
 
 typedef enum { MaxOutputCurrent = 0xA, Test = 0x69 } messages;
 
-class Mppt : private CanDevice {  // Mppt = Maximum Power Point Tracking. MPPT
+class Mppt : public CanDevice {  // Mppt = Maximum Power Point Tracking. MPPT
                                   // optimizes voltage
                                   // conversion between solar array and battery
                                   // to minimize power loss.

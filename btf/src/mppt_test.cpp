@@ -1,11 +1,13 @@
-#include <gtest/gtest.h>
 #include "mppt.h"
+#include <gtest/gtest.h>
 
 TEST(MpptTest, CanAssertions) {
   Can c("vcan0");
   Mppt mppt(c);
-  // Expect two strings not to be equal.
-  EXPECT_STRNE("hello", "world");
-  // Expect equality.
-  EXPECT_EQ(7 * 6, 42);
+  struct can_frame msg;
+  float data = 9;
+  //mppt.bus.send(MaxOutputCurrent, (uint8_t *)&data, sizeof(float));
+
+  c.read(&msg);
+  EXPECT_EQ(msg.can_id, MaxOutputCurrent);
 }

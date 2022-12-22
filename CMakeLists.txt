@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.14)
+
+# GoogleTest requires at least C++14
+set(CMAKE_CXX_STANDARD 14)
 
 project(PodEmbeddedBeta VERSION 0.1)
 
@@ -13,7 +16,6 @@ set(CMAKE_CXX_STANDARD 11)
 # Run Autocoder when CMake is run
 execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/bloop-dev autocode)
 
-
 IF(TEST)
     ADD_DEFINITIONS(-DTEST)
     set(dependencies tests.cpp)
@@ -23,6 +25,8 @@ ENDIF()
 
 add_subdirectory(embedded/devices)
 add_subdirectory(embedded/drivers)
+add_subdirectory(btf)
+
 set(libraries devices
     drivers)
 

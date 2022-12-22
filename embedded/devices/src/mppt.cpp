@@ -1,4 +1,5 @@
 #include "mppt.h"
+
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -13,11 +14,11 @@ int Mppt::sendMaxOutputCurrent(float moc) {
 
 int Mppt::parse(struct can_frame &msg) {
   switch (msg.can_id) {
-  case Test:
-    std::cout << msg.data << std::endl;
-    break;
-  default:
-    return -1;
+    case Test:
+      std::cout << msg.data << std::endl;
+      break;
+    default:
+      return -1;
   }
   return 0;
 }

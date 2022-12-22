@@ -13,12 +13,13 @@ using std::mutex;
 using std::thread;
 using std::vector;
 
-template <typename T> struct mutexVar {
-private:
+template <typename T>
+struct mutexVar {
+ private:
   mutex mu;
   T value = -1;
 
-public:
+ public:
   void setValue(T data) {
     lock_guard<mutex> l(mu);
     value = data;
@@ -32,7 +33,7 @@ public:
 class CanDevice;
 
 class Can {
-private:
+ private:
   vector<CanDevice *> devices;
   mutex mu;
   thread t;
@@ -41,7 +42,7 @@ private:
   bool isInit = false;
   void loop();
 
-public:
+ public:
   Can(const char *can_i);
   ~Can();
   void add(CanDevice *c);
@@ -51,7 +52,7 @@ public:
 };
 
 class CanDevice {
-public:
+ public:
   CanDevice(Can &bus) : bus(bus) { bus.add(this); }
   Can &bus;
   virtual int parse(struct can_frame &msg) = 0;

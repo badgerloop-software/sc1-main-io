@@ -1,4 +1,5 @@
 #include "can.h"
+
 #include <errno.h>
 #include <net/if.h>
 #include <string.h>
@@ -15,8 +16,7 @@ Returns 0 on success, -1 on failure
 */
 
 int Can::init() {
-  if (this->isInit)
-    return 0;
+  if (this->isInit) return 0;
 
   lock_guard<mutex> l(mu);
 
@@ -51,8 +51,7 @@ Reads from CAN bus
 Returns number of bytes read or -1 on failure
 */
 int Can::read(struct can_frame *msg) {
-  if (init() < 0)
-    return -1;
+  if (init() < 0) return -1;
 
   lock_guard<mutex> l(mu);
   return recv(this->sock, msg, sizeof(struct can_frame), MSG_DONTWAIT);
@@ -63,8 +62,7 @@ Sends a CAN frame to the CAN bus.
 Returns number of bytes sent or -1 on failure
 */
 int Can::send(int id, uint8_t *data, uint8_t size) {
-  if (init() < 0)
-    return -1;
+  if (init() < 0) return -1;
 
   struct can_frame msg;
 
@@ -87,10 +85,9 @@ void Can::loop() {
 
   while (isInit && read(&msg))
     for (CanDevice *d : devices)
-      if (d->parse(msg) == 0)
-        break;
+      if (d->parse(msg) == 0) break;
 
-  isInit = false; // will be retried on next r/w
+  isInit = false;  // will be retried on next r/w
 }
 
 Can::~Can() {

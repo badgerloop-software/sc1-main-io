@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 project(PodEmbeddedBeta VERSION 0.1)
 
-OPTION(TEST "Enable test wrapper" OFF)
+OPTION(DEV "Enable test wrapper" OFF)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out/lib)
@@ -16,11 +16,11 @@ set(CMAKE_CXX_STANDARD 11)
 # Run Autocoder when CMake is run
 execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/bloop-dev autocode)
 
-IF(TEST)
-    ADD_DEFINITIONS(-DTEST)
+IF(DEV)
+    ADD_DEFINITIONS(-DDEV)
     set(dependencies tests.cpp)
 ELSE()
-     set(dependencies main.cpp)
+    set(dependencies main.cpp)
 ENDIF()
 
 add_subdirectory(embedded/devices)

@@ -53,7 +53,7 @@ int I2c::write_byte(uint8_t reg) {
     std::cerr << "I2C write byte error\n";
     return -EIO;
   }
-#ifdef TEST
+#ifdef DEV
   usleep(500000);
 #endif
 
@@ -65,7 +65,7 @@ int I2c::read_data(uint8_t *buff, int size) {
     std::cerr << "I2C read data error\n";
     return -EIO;
   }
-#ifdef TEST
+#ifdef DEV
   usleep(500000);
 #endif
   return 0;

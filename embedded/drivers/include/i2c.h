@@ -38,7 +38,7 @@ int I2c::write_data(uint8_t reg, T val) {
     std::cerr << "I2C write data error\n";
     return -EIO;
   }
-#ifdef TEST
+#ifdef DEV
   usleep(500000);
 #endif
   return 0;

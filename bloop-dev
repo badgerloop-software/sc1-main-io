@@ -19,7 +19,7 @@ if [ "$1" == "build" ]; then
     $0 clean
     mkdir build && cd build
     if [ "$2" == "test" ]; then
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DTEST=ON -Wno-dev ..
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DDEV=ON -Wno-dev ..
     else
         cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..
     fi
@@ -91,7 +91,7 @@ elif [ "$1" == "cross" ]; then
     fi
 
     if [ "$2" == "test" ]; then
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_TOOLCHAIN_FILE=$toolchain -DTEST=ON -Wno-dev ..
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_TOOLCHAIN_FILE=$toolchain -DDEV=ON -Wno-dev ..
     else
         cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_TOOLCHAIN_FILE=$toolchain ..
     fi

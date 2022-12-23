@@ -25,7 +25,7 @@ int Bms::bmsClearFaults(void)  // send CAN info
 int Bms::bmsParseMsg()  // read CAN bus
 {
   struct can_frame frame;
-  bus.read(&frame);  // read CAN bus to get id
+  bus.read(frame);  // read CAN bus to get id
   uint32_t id = frame.can_id;
   uint8_t *msg = (frame.data);
 

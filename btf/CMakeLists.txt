@@ -18,7 +18,7 @@ target_include_directories(gtests PUBLIC include)
 target_link_libraries(gtests
   devices
   drivers
-  GTest::gtest_main)
+  gtest)
 
 include(GoogleTest)
 gtest_discover_tests(gtests)

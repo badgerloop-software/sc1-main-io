@@ -1,5 +1,6 @@
-#include "gtest/gtest.h"
 #include <stdio.h>
+
+#include "gtest/gtest.h"
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;
@@ -17,7 +18,7 @@ class LogPrinter : public EmptyTestEventListener {
   };
   std::vector<Log> Logs;
 
-public:
+ public:
   virtual void OnTestProgramEnd(const UnitTest &unit_test);
   virtual void OnTestStart(const testing::TestInfo &test_info);
   virtual void OnTestEnd(const testing::TestInfo &test_info);

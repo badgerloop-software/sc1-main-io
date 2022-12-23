@@ -12,11 +12,11 @@ int Mppt::sendMaxOutputCurrent(float moc) {
 
 int Mppt::parse(struct can_frame &msg) {
   switch (msg.can_id) {
-  case Test:
-    push(msg);
-    break;
-  default:
-    return -1;
+    case Test:
+      push(msg);
+      break;
+    default:
+      return -1;
   }
   return 0;
 }

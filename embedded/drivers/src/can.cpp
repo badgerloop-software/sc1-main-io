@@ -1,12 +1,14 @@
 #include "can.h"
-#include <csignal>
+
 #include <errno.h>
-#include <iostream>
 #include <net/if.h>
 #include <poll.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+
+#include <csignal>
+#include <iostream>
 
 Can::Can(const char *can_i) : can_i(can_i) {}
 
@@ -15,8 +17,7 @@ Initialize canbus
 Returns 0 on success, -1 on failure
 */
 int Can::init() {
-  if (isInit)
-    return 0;
+  if (isInit) return 0;
 
   lock_guard<mutex> l(mu);
 
@@ -51,8 +52,7 @@ Reads from CAN bus
 Returns number of bytes read or -1 on failure
 */
 int Can::read(struct can_frame &msg) {
-  if (init() < 0)
-    return -1;
+  if (init() < 0) return -1;
 
   lock_guard<mutex> l(mu);
 
@@ -64,8 +64,7 @@ Sends a CAN frame to the CAN bus.
 Returns number of bytes sent or -1 on failure
 */
 int Can::send(int id, uint8_t *data, uint8_t size) {
-  if (init() < 0 || size > CAN_MAX_DLEN)
-    return -1;
+  if (init() < 0 || size > CAN_MAX_DLEN) return -1;
 
   lock_guard<mutex> l(mu);
 
@@ -88,23 +87,20 @@ void Can::loop() {
   struct pollfd fd = {sock, POLLIN};
 
   while (isInit) {
-    int ret = poll(&fd, 1, 200); // check isInit every 200ms but immediately
-                                 // return if message is on the socket
+    int ret = poll(&fd, 1, 200);  // check isInit every 200ms but immediately
+                                  // return if message is on the socket
     if (ret > 0) {
-      if (read(msg) < 0)
-        break; // not good. Try to re-initialize
+      if (read(msg) < 0) break;  // not good. Try to re-initialize
       for (CanDevice *d : devices)
-        if (d->parse(msg) == 0)
-          break;
+        if (d->parse(msg) == 0) break;
     }
   }
 
-  isInit = false; // will be retried on next r/w
+  isInit = false;  // will be retried on next r/w
   close(sock);
 }
 
 Can::~Can() {
   isInit = false;
-  if (t.joinable())
-    t.join();
+  if (t.joinable()) t.join();
 }

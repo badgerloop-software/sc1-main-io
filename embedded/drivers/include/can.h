@@ -4,20 +4,23 @@
 #include <linux/can.h>
 #include <stdint.h>
 
-#include <condition_variable>
+#include <functional>
 #include <iostream>
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
-using std::condition_variable;
+using std::function;
 using std::lock_guard;
 using std::mutex;
-using std::queue;
-using std::thread;  // for iterating over devices
-using std::unique_lock;
-using std::vector;  // for frames
+using std::pair;
+using std::thread;
+using std::unordered_map;
+using std::vector;
+
+typedef pair<int, function<void(struct can_frame &)>> callback;
 
 template <typename T>
 struct mutexVar {
@@ -40,19 +43,19 @@ class CanDevice;
 
 class Can {
  private:
-  vector<CanDevice *> devices;
+  unordered_map<int, function<void(struct can_frame &)>> callback_map;
   mutex mu;
   thread t;
   const char *can_i;
   int sock;
   bool isInit = false;
   void loop();
+  int read(struct can_frame &msg);
 
  public:
   Can(const char *can_i);
   ~Can();
-  void add(CanDevice *c);
-  int read(struct can_frame &msg);
+  void add(vector<callback> &callbacks);
   int send(int id, uint8_t *data, uint8_t size);
   int init();
 };
@@ -60,31 +63,12 @@ class Can {
 class CanDevice {
  private:
   mutex mu;
-  condition_variable cv;
-  queue<struct can_frame> frames;
 
  public:
-  CanDevice(Can &bus) : bus(bus) { bus.add(this); }
+  CanDevice(Can &bus, vector<callback> &callbacks) : bus(bus) {
+    bus.add(callbacks);
+  }
   Can &bus;
-
-  /*
-  You are responsible for implementing
-  this method to add messages to frames.
-  Return 0 if the message belongs to you, -1 otherwise.
-  */
-  virtual int parse(struct can_frame &msg) = 0;
-
-  void pop(struct can_frame &msg) {
-    unique_lock<mutex> l(mu);
-    cv.wait(l, [this] { return !frames.empty(); });
-    msg = frames.front();
-    frames.pop();
-  }
-  void push(struct can_frame &msg) {
-    lock_guard<mutex> l(mu);
-    frames.push(msg);
-    cv.notify_one();
-  }
 };
 
 #endif

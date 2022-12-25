@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 #include <csignal>
 #include <iostream>
@@ -76,10 +77,10 @@ int Can::send(int id, uint8_t *data, uint8_t size) {
   return ::send(sock, &msg, sizeof(struct can_frame), MSG_DONTWAIT);
 }
 
-void Can::add(CanDevice *c) {
+void Can::add(vector<callback> &callbacks) {
   lock_guard<mutex> l(mu);
 
-  devices.push_back(c);
+  callback_map.insert(callbacks.begin(), callbacks.end());
 }
 
 void Can::loop() {
@@ -90,13 +91,15 @@ void Can::loop() {
     int ret = poll(&fd, 1, 200);  // check isInit every 200ms but immediately
                                   // return if message is on the socket
     if (ret > 0) {
-      if (read(msg) < 0) break;  // not good. Try to re-initialize
-      for (CanDevice *d : devices)
-        if (d->parse(msg) == 0) break;
+      if (read(msg) < 0)  // not good. Try to re-initialize
+        break;
+      // const iterator is gross, use auto
+      auto pair = callback_map.find(msg.can_id);
+      if (pair != callback_map.end()) (*pair).second(msg);  // execute function
     }
   }
 
-  isInit = false;  // will be retried on next r/w
+  isInit = false;  // will retry on next r/w
   close(sock);
 }
 

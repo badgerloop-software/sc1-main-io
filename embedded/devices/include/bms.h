@@ -96,5 +96,4 @@ class Bms : CanDevice {
  public:
   Bms(Can &bus);
   int bmsClearFaults(void);  // write function
-  int bmsParseMsg();         // read function
 };

@@ -10,7 +10,7 @@ static Can s("vcan0");
 static Can r("vcan0");
 
 TEST(Can, callbacks) {
-  volatile uint32_t flag;
+  volatile uint32_t flag = 0;
 
   EXPECT_EQ(s.init(), 0);
   EXPECT_EQ(r.init(), 0);
@@ -24,19 +24,16 @@ TEST(Can, callbacks) {
 
   int pid = fork();
   if (pid == 0) {
-    while (flag)
-      ;
     uint32_t data = 0xDEADBEEF;
     s.send(0x21, (uint8_t *)&data, sizeof(data));
 
-    while (flag)
+    while (flag == data)
       ;
     data = 0xBAD637;
     s.send(0x39, (uint8_t *)&data, sizeof(data));
     exit(0);
   }
 
-  flag = 0;
   while (flag == 0)
     ;
   EXPECT_EQ(flag, 0xDEADBEEF);

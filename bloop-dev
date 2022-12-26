@@ -147,10 +147,16 @@ elif [ "$1" == "setup" ]; then
 
     $PRE_COMMIT install
 
+    git submodule update --init --recursive
+
 
 elif [ "$1" == "lint" ]; then
     $PRE_COMMIT run -a
 
 elif [ "$1" == "autocode" ]; then
     $PYTHON $ROOT_DIR/autocoding/autocode.py
+
+elif [ "$1" == "test" ]; then
+    $0 clean
+    echo "NOT YET IMPLEMENTED"
 fi

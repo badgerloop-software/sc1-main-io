@@ -2,7 +2,6 @@ add_subdirectory(googletest)
 
 enable_testing()
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
 add_executable(gtests
   include/gtest_globals.h
   src/gtests.cpp

@@ -80,7 +80,9 @@ int Can::send(int id, uint8_t *data, uint8_t size) {
 void Can::add(vector<callback> &callbacks) {
   lock_guard<mutex> l(mu);
 
-  callback_map.insert(callbacks.begin(), callbacks.end());
+  // theoretically moves callback memory into hashtable
+  for (callback &c : callbacks) callback_map.emplace(std::move(c));
+  callbacks.clear();  // invalidate local callbacks
 }
 
 void Can::loop() {

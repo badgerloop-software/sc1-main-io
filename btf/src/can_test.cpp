@@ -17,7 +17,11 @@ TEST(Can, callbacks) {
       {0x39, [&flag](struct can_frame &frame) { flag = 0x1234; }},
   };
 
+  assert(callbacks.size());
+
   CanDevice cd(r, callbacks);
+
+  assert(!callbacks.size());
 
   EXPECT_EQ(s.init(), 0);
   EXPECT_EQ(r.init(), 0);
@@ -25,34 +29,38 @@ TEST(Can, callbacks) {
   uint32_t data = 0xDEADBEEF;
   s.send(0x21, (uint8_t *)&data, sizeof(data));
 
-  while (flag == 0)
+  while (!flag)
     ;
   EXPECT_EQ(flag, 0xDEADBEEF);
   flag = 0;
 
   data = 0xBAD637;
   s.send(0x39, (uint8_t *)&data, sizeof(data));
-  while (flag == 0)
+  while (!flag)
     ;
   EXPECT_EQ(flag, 0x1234);
 }
 
 TEST(Can, mppt) {
-  volatile float flag = 0;
+  volatile float flag;
+  volatile bool done = 0;
   struct can_frame msg;
   Mppt m(s);
 
   // make can device to read message from MPPT
   vector<callback> callbacks{
       {MaxOutputCurrent,
-       [&flag](struct can_frame &frame) { flag = *(float *)frame.data; }},
+       [&flag, &done](struct can_frame &frame) {
+         flag = *(float *)frame.data;
+         done = true;
+       }},
   };
   CanDevice cd(r, callbacks);
 
   float data = 2321.442;
   m.sendMaxOutputCurrent(data);
 
-  while (flag == 0)
+  while (!done)
     ;
   EXPECT_EQ(flag, data);
 }

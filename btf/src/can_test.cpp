@@ -42,7 +42,7 @@ TEST(Can, callbacks) {
 }
 
 TEST(Can, mppt) {
-  volatile float flag;
+  volatile float flag = 0;
   volatile bool done = 0;
   struct can_frame msg;
   Mppt m(s);

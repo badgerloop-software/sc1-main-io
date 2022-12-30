@@ -25,8 +25,8 @@ class I2c {
   ~I2c();
   int open_i2c();
   bool is_open();
-  int read_word(uint8_t reg);
   int read_byte(uint8_t reg);
+  int read_word(uint8_t reg);
   int write_byte(uint8_t reg, uint8_t val);
   int write_word(uint8_t reg, uint16_t val);
 };

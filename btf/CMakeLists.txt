@@ -6,7 +6,8 @@ add_executable(gtests
   include/gtest_globals.h
   src/gtests.cpp
   src/LogPrinter.cpp
-  src/can_test.cpp)
+  src/can_test.cpp
+  src/i2c_test.cpp)
 
 target_include_directories(gtests PUBLIC include)
 

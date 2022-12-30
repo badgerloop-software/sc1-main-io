@@ -47,6 +47,11 @@ TEST(I2c, mcp23017) {
   DUT.set_state(pin, val);
   // use helper to check that the gpio register looks like what we expect
   EXPECT_EQ((h.rbyte(MCP_GPIOA_REG) >> pin) & 1, val);
+
+  val = 0;  // now lower same pin to make sure we didn't get lucky
+  DUT.set_state(pin, val);
+  EXPECT_EQ((h.rbyte(MCP_GPIOA_REG) >> pin) & 1, val);
+
   pin = 0;  // this pin is an input (check above)
   EXPECT_EQ(DUT.set_state(pin, val), -EINVAL);  // setting an input should fail
 }

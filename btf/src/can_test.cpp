@@ -29,14 +29,14 @@ TEST(Can, callbacks) {
   uint32_t data = 0xDEADBEEF;
   s.send(0x21, (uint8_t *)&data, sizeof(data));
 
-  while (!flag)
+  while (!flag && !s.init() && !r.init())
     ;
+
   EXPECT_EQ(flag, 0xDEADBEEF);
   flag = 0;
 
-  data = 0xBAD637;
   s.send(0x39, (uint8_t *)&data, sizeof(data));
-  while (!flag)
+  while (!flag && !s.init() && !r.init())
     ;
   EXPECT_EQ(flag, 0x1234);
 }
@@ -60,7 +60,7 @@ TEST(Can, mppt) {
   float data = 2321.442;
   m.sendMaxOutputCurrent(data);
 
-  while (!done)
+  while (!flag && !s.init() && !r.init())
     ;
   EXPECT_EQ(flag, data);
 }

@@ -11,8 +11,8 @@ class helper : private I2c {
 };
 
 TEST(I2c, mcp23017) {
-  Mcp23017 m(0, 0x24);
-  helper h(0, 0x24);
+  Mcp23017 m(STUB_BUS, 0x24);
+  helper h(STUB_BUS, 0x24);
 
   uint8_t directions[MCP_NUM_PINS] = {1, 1, 0, 1, 0, 1, 0, 0,
                                       0, 1, 1, 1, 1, 1, 0, 1};

@@ -13,6 +13,10 @@ extern "C" {
 #include "i2c-dev.h"
 }
 
+#ifndef STUB_BUS
+#define STUB_BUS (-1)
+#endif
+
 class I2c {
  private:
   int fd;

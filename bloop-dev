@@ -13,15 +13,22 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
+STUB_BUS=$(awk '{ if ($4 ~ /stub/) { print substr($1,5) }}' <(i2cdetect -l))
 
+if [ -z ${STUB_BUS} ]; then
+  ARGS="-DCMAKE_EXPORT_COMPILE_COMMANDS=1 "
+else
+  ARGS="-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DSTUB_BUS=${STUB_BUS} "
+fi
 
 if [ "$1" == "build" ]; then
     $0 clean
     mkdir build && cd build
     if [ "$2" == "test" ]; then
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DDEV=ON -Wno-dev ..
+        cmake ${ARGS} -DDEV=ON -Wno-dev ..
     else
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..
+        cmake ${ARGS} ..
+        echo "cmake ${ARGS} .."
     fi
 
     if [ $? -ne 0 ]; then
@@ -91,9 +98,9 @@ elif [ "$1" == "cross" ]; then
     fi
 
     if [ "$2" == "test" ]; then
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_TOOLCHAIN_FILE=$toolchain -DDEV=ON -Wno-dev ..
+        cmake ${ARGS} -DCMAKE_TOOLCHAIN_FILE=$toolchain -DDEV=ON -Wno-dev ..
     else
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_TOOLCHAIN_FILE=$toolchain ..
+        cmake ${ARGS} -DCMAKE_TOOLCHAIN_FILE=$toolchain ..
     fi
 
     if [ $? -ne 0 ]; then

@@ -27,11 +27,14 @@ add_subdirectory(embedded/devices)
 add_subdirectory(embedded/drivers)
 add_subdirectory(btf)
 
-set(libraries devices
-    drivers)
+set(libraries
+    devices
+    drivers
+    pthread
+    i2c)
 
 add_executable(badgerloop ${dependencies})
-target_link_libraries(badgerloop PRIVATE ${libraries} pthread)
+target_link_libraries(badgerloop PRIVATE ${libraries})
 
 if( MATCHES "Linux")
     add_subdirectory(Test)

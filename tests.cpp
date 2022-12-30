@@ -17,7 +17,7 @@ int mcp23017_test() {
   static const uint8_t test_array[16] = {0, 1, 0, 0, 1, 0, 1, 1,
                                          0, 1, 0, 0, 0, 1, 1, 1};
   // initialize the device
-  Mcp23017 dev = Mcp23017(2, 0x24);
+  Mcp23017 dev = Mcp23017(0, 0x24);
 
   // begin the device dev.begin(array of 16 bits)
   if (dev.begin(test_array)) return 1;
@@ -223,8 +223,8 @@ int mppt_test() {
 }
 
 int main() {
-  std::cout << "Beginning mppt tests\n";
-  mppt_test();
+  std::cout << "mcp2307_test[" << mcp23017_test() << "]\n";
+
   /*
   Serial serial = Serial();
   if (serial.openDevice(4, 9600) != 1) std::cout << "error\n";

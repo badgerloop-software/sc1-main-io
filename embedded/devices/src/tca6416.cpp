@@ -9,20 +9,17 @@ Tca6416::Tca6416(int bus, int addr) : I2c(bus, addr, O_RDWR) {}
 
 int Tca6416::clear_settings() {
   /*Reset the configuration registers*/
-  if (this->write_data<uint8_t>(TCA_CFG0_REG, 0xFF) ||
-      this->write_data<uint8_t>(TCA_CFG1_REG, 0xFF))
+  if (write_byte(TCA_CFG0_REG, 0xFF) || write_byte(TCA_CFG1_REG, 0xFF))
     return -1;
 
   /*Reset the output registers*/
-  if (this->write_data<uint8_t>(TCA_OUT0_REG, 0xFF) ||
-      this->write_data<uint8_t>(TCA_OUT1_REG, 0xFF))
+  if (write_byte(TCA_OUT0_REG, 0xFF) || write_byte(TCA_OUT1_REG, 0xFF))
     return -1;
 
   return 0;
 }
 
 int Tca6416::set_dir(bool bank, int pin, uint8_t dir) {
-  uint8_t current_status;
   uint8_t dirReg;
   int rc;
 
@@ -35,19 +32,20 @@ int Tca6416::set_dir(bool bank, int pin, uint8_t dir) {
   } else {
     dirReg = TCA_CFG0_REG;
   }
-  current_status = this->read_from_reg(dirReg);
+  rc = read_byte(dirReg);
+  if (rc < 0) return rc;
 
   /*Write the value of dir to the correct pin*/
   if (dir) {
-    rc = this->write_data<uint8_t>(dirReg, current_status | (1 << pin));
+    rc = write_byte(dirReg, rc | (1 << pin));
   } else {
-    rc = this->write_data<uint8_t>(dirReg, current_status & ~(1 << pin));
+    rc = write_byte(dirReg, rc & ~(1 << pin));
   }
   return rc;
 }
 
 uint8_t Tca6416::get_dir(bool bank, int pin) {
-  uint8_t current_status;
+  int rc;
   uint8_t dirReg;
 
   /*Return error if pin number invalid*/
@@ -59,42 +57,34 @@ uint8_t Tca6416::get_dir(bool bank, int pin) {
   } else {
     dirReg = TCA_CFG0_REG;
   }
-  current_status = read_from_reg(dirReg);
+  rc = read_byte(dirReg);
+  if (rc < 0) return rc;
 
   /* Shift the relevant bit all the way right, then AND with 1 to clear other
    * bits*/
-  return ((current_status >> pin) & 1);
+  return ((rc >> pin) & 1);
 }
 
 int Tca6416::begin(const uint8_t directions[]) {
   int rc;
-  if (!this->is_open()) {
-    rc = this->open_i2c();
-    if (rc) return rc;
-  }
-  rc = this->clear_settings();
-  if (rc) {
-    std::cerr << "error clearing settings\n";
-    return rc;
-  }
+  if ((rc = open_i2c() < 0) || (rc = clear_settings() < 0)) return rc;
 
   // set directions for pins in the first bank
-  for (int i = 0; i < TCA_NUM_PINS_PER_BANK; ++i)
-    this->set_dir(0, i, directions[i]);
+  for (int i = 0; i < TCA_NUM_PINS_PER_BANK; ++i) set_dir(0, i, directions[i]);
   // set directions for pins in the second bank
   for (int i = 0; i < TCA_NUM_PINS_PER_BANK; ++i)
-    this->set_dir(1, i, directions[TCA_NUM_PINS_PER_BANK + i]);
+    set_dir(1, i, directions[TCA_NUM_PINS_PER_BANK + i]);
 
   // Make sure each pin in bank 0 actually received the correct value
   for (int i = 0; i < TCA_NUM_PINS_PER_BANK; ++i) {
-    if (this->get_dir(0, i) != directions[i]) {
+    if (get_dir(0, i) != directions[i]) {
       std::cerr << "Error setting direction of pin " << i << "\n";
       return -EIO;
     }
   }
   // Repeat process for bank 1
   for (int i = 0; i < TCA_NUM_PINS_PER_BANK; ++i) {
-    if (this->get_dir(1, i) != directions[TCA_NUM_PINS_PER_BANK + i]) {
+    if (get_dir(1, i) != directions[TCA_NUM_PINS_PER_BANK + i]) {
       std::cerr << "Error setting direction of pin " << i << "\n";
       return -EIO;
     }
@@ -103,9 +93,9 @@ int Tca6416::begin(const uint8_t directions[]) {
 }
 
 uint8_t Tca6416::get_state(bool bank, int pin) {
-  uint8_t current_status;
   uint8_t stateReg;
   uint8_t dir;
+  int rc;
 
   if (pin >= TCA_NUM_PINS_PER_BANK || pin < 0) return -EINVAL;
   dir = get_dir(bank, pin);
@@ -122,14 +112,13 @@ uint8_t Tca6416::get_state(bool bank, int pin) {
       stateReg = TCA_OUT0_REG;
   }
 
-  current_status = this->read_from_reg(stateReg);
+  rc = read_byte(stateReg);
+  if (rc < 0) return rc;
 
-  return ((current_status >> pin) & 1);
+  return ((rc >> pin) & 1);
 }
 
 int Tca6416::set_state(bool bank, int pin, uint8_t val) {
-  uint8_t current_status;
-  uint8_t current_dir;
   uint8_t stateReg;
   uint8_t dirReg;
   int rc;
@@ -145,14 +134,16 @@ int Tca6416::set_state(bool bank, int pin, uint8_t val) {
     stateReg = TCA_OUT0_REG;
   }
 
-  current_dir = this->read_from_reg(dirReg);
-  if ((current_dir >> pin) & 0x1) return -EINVAL;
-  current_status = this->read_from_reg(stateReg);
+  rc = read_byte(dirReg);
+  if (rc < 0) return rc;
+  if ((rc >> pin) & 0x1) return -EINVAL;
+  rc = read_byte(stateReg);
+  if (rc < 0) return rc;
 
   if (val)
-    rc = this->write_data<uint8_t>(stateReg, current_status | (1 << pin));
+    rc = write_byte(stateReg, rc | (1 << pin));
   else
-    rc = this->write_data<uint8_t>(stateReg, current_status & ~(1 << pin));
+    rc = write_byte(stateReg, rc & ~(1 << pin));
 
   return rc;
 }

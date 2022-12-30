@@ -30,8 +30,7 @@ add_subdirectory(btf)
 set(libraries
     devices
     drivers
-    pthread
-    i2c)
+    pthread)
 
 add_executable(badgerloop ${dependencies})
 target_link_libraries(badgerloop PRIVATE ${libraries})

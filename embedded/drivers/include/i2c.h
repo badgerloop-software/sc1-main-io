@@ -1,18 +1,16 @@
 #ifndef __i2c_h__
 #define __i2c_h__
 
+#include <cstring>
+#include <iostream>
+
+extern "C" {
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
 
-#include <cstring>
-#include <iostream>
-
-extern "C" {
-#include <i2c/smbus.h>
-#include <linux/i2c-dev.h>
-#include <linux/i2c.h>
+#include "i2c-dev.h"
 }
 
 class I2c {

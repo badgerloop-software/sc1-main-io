@@ -1,7 +1,5 @@
 #include "bms.h"
 
-Bms::Bms(Can &canBus) : CanDevice(canBus, bms_callbacks) {}
-
 int Bms::bmsClearFaults(void)  // send CAN info
 {
   uint16_t can_id = 0x7e3;

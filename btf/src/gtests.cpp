@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "LogPrinter.h"
-#include "gtest_globals.h"
 
 char executable_path[128];
 // Run all GTest Tests

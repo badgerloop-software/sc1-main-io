@@ -24,7 +24,7 @@ int Mcp23017::begin(const uint8_t directions[]) {
   int rc;
 
   if (!is_open()) {
-    rc = open_i2c();
+    rc = open();
     if (rc < 0) return rc;
   }
 

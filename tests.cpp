@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 
 #include <iostream>
@@ -212,20 +213,7 @@ int gpio_test(Serial serial) {
   return returnCondition;
 }
 
-int mppt_test() {
-  Can c("vcan0");
-  Mppt mppt(c);
-
-  float data = 9;
-  mppt.bus.send(MaxOutputCurrent, (uint8_t *)&data, sizeof(float));
-
-  return 0;
-}
-
 int main() {
-  std::cout << "mcp2307_test[" << mcp23017_test() << "]\n";
-
-  /*
   Serial serial = Serial();
   if (serial.openDevice(4, 9600) != 1) std::cout << "error\n";
   std::cout << "Beginning MCP23017 tests\n";
@@ -262,6 +250,6 @@ int main() {
   std::cout << "GPIO test passed\n";
 
   serial.closeDevice();
-  */
+
   return 0;
 }

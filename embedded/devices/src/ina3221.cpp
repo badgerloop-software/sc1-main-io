@@ -58,7 +58,7 @@ and initiates power on reset
 int Ina3221::begin() {
   int rc;
 
-  rc = open_i2c();
+  rc = open();
   if (rc < 0) return rc;
 
   // Read device register

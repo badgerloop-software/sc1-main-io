@@ -17,7 +17,7 @@ I2c::~I2c() {
 
 bool I2c::is_open() { return fd != -1; }
 
-int I2c::open_i2c() {
+int I2c::open() {
   char filename[20];
 
   if (is_open()) return 0;
@@ -28,7 +28,7 @@ int I2c::open_i2c() {
   }
 
   sprintf(filename, "/dev/i2c-%d", bus);
-  fd = open(filename, openMode);
+  fd = ::open(filename, openMode);
   if (fd < 0) {
     std::cerr << "Error - Could not open file\n";
     return -ENODEV;

@@ -77,12 +77,10 @@ int Can::send(int id, uint8_t *data, uint8_t size) {
   return ::send(sock, &msg, sizeof(struct can_frame), MSG_DONTWAIT);
 }
 
-void Can::add(vector<callback> &callbacks) {
+void Can::add(const vector<callback> &callbacks) {
   lock_guard<mutex> l(mu);
 
-  // theoretically moves callback memory into hashtable
-  for (callback &c : callbacks) callback_map.emplace(std::move(c));
-  callbacks.clear();  // invalidate local callbacks
+  callback_map.insert(callbacks.begin(), callbacks.end());
 }
 
 void Can::loop() {
@@ -90,12 +88,12 @@ void Can::loop() {
   struct pollfd fd = {sock, POLLIN};
 
   while (isInit) {
-    int ret = poll(&fd, 1, 200);  // check isInit every 200ms but immediately
-                                  // return if message is on the socket
+    int ret = poll(&fd, 1, 500);  // check isInit every 1/2 second
+                                  // but immediately return if
+                                  // message is on the socket
     if (ret > 0) {
       if (read(msg) < 0)  // not good. Try to re-initialize
         break;
-      // const iterator is gross, use auto
       auto pair = callback_map.find(msg.can_id);
       if (pair != callback_map.end()) (*pair).second(msg);  // execute function
     }

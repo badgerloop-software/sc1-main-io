@@ -67,7 +67,7 @@ uint8_t Tca6416::get_dir(bool bank, int pin) {
 
 int Tca6416::begin(const uint8_t directions[]) {
   int rc;
-  if ((rc = open_i2c() < 0) || (rc = clear_settings() < 0)) return rc;
+  if ((rc = open() < 0) || (rc = clear_settings() < 0)) return rc;
 
   // set directions for pins in the first bank
   for (int i = 0; i < TCA_NUM_PINS_PER_BANK; ++i) set_dir(0, i, directions[i]);

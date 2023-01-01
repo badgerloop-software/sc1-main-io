@@ -24,10 +24,10 @@ class I2c {
   int deviceAddress;
   int openMode;
 
- protected:
+ public:
   I2c(int bus, int addr, int mode);
   ~I2c();
-  int open_i2c();
+  int open();
   bool is_open();
   int read_byte(uint8_t reg);
   int read_word(uint8_t reg);

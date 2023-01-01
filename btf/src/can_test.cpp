@@ -1,66 +1,63 @@
-#include "can.h"
-
 #include <gtest/gtest.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 #include "mppt.h"
 
-static Can s("vcan0");
-static Can r("vcan0");
+class CanTest : public testing::Test {
+ private:
+  Can c;
+  CanDevice d;
 
-TEST(Can, callbacks) {
-  volatile uint32_t flag = 0;
-  vector<callback> callbacks{
-      {0x21,
-       [&flag](struct can_frame &frame) { flag = *(uint32_t *)frame.data; }},
-      {0x39, [&flag](struct can_frame &frame) { flag = 0x1234; }},
-  };
+ protected:
+  uint32_t i;
+  float f;
+  Can DUTbus;
+  CanTest()
+      : c("vcan0"),
+        DUTbus("vcan0"),
+        d(c,
+          {
+              {0x21,
+               [this](struct can_frame &frame) {
+                 i = *(uint32_t *)frame.data;
+               }},
+              {0x39, [this](struct can_frame &frame) { i = 0x1234; }},
 
-  assert(callbacks.size());
+              {MaxOutputCurrent,
+               [this](struct can_frame &frame) { f = *(float *)frame.data; }},
 
-  CanDevice cd(r, callbacks);
+          }) {}
+  void SetUp() override { EXPECT_EQ(c.init(), 0); }
+};
 
-  assert(!callbacks.size());
-
-  EXPECT_EQ(s.init(), 0);
-  EXPECT_EQ(r.init(), 0);
+TEST_F(CanTest, callbacks) {
+  EXPECT_EQ(DUTbus.init(), 0);
 
   uint32_t data = 0xDEADBEEF;
-  s.send(0x21, (uint8_t *)&data, sizeof(data));
+  i = 0;
+  DUTbus.send(0x21, (uint8_t *)&data, sizeof(data));
 
-  while (!flag && !s.init() && !r.init())
+  while (!i && !DUTbus.init())
     ;
 
-  EXPECT_EQ(flag, 0xDEADBEEF);
-  flag = 0;
+  EXPECT_EQ(i, 0xDEADBEEF);
+  i = 0;
 
-  s.send(0x39, (uint8_t *)&data, sizeof(data));
-  while (!flag && !s.init() && !r.init())
+  DUTbus.send(0x39, (uint8_t *)&data, sizeof(data));
+  while (!i && !DUTbus.init())
     ;
-  EXPECT_EQ(flag, 0x1234);
+  EXPECT_EQ(i, 0x1234);
 }
 
-TEST(Can, mppt) {
-  volatile float flag = 0;
-  volatile bool done = 0;
-  struct can_frame msg;
-  Mppt m(s);
+TEST_F(CanTest, mppt) {
+  Mppt DUT(DUTbus);
 
-  // make can device to read message from MPPT
-  vector<callback> callbacks{
-      {MaxOutputCurrent,
-       [&flag, &done](struct can_frame &frame) {
-         flag = *(float *)frame.data;
-         done = true;
-       }},
-  };
-  CanDevice cd(r, callbacks);
-
+  f = 0;
   float data = 2321.442;
-  m.sendMaxOutputCurrent(data);
+  DUT.sendMaxOutputCurrent(data);
 
-  while (!flag && !s.init() && !r.init())
+  while (!f && !DUTbus.init())
     ;
-  EXPECT_EQ(flag, data);
+  EXPECT_EQ(f, data);
 }

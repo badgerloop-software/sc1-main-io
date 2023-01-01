@@ -54,20 +54,19 @@ class Can {
  public:
   Can(const char *can_i);
   ~Can();
-  void add(vector<callback> &callbacks);
+  void add(const vector<callback> &callbacks);
   int send(int id, uint8_t *data, uint8_t size);
   int init();
 };
 
 class CanDevice {
- private:
-  mutex mu;
+ protected:
+  Can &bus;
 
  public:
-  CanDevice(Can &bus, vector<callback> &callbacks) : bus(bus) {
+  CanDevice(Can &bus, const vector<callback> &callbacks) : bus(bus) {
     bus.add(callbacks);
   }
-  Can &bus;
 };
 
 #endif

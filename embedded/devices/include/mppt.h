@@ -13,7 +13,7 @@ class Mppt : public CanDevice {  // Mppt = Maximum Power Point Tracking. MPPT
                                  // to minimize power loss.
 
  public:
-  Mppt(Can &c) : CanDevice(c, {{0x6B0, [](struct can_frame &frame) {}}}) {}
+  Mppt(Can &c) : CanDevice(c, {}) {}
   int sendMaxOutputCurrent(float moc);
 };
 

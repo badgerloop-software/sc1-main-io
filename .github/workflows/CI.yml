@@ -51,4 +51,4 @@ jobs:
     - name: Setup
       run: ./bloop-dev setup && ./btf/i2cinit.sh && ./btf/caninit.sh && ./bloop-dev build
     - name: Test
-      run: ./out/gtests
+      run: sudo ./out/gtests

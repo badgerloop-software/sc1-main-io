@@ -1,54 +1,45 @@
 name: C/C++ CI
 
-on:
-  push:
-  pull_request:
+on: push
 
 jobs:
+
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup
+      run: ./bloop-dev setup
 
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup
-      run: ./bloop-dev setup
+    - uses: setup
     - name: Build
       run: ./bloop-dev build
-
-  build-test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup
-      run: ./bloop-dev setup
-    - name: Build Test
-      run: ./bloop-dev build test
 
   cross-compile:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup
-      run: ./bloop-dev setup
-    - name: Debug
-      run: cd ~ && ls
+    - uses: setup
     - name: Cross-Compile
       run: ./bloop-dev cross
+
+  gtests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: setup
+    - uses: build
+    - name: Gtests
+      run: ./btf/i2cinit.sh && ./btf/caninit.sh && sudo ./out/gtests
 
   lint:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup
-      run: ./bloop-dev setup
+    - uses: setup
     - name: Lint
       run: ./bloop-dev lint
-
-  gtest:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup
-      run: ./bloop-dev setup && ./btf/i2cinit.sh && ./btf/caninit.sh && ./bloop-dev build
-    - name: Test
-      run: sudo ./out/gtests

@@ -133,6 +133,7 @@ elif [ "$1" == "setup" ]; then
         virtualenv \
         clang-format \
         cppcheck \
+        libi2c-dev \
         i2c-tools
 
     virtualenv -p python3 $PYTHON_ENV

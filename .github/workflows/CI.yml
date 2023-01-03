@@ -12,7 +12,7 @@ jobs:
     - name: Lint
       run: ./bloop-dev lint
     - name: Cross-Compile
-      run: ./bloop-dev cross
+      run: ./bloop-dev cross && ./bloop-dev clean
     - name: Build
       run: ./bloop-dev build
     - name: GTests

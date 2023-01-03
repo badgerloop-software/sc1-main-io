@@ -107,12 +107,13 @@ elif [ "$1" == "clean" ]; then
 elif [ "$1" == "setup" ]; then
   sudo apt update
   sudo apt install \
+    cmake \
     python3 \
     virtualenv \
     clang-format \
     cppcheck \
     i2c-tools \
-    linux-modules-extra-$(uname -r)
+    linux-modules-extra-5.15.0-1003-azure
 
   virtualenv -p python3 $PYTHON_ENV
   $PYBIN/pip install pre-commit

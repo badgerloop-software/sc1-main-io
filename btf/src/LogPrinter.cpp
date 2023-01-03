@@ -1,7 +1,7 @@
 #include "LogPrinter.h"
 
-void linePrinter(char line, std::string lStyle, std::string title,
-                 std::string rStyle) {
+void linePrinter(const char line, const std::string& lStyle,
+                 const std::string& title, const std::string& rStyle) {
   struct winsize size;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
   std::string space = title.length() > 0 ? "   " : "";

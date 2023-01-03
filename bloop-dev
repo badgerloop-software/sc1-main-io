@@ -63,7 +63,7 @@ if [ "$1" == "build" ]; then
 
     popd
     sudo ./out/gtests
-    [ $? -eq 0 ] && pickle_rick || oops "clean then try again"
+    [ $? -eq 0 ] && pickle_rick || oops "GTests failed"
 
 elif [ "$1" == "cross" ]; then
     prep

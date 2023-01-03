@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 project(PodEmbeddedBeta VERSION 0.1)
 
-option(DEV "Enable test wrapper" OFF)
-
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
@@ -20,13 +18,6 @@ if(DEFINED STUB_BUS)
     add_definitions(-DSTUB_BUS=${STUB_BUS})
 endif()
 
-if(DEFINED DEV)
-    add_definitions(-DDEV)
-    set(dependencies tests.cpp)
-else()
-    set(dependencies main.cpp)
-endif()
-
 add_subdirectory(embedded/devices)
 add_subdirectory(embedded/drivers)
 add_subdirectory(btf)
@@ -36,7 +27,7 @@ set(libraries
     drivers
     pthread)
 
-add_executable(badgerloop ${dependencies})
+add_executable(badgerloop main.cpp)
 target_link_libraries(badgerloop PRIVATE ${libraries})
 
 if( MATCHES "Linux")

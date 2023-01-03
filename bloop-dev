@@ -6,36 +6,37 @@ PYTHON_ENV=$ROOT_DIR/.env
 PYBIN=$PYTHON_ENV/bin
 PRE_COMMIT=$PYBIN/pre-commit
 PYTHON=$PYBIN/python
+STUB_BUS=$(awk '{ if ($4 ~ /stub/) { print substr($1,5) }}' <(i2cdetect -l) 2> /dev/null)
 
+#credit: https://emojicombos.com/rick-and-morty-ascii-art
 pickle_rick() {
-    cat <<'EOF'
-        ___
-    . -^   `--,
-   /# =========`-_
-  /# (--====___====\
- /#   .- --.  . --.|
-/##   |  * ) (   * ),
-|##   \    /\ \   / |
-|###   ---   \ ---  |
-|####      ___)    #|
-|######           ##|
- \##### ---------- /
-  \####           (
-   `\###          |
-     \###         |
-      \##        |
-       \###.    .)
-        `======/
-EOF
+echo -e '\033[32m⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⡤⣠⣤⣴⡾⠛⠛⠛⠛⠛⠋⠙⠛⠛⠻⣿⣿⣶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠘⢟⠒⠒⠦⢴⡿⣿⠟⢳⠀⠉⠢⡦⣤⠶⠶⢿⣿⣿⣿⣶⣄⠀⠙⠟⠉⠛⢿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠈⢧⠀⠀⠀⠙⠳⣾⣿⠇⠀⠀⠘⣿⡄⡷⣶⣶⣤⣄⣭⣿⣷⣦⣀⠀⠀⠀⠻⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⣸⠀⠀⠀⠀⠀⠈⠋⠀⠀⠀⠀⠘⡿⠁⢫⠉⠻⢿⣿⣉⠛⢿⣿⣦⣀⡀⠀⠛⢿⣷⣤⡀⠀⠀⠀⠀⠀
+⢀⣠⠤⠤⠀⠠⠤⢴⣻⠀⠀⠀⢀⡠⠤⠒⠒⠒⠢⣄⠀⠁⠀⢸⠀⠀⠀⠀⠹⣷⡈⢻⣿⢿⣿⣦⣀⣀⢹⡝⢿⣦⡀⠀⠀⠀
+⠀⠉⠓⢄⠀⠀⠀⠀⠀⠀⣠⠞⠁⣀⡠⠤⠐⠒⠒⠚⢷⡄⠀⢸⡀⣀⣠⣆⣀⣈⡉⠀⠙⣷⣍⠻⣿⣿⠀⠙⠈⠻⣿⣦⡀⠀
+⠀⠀⠀⠀⣷⡄⠀⠀⠀⢰⠁⡴⢊⡡⠔⠒⠉⠉⠉⢉⡩⠼⣆⠀⠉⠀⢰⠙⢿⣿⣿⣄⠀⠻⣿⣷⡈⢻⣷⡀⢀⠀⢸⣿⣧⠀
+⠀⠀⠀⢸⣿⣿⡀⠀⢠⡇⠈⠋⣡⠤⠀⠤⣄⠀⡴⠉⠀⠀⠀⠱⡄⢀⡏⠀⠸⡾⢿⣿⡇⠀⢸⣧⡁⠸⣯⠳⣿⠃⠀⣻⣿⠀
+⠲⣦⠒⠛⠛⠋⠀⠀⢸⠁⠀⡜⠁⠀⡀⠀⠈⡦⡇⠀⠐⠋⠀⢀⣇⣼⣀⣴⠀⠀⢠⣿⡥⠄⠀⠛⠿⠦⢜⣧⠙⢦⠈⣿⣿⠀
+⠀⠈⢳⣄⡀⠀⠀⠀⢸⡀⠀⡇⠀⠀⠃⠀⠀⡇⠑⢤⣀⣀⡤⣾⠀⠀⢀⠇⢀⠴⠊⠁⠀⣀⣀⣀⣀⠀⠀⠈⠑⢼⣀⣿⣿⡄
+⠀⠀⠀⣿⣿⡶⠤⠀⠀⡇⠀⢘⠢⠤⠤⣴⠊⠀⡄⠹⡄⠒⠚⠹⠉⢦⠎⣰⠃⢀⠴⢚⣛⡓⠠⠄⠀⠈⠑⠢⢄⠀⠑⢿⣿⡇
+⠀⠀⣸⣟⡁⠀⠀⠀⢠⢷⠀⠀⠉⠉⠉⠁⠀⠀⠘⠦⠇⠀⠀⠀⡧⠋⡴⠁⡴⢡⠞⠁⠀⠈⠳⡄⠀⠀⠀⠒⠤⣑⡄⠘⣿⠁
+⠀⠀⢹⣷⣮⡙⠢⡄⢣⡈⡆⠀⠀⡄⣀⣠⡤⠄⠀⠠⠤⣀⢠⠐⡇⠐⡅⡜⠀⢸⠀⠀⠒⠀⠀⡅⢠⠖⠉⠉⠙⢮⠹⡀⢿⠀
+⠀⠀⠈⣿⣿⡇⡴⠁⠀⣉⣻⣄⠀⠫⠹⠞⠁⠀⠀⠀⠀⠠⠋⢰⠃⡠⢻⠁⠀⠈⠳⠤⣀⡠⠜⠁⢆⠀⠀⢤⠀⠀⡇⡇⡸⠀
+⠀⠀⠀⠘⢿⣿⣴⡞⢯⡁⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠋⠀⠧⣸⠀⠀⠀⠀⠀⠀⠐⠢⠽⠘⠦⣀⣀⣀⠔⠁⡇⠇⠀
+⠀⠀⠀⠀⠈⠛⢿⣿⣌⣷⡈⠉⠙⣿⣷⣤⠤⣀⣠⣤⣴⡊⠁⠀⠀⠀⠈⢇⠀⢀⣾⣿⣿⣭⣱⣦⡀⠀⠀⠀⠀⠀⣸⡞⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣦⠀⠀⠈⠙⣿⣿⣦⣬⣽⣿⣶⣤⣤⣶⣤⣬⣧⡈⠛⠋⠉⠙⠻⣿⣷⠀⠀⠀⢀⡴⢙⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣿⣶⡄⠀⠀⠈⠙⠻⣯⣍⡉⠙⣛⠛⠛⠛⢻⣿⣿⣶⢤⣀⠀⠀⠈⠁⢀⣀⠴⠚⠒⠋⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢷⣦⣀⣴⣦⠀⠉⠻⠿⠿⢿⡿⠷⠞⠛⠛⠋⣁⣀⣤⣭⣿⣿⣯⡿⠏⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠿⢿⣷⣶⣶⣤⣤⣶⣤⣶⣶⣴⣾⣿⣿⠿⠟⠛⠋⠉⠁         \033[0m' >&2
 }
 
-
-if [ $# -eq 0 ]; then
-    echo "Usage $0 {clean, build, cross, setup, lint, autocode}"
+oops() {
+    echo -e "\033[1;42mError:\033[0m \033[1;32m${*}\033[0m" >&2
     exit 1
-fi
+}
 
-STUB_BUS=$(awk '{ if ($4 ~ /stub/) { print substr($1,5) }}' <(i2cdetect -l) 2> /dev/null)
 
 if [ -z ${STUB_BUS} ]; then
   ARGS="-DCMAKE_EXPORT_COMPILE_COMMANDS=1"
@@ -44,83 +45,61 @@ else
 fi
 
 if [ "$1" == "build" ]; then
+    ./btf/i2cinit.sh && ./btf/caninit.sh
+
     [ -d build ] || mkdir build
-    cd build
+    pushd build
 
-    if [ "$2" == "test" ]; then
-        cmake ${ARGS} -DDEV=ON -Wno-dev ..
-    else
-        cmake ${ARGS} ..
-    fi
+    cmake ${ARGS} ..
 
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, CMake failed"
-        exit 1
-    fi
+    [ $? -ne 0 ] && oops "CMake failed"
 
     make
 
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, Make failed"
-        exit 1
-    fi
+    [ $? -ne 0 ] && oops "Make failed"
 
-    pickle_rick
+    popd
+    sudo ./out/gtests
+    [ $? -eq 0 ] && pickle_rick || oops "clean then try again"
 
 elif [ "$1" == "cross" ]; then
     [ -d build ] || mkdir build
-    cd build
+    pushd build
 
     if [ $(uname -m) == "aarch64" ]; then
+        if [ ! -d /opt/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf ]; then
+  	        wget -c \
+              https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz \
+              -P /tmp/
 
-      if [ ! -d /opt/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf ]; then
-  	wget -c \
-      https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz \
-      -P /tmp/
-  	if [ $? -ne 0 ]; then
-  		echo "Failure to get arm-linux-gnueabihf"
-  	fi
-  	sudo tar xf /tmp/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz -C /opt/
+  	        [ $? -ne 0 ] && oops "Failure to get arm-linux-gnueabihf"
 
-  	rm /tmp/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz
-      fi
-      toolchain='./toolchains/beaglebone_aarch64.cmake'
+  	        sudo tar xf /tmp/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz -C /opt/
+  	        rm /tmp/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz
+        fi
+        TOOLCHAIN='./toolchains/beaglebone_aarch64.cmake'
 
     elif [ $(uname -m) == "x86_64" ]; then
+        if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
+        	  wget -c \
+              https://releases.linaro.org/components/toolchain/binaries/6.5-2018.12/arm-linux-gnueabihf/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz \
+              -P /tmp/
 
-      if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
-  	wget -c \
-      https://releases.linaro.org/components/toolchain/binaries/6.5-2018.12/arm-linux-gnueabihf/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz \
-      -P /tmp/
-  	if [ $? -ne 0 ]; then
-  		echo "Failure to get arm-linux-gnueabihf"
-  	fi
-  	sudo tar xf /tmp/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz -C /opt/
+        	  [ $? -ne 0 ] && oops "Failure to get arm-linux-gnueabihf"
 
-  	rm /tmp/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
-      fi
-      toolchain='./toolchains/beaglebone.cmake'
+        	  sudo tar xf /tmp/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz -C /opt/
+        	  rm /tmp/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
+        fi
+        TOOLCHAIN='./toolchains/beaglebone.cmake'
     fi
 
-    if [ "$2" == "test" ]; then
-        cmake ${ARGS} -DCMAKE_TOOLCHAIN_FILE=$toolchain -DDEV=ON -Wno-dev ..
-    else
-        cmake ${ARGS} -DCMAKE_TOOLCHAIN_FILE=$toolchain ..
-    fi
+    cmake ${ARGS} -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN ..
 
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, CMake failed"
-        exit 1
-    fi
+    [ $? -ne 0 ] && oops "CMake failed"
 
     make
 
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, Make failed"
-        exit 1
-    fi
-
-    pickle_rick
+    [ $? -ne 0 ] && oops "Make failed" || pickle_rick
 
 elif [ "$1" == "clean" ]; then
 	rm -rf build
@@ -136,7 +115,7 @@ elif [ "$1" == "setup" ]; then
         clang-format \
         cppcheck \
         i2c-tools \
-        linux-modules-extra-$(uname -r)
+        linux-generic
 
     virtualenv -p python3 $PYTHON_ENV
 
@@ -152,7 +131,6 @@ elif [ "$1" == "lint" ]; then
 
 elif [ "$1" == "autocode" ]; then
     $PYTHON $ROOT_DIR/autocoding/autocode.py
-
-elif [ "$1" == "test" ]; then
-    echo "NOT YET IMPLEMENTED"
+else
+    oops "Usage $0 {clean, build, cross, setup, lint, autocode}"
 fi

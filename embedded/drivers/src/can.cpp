@@ -29,7 +29,7 @@ int Can::init() {
   strcpy(ifr.ifr_name, can_i);
 
   if (ioctl(sock, SIOCGIFINDEX, &ifr)) {
-    std::cout << "Error: Could not locate CAN bus\n";
+    std::cerr << "Error: Could not locate CAN bus\n";
     return -1;
   }
 
@@ -37,7 +37,7 @@ int Can::init() {
   addr.can_ifindex = ifr.ifr_ifindex;
 
   if (bind(sock, (struct sockaddr *)&addr, sizeof(addr))) {
-    std::cout << "Error: Error binding address to socket\n";
+    std::cerr << "Error: Error binding address to socket\n";
     return -1;
   }
 

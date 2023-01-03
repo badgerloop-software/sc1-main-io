@@ -101,6 +101,8 @@ void Can::loop() {
 
   isInit = false;  // will retry on next r/w
   close(sock);
+  close(pfd[0]);
+  close(pfd[1]);
 }
 
 Can::~Can() {

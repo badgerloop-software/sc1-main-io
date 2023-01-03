@@ -3,14 +3,14 @@ name: Main-IO CI
 on: push
 
 jobs:
-  setup:
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Lint
-      run: ./bloop-dev lint
     - name: Setup
       run: ./bloop-dev setup
+    - name: Lint
+      run: ./bloop-dev lint
     - name: Cross-Compile
       run: ./bloop-dev cross
     - name: Build

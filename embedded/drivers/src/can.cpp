@@ -105,6 +105,6 @@ void Can::loop() {
 
 Can::~Can() {
   isInit = false;
-  write(pfd[1], NULL, 1);  // stop loop
+  write(pfd[1], "\0", 1);  // stop loop
   if (t.joinable()) t.join();
 }

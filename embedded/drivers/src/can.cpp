@@ -84,16 +84,16 @@ void Can::add(const vector<callback> &callbacks) {
 }
 
 void Can::loop() {
+  pipe(pfd);  // make pipe
   struct can_frame msg;
-  struct pollfd fd = {sock, POLLIN};
+  // poll both socket and pipe for end condition
+  struct pollfd fds[2] = {{sock, POLLIN}, {pfd[0], POLLIN}};
 
   while (isInit) {
-    int ret = poll(&fd, 1, 500);  // check isInit every 1/2 second
-                                  // but immediately return if
-                                  // message is on the socket
-    if (ret > 0) {
-      if (read(msg) < 0)  // not good. Try to re-initialize
-        break;
+    int ret = poll(fds, 2, -1);  // wait indefinitely for message on any fd
+    // only check socket for message
+    if (ret > 0 && fds[0].revents & POLLIN) {
+      if (read(msg) < 0) break;  // not good. Try to re-initialize
       auto pair = callback_map.find(msg.can_id);
       if (pair != callback_map.end()) (*pair).second(msg);  // execute function
     }
@@ -105,5 +105,6 @@ void Can::loop() {
 
 Can::~Can() {
   isInit = false;
+  write(pfd[1], NULL, 1);  // stop loop
   if (t.joinable()) t.join();
 }

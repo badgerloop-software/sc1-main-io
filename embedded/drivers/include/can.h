@@ -46,6 +46,7 @@ class Can {
   mutex mu;
   thread t;
   const char *can_i;
+  int pfd[2];
   int sock;
   bool isInit = false;
   void loop();

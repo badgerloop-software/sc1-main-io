@@ -115,7 +115,7 @@ elif [ "$1" == "setup" ]; then
         clang-format \
         cppcheck \
         i2c-tools \
-        linux-generic
+        linux-modules-extra-$(uname -r)
 
     virtualenv -p python3 $PYTHON_ENV
 

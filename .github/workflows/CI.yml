@@ -8,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup
-      run: ./bloop-dev setup
+      run: ./bloop-dev setup && ./btf/i2cinit.sh && ./btf/caninit.sh
     - name: Lint
       run: ./bloop-dev lint
     - name: Cross-Compile
@@ -16,4 +16,4 @@ jobs:
     - name: Build
       run: ./bloop-dev build
     - name: GTests
-      run: ./btf/i2cinit.sh && ./btf/caninit.sh && sudo ./out/gtests
+      run: sudo ./out/gtests

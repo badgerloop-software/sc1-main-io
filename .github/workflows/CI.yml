@@ -1,47 +1,19 @@
-name: C/C++ CI
+name: Main-IO CI
 
-on:
-  push:
-  pull_request:
+on: push
 
 jobs:
-
   setup:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup
-      run: ./bloop-dev setup
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: setup
-    - name: Build
-      run: ./bloop-dev build
-
-  cross-compile:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: setup
-    - name: Cross-Compile
-      run: ./bloop-dev cross
-
-  gtests:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: setup
-    - uses: build
-    - name: Gtests
-      run: ./btf/i2cinit.sh && ./btf/caninit.sh && sudo ./out/gtests
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: setup
     - name: Lint
       run: ./bloop-dev lint
+    - name: Setup
+      run: ./bloop-dev setup
+    - name: Cross-Compile
+      run: ./bloop-dev cross
+    - name: Build
+      run: ./bloop-dev build
+    - name: GTests
+      run: ./btf/i2cinit.sh && ./btf/caninit.sh && sudo ./out/gtests

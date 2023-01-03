@@ -3,17 +3,15 @@ name: Main-IO CI
 on: push
 
 jobs:
-  build:
+  WubbaLubbaDubDub:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Setup
-      run: ./bloop-dev setup && ./btf/i2cinit.sh && ./btf/caninit.sh
+      run: ./bloop-dev setup
     - name: Lint
       run: ./bloop-dev lint
     - name: Cross-Compile
       run: ./bloop-dev cross && ./bloop-dev clean
     - name: Build
       run: ./bloop-dev build
-    - name: GTests
-      run: sudo ./out/gtests

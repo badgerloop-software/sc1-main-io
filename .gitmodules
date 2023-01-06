@@ -1,6 +1,3 @@
 [submodule "btf/googletest"]
 	path = btf/googletest
 	url = https://github.com/google/googletest.git
-[submodule "btf/libgpiod"]
-	path = btf/libgpiod
-	url = https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git

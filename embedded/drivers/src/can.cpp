@@ -41,6 +41,8 @@ int Can::init() {
     return -1;
   }
 
+  if (pipe(pfd) < 0) return -1;
+
   isInit = true;
 
   t = thread(&Can::loop, this);
@@ -84,7 +86,6 @@ void Can::add(const vector<callback> &callbacks) {
 }
 
 void Can::loop() {
-  pipe(pfd);  // make pipe
   struct can_frame msg;
   // poll both socket and pipe for end condition
   struct pollfd fds[2] = {{sock, POLLIN}, {pfd[0], POLLIN}};
@@ -99,14 +100,20 @@ void Can::loop() {
     }
   }
 
-  isInit = false;  // will retry on next r/w
+  lock_guard<mutex> l(mu);
+
   close(sock);
   close(pfd[0]);
   close(pfd[1]);
+  isInit = false;  // make sure not init (failures within thread)
+                   // will retry on next r/w
 }
 
 Can::~Can() {
-  isInit = false;
-  write(pfd[1], "\0", 1);  // stop loop
+  {
+    lock_guard<mutex> l(mu);
+    isInit = false;
+    write(pfd[1], "\0", 1);  // stop loop
+  }
   if (t.joinable()) t.join();
 }

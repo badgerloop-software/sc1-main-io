@@ -9,8 +9,8 @@ PYTHON=$PYBIN/python
 ARGS="-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DBUILD_GMOCK=OFF"
 
 prep() {
-  ./btf/i2cinit.sh && ./btf/caninit.sh 2> /dev/null
-  STUB_BUS=$(awk '{ if ($4 ~ /stub/) { print substr($1,5) }}' <(i2cdetect -l) 2> /dev/null)
+  ./btf/i2cinit.sh && ./btf/caninit.sh && ./btf/gpioinit.sh 2> /dev/null
+  STUB_BUS=$(i2cdetect -l | awk '{ if ($4 ~ /stub/) { print substr($1,5) }}' 2> /dev/null)
   [ -z ${STUB_BUS} ] || ARGS="$ARGS -DSTUB_BUS=${STUB_BUS}"
 }
 

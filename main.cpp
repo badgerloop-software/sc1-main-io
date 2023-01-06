@@ -151,6 +151,7 @@ int ina3221_test() {
   return 0;
 }
 
+/*
 int gpio_test(Serial serial) {
   int returnCondition = 0;
   // initialize the pins
@@ -211,8 +212,15 @@ int gpio_test(Serial serial) {
   serial.flushReceiver();
   return returnCondition;
 }
+*/
 
 int main() {
+  Gpio g("/dev/gpiochip0");
+  g.begin();
+  g.write({{1, 1}}, "Holla");
+  usleep(1000000);
+
+  /*
   Serial serial = Serial();
   if (serial.openDevice(4, 9600) != 1) std::cout << "error\n";
   std::cout << "Beginning MCP23017 tests\n";
@@ -250,5 +258,6 @@ int main() {
 
   serial.closeDevice();
 
+  */
   return 0;
 }

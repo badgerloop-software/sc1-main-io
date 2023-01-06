@@ -1,16 +1,28 @@
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef __GPIO_H__
+#define __GPIO_H__
+
+#include <gpiod.h>
+
+#include <iostream>
+#include <vector>
+
+using std::pair;
+using std::vector;
+
+#define LINE_NUM (P)(P % 32)
+#define BANK_NUM (P)(P / 32)
 
 class Gpio {
  private:
-  bool direction;  // 1 is input(read), 0 is output(write)
-  int value;
-  int pinNumber;
-  std::size_t pinNumberSize;
+  const char *name;
+  int fd;
+  struct gpiod_chip *chip;
+  gpiod_line *lines[GPIOD_LINE_BULK_MAX_LINES] = {0};
 
  public:
-  Gpio(int pinNumber, bool direction);
-  int begin();  // sets the direction
-  int setValue(bool value);
-  int getValue();
+  Gpio(const char *name) : name(name) {}
+  int begin();
+  int write(const vector<pair<unsigned int, bool>> &pins, const char *name);
 };
+
+#endif

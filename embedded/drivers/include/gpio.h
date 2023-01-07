@@ -1,28 +1,46 @@
 #ifndef __GPIO_H__
 #define __GPIO_H__
 
-#include <gpiod.h>
+#include <linux/gpio.h>
+#include <unistd.h>
 
 #include <iostream>
 #include <vector>
 
-using std::pair;
+using std::string;
 using std::vector;
 
-#define LINE_NUM (P)(P % 32)
-#define BANK_NUM (P)(P / 32)
+#define MAX_PINS (64)
+#define MAX_BANKS (3)
+
+struct io_req {
+  gpiohandle_data line_values[MAX_BANKS] = {0};  // passed in ioctl
+  int pins[MAX_BANKS][MAX_PINS] = {0};  // keep track of what index is what pin
+  int bank_count[MAX_BANKS] = {0};      // number of pins requested
+};
 
 class Gpio {
+  typedef __aligned_u64 u64;
+
  private:
-  const char *name;
-  int fd;
+  unsigned int nbanks;
+  bool isInit;
+  uint64_t directions;
+  uint64_t values;
+  struct gpiohandle_request request[GPIOHANDLES_MAX];
+  char bank_name[MAX_BANKS][GPIO_MAX_NAME_SIZE];
+  int bank_fd[MAX_BANKS] = {0};
   struct gpiod_chip *chip;
-  gpiod_line *lines[GPIOD_LINE_BULK_MAX_LINES] = {0};
 
  public:
-  Gpio(const char *name) : name(name) {}
+  Gpio(const vector<string> &chips);
+  ~Gpio() {
+    for (int i = 0; i < nbanks; i++)
+      if (bank_fd[i]) close(bank_fd[i]);
+  }
   int begin();
-  int write(const vector<pair<unsigned int, bool>> &pins, const char *name);
+  int Io(io_req &pins);
+  void mark_pin(io_req &req, unsigned int pin, bool value);
 };
 
 #endif

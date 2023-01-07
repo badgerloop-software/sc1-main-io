@@ -215,49 +215,50 @@ int gpio_test(Serial serial) {
 */
 
 int main() {
-  Gpio g("/dev/gpiochip0");
-  g.begin();
-  g.write({{1, 1}}, "Holla");
-  usleep(1000000);
-
-  /*
-  Serial serial = Serial();
-  if (serial.openDevice(4, 9600) != 1) std::cout << "error\n";
-  std::cout << "Beginning MCP23017 tests\n";
-  serial.writeString("mcp23017\n");
-
-  // Test calls go here
-  if (mcp23017_test()) {
-    std::cout << "MCP23017 test failed\n";
-    return 1;
-  }
-
-  serial.writeString("tca6416\n");
-  usleep(10000);  // delay to allow device to change
-  std::cout << "Beginning TCA tests\n";
-  if (tca6416_test()) {
-    std::cout << "TCA6416 test failed\n";
-    return -1;
-  }
-  std::cout << "TCA6416 tests passed\n";
-
-  std::cout << "Beginning GPIO tests\n";
-  if (gpio_test(serial)) {
-    std::cout << "GPIO test failed\n";
-    return 1;
-  }
-
-  std::cout << "Begnning INA3221 tests\n";
-  //  serial.writeString("ina3221");
-  if (ina3221_test()) {
-    std::cout << "INA3221 test failed\n";
-    return -1;
-  }
-
-  std::cout << "GPIO test passed\n";
-
-  serial.closeDevice();
-
-  */
+  Gpio a({"/dev/gpiochip0"});
+  a.begin();
+  io_req req;
+  a.mark_pin(req, 0, 1);
+  a.Io(req);
   return 0;
 }
+
+/*
+Serial serial = Serial();
+if (serial.openDevice(4, 9600) != 1) std::cout << "error\n";
+std::cout << "Beginning MCP23017 tests\n";
+serial.writeString("mcp23017\n");
+
+// Test calls go here
+if (mcp23017_test()) {
+  std::cout << "MCP23017 test failed\n";
+  return 1;
+}
+
+serial.writeString("tca6416\n");
+usleep(10000);  // delay to allow device to change
+std::cout << "Beginning TCA tests\n";
+if (tca6416_test()) {
+  std::cout << "TCA6416 test failed\n";
+  return -1;
+}
+std::cout << "TCA6416 tests passed\n";
+
+std::cout << "Beginning GPIO tests\n";
+if (gpio_test(serial)) {
+  std::cout << "GPIO test failed\n";
+  return 1;
+}
+
+std::cout << "Begnning INA3221 tests\n";
+//  serial.writeString("ina3221");
+if (ina3221_test()) {
+  std::cout << "INA3221 test failed\n";
+  return -1;
+}
+
+std::cout << "GPIO test passed\n";
+
+serial.closeDevice();
+
+*/

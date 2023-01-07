@@ -8,7 +8,6 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include <csignal>
 #include <iostream>
 
 Can::Can(const char *can_i) : can_i(can_i) {}

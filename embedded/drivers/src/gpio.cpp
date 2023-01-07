@@ -1,48 +1,79 @@
 #include "gpio.h"
 
-#include <gpiod.h>
+#include <fcntl.h>
+#include <string.h>
+#include <sys/ioctl.h>
 
 #include <iostream>
 
-int Gpio::begin() {
-  chip = gpiod_chip_open(name);
-  if (!chip) {
-    std::cerr << "Error opening gpiod chip\n";
-    return -1;
-  }
-  return 0;
-};
-
-int Gpio::write(const vector<pair<unsigned int, bool>> &pins,
-                const char *name) {
-  struct gpiod_line_bulk bulk[GPIOD_LINE_BULK_MAX_LINES];
-  unsigned int offsets[GPIOD_LINE_BULK_MAX_LINES], num_offsets;
-  int default_vals[GPIOD_LINE_BULK_MAX_LINES];
-
-  // unpack pins vector
-  if ((num_offsets = pins.size()) > GPIOD_LINE_BULK_MAX_LINES) {
-    std::cerr << "Too many lines passed\n";
-    return -1;
-  }
-
+Gpio::Gpio(const vector<string> &chips) {
+  nbanks = chips.size();
   int i = 0;
-  for (auto &p : pins) {
-    offsets[i] = p.first;
-    default_vals[i] = p.second;
-    i++;
+  for (auto &s : chips) strcpy(bank_name[i++], s.c_str());
+}
+
+void Gpio::mark_pin(io_req &req, unsigned int pin, bool value) {
+  // get pin location
+  int line = pin % MAX_PINS;
+  int bank = pin / MAX_PINS;
+
+  int *count = &req.bank_count[bank];
+
+  req.pins[bank][*count] = line;  // store line offset
+  req.line_values[bank].values[*count] = value;
+
+  (*count)++;
+}
+
+int Gpio::Io(io_req &req) {
+  if (begin() < 0) return -1;
+  for (int bank = 0; bank < nbanks; bank++) {
+    if (req.bank_count[bank]) {
+      /*
+       */
+      struct gpiohandle_request lreq;
+      memset(&lreq.default_values, 0, sizeof(lreq.default_values));
+      lreq.flags = GPIOHANDLE_REQUEST_OUTPUT;
+      strcpy(lreq.consumer_label, "TESTIO");
+      lreq.lines = req.bank_count[bank];
+
+      for (int line = 0; line < lreq.lines; line++) {
+        lreq.lineoffsets[line] = req.pins[bank][line];
+      }
+
+      // request linehandles
+      if (ioctl(bank_fd[bank], GPIO_GET_LINEHANDLE_IOCTL, &lreq) < 0) {
+        std::cerr << "Error requesting linehandles: " << errno << std::endl;
+        return -1;
+      }
+
+      // provide data
+      if (ioctl(lreq.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL,
+                &req.line_values[bank]) < 0) {
+        std::cerr << "Error setting values: " << errno << std::endl;
+        return -1;
+      }
+    }
   }
-
-  if (gpiod_chip_get_lines(chip, offsets, num_offsets, bulk) < 0) {
-    std::cerr << "Failed to get lines\n";
-    return -1;
-  }
-
-  gpiod_line_release_bulk(bulk);
-
-  if (gpiod_line_request_bulk_output(bulk, name, default_vals) < 0) {
-    std::cerr << "Failed to request output on lines\n";
-    return -1;
-  }
-
   return 0;
 }
+
+int Gpio::begin() {
+  if (isInit) return 0;
+
+  for (int i = 0; i < nbanks; i++) {
+    if ((bank_fd[i] = open(bank_name[i], O_RDWR)) < 0) {
+      std::cerr << "Error opening " << bank_name[i] << std::endl;
+      return -1;
+    }
+    struct gpiochip_info info;
+    if ((ioctl(bank_fd[i], GPIO_GET_CHIPINFO_IOCTL, &info)) < 0) {
+      std::cerr << "Error getting chip info " << bank_name[i] << std::endl;
+    }
+    std::cout << "Name: " << info.name << "\nLabel: " << info.label
+              << "\nLines: " << info.lines << std::endl;
+  }
+
+  isInit = true;
+  return 0;
+};

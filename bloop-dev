@@ -109,15 +109,14 @@ elif [ "$1" == "clean" ]; then
   echo "clean finished"
 
 elif [ "$1" == "setup" ]; then
-  sudo apt update
-  sudo apt install \
+  sudo apt update -y
+  sudo apt install -y \
     cmake \
     python3 \
     virtualenv \
     clang-format \
     cppcheck \
-    i2c-tools \
-    linux-modules-5.17.0-1003-oem
+    i2c-tools
 
   virtualenv -p python3 $PYTHON_ENV
   $PYBIN/pip install pre-commit
@@ -125,7 +124,10 @@ elif [ "$1" == "setup" ]; then
 
   git submodule update --init --recursive
 
-  warn "Restart to install kernel"
+  sudo apt install -y \
+    linux-modules-extra-5.19.0-21-generic && \
+    warn "Restart to install kernel modules" || \
+    warn "Upgrade to kinetic (22.10) then run setup to install kernel modules"
 
 elif [ "$1" == "lint" ]; then
   $PRE_COMMIT run -a

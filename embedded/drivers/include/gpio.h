@@ -10,7 +10,7 @@
 using std::string;
 using std::vector;
 
-#define MAX_PINS (64)
+#define MAX_PINS (32)
 #define MAX_BANKS (3)
 
 struct io_req {

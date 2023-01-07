@@ -69,28 +69,29 @@ elif [ "$1" == "cross" ]; then
   pushd build
 
   if [ $(uname -m) == "aarch64" ]; then
-    if [ ! -d /opt/arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-linux-gnueabihf ]; then
-      curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-linux-gnueabihf.tar.xz \
-      -o /tmp/arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-linux-gnueabihf.tar.xz
+    if [ ! -d /opt/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf ]; then
+      curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz \
+      -o /tmp/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz
 
       [ $? -ne 0 ] && oops "Failure to get arm-linux-gnueabihf"
 
-      sudo tar xf /tmp/arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-linux-gnueabihf.tar.xz -C /opt/
-      rm /tmp/arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-linux-gnueabihf.tar.xz
+      sudo tar xf /tmp/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz -C /opt/
+      rm /tmp/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz
     fi
     TOOLCHAIN='./toolchains/beaglebone_aarch64.cmake'
 
-  elif [ $(uname -m) == "x86_64" ]; then
-    if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
 
-      curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-linux-gnueabihf.tar.xz \
-      -o /tmp/arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-linux-gnueabihf.tar.xz
+  elif [ $(uname -m) == "x86_64" ]; then
+    if [ ! -d /opt/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf ]; then
+
+      curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf.tar.xz \
+      -o /tmp/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf.tar.xz
 
 
       [ $? -ne 0 ] && oops "Failure to get arm-linux-gnueabihf"
 
-      sudo tar xf /tmp/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-linux-gnueabihf.tar.xz -C /opt/
-      rm /tmp/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-linux-gnueabihf.tar.xz
+      sudo tar xf /tmp/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf.tar.xz -C /opt/
+      rm /tmp/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf.tar.xz
     fi
     TOOLCHAIN='./toolchains/beaglebone.cmake'
   fi

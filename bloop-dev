@@ -84,7 +84,7 @@ elif [ "$1" == "cross" ]; then
   elif [ $(uname -m) == "x86_64" ]; then
     if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
       curl -L /
-      https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-linux-gnueabihf.tar.xz
+      https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-linux-gnueabihf.tar.xz /
       -o /tmp/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-linux-gnueabihf.tar.xz
 
       [ $? -ne 0 ] && oops "Failure to get arm-linux-gnueabihf"

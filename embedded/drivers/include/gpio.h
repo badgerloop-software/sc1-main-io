@@ -7,17 +7,12 @@
 #include <iostream>
 #include <vector>
 
+using std::pair;
 using std::string;
 using std::vector;
 
 #define MAX_PINS (32)
 #define MAX_BANKS (3)
-
-struct io_req {
-  gpiohandle_data line_values[MAX_BANKS] = {0};  // passed in ioctl
-  int pins[MAX_BANKS][MAX_PINS] = {0};  // keep track of what index is what pin
-  int bank_count[MAX_BANKS] = {0};      // number of pins requested
-};
 
 class Gpio {
   typedef __aligned_u64 u64;
@@ -32,14 +27,23 @@ class Gpio {
   int bank_fd[MAX_BANKS] = {0};
 
  public:
+  class Pins {
+   public:
+    Pins(const vector<unsigned int> &pins){};
+    int bank_count[MAX_BANKS] = {0};               // number of pins requested
+    gpiohandle_data line_values[MAX_BANKS] = {0};  // passed in ioctl
+    int offset[MAX_BANKS][MAX_PINS] = {
+        0};  // keep track of what index is what pin
+  };
+
   Gpio(const vector<string> &chips);
   ~Gpio() {
     for (int i = 0; i < nbanks; i++)
       if (bank_fd[i]) close(bank_fd[i]);
   }
   int begin();
-  int Io(io_req &pins);
-  void mark_pin(io_req &req, unsigned int pin, bool value);
+  int Io(Pins &pins);
+  void mark_pin(Pins &pin, pair<unsigned int, bool> req);
 };
 
 #endif

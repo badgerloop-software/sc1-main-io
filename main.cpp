@@ -217,9 +217,11 @@ int gpio_test(Serial serial) {
 int main() {
   Gpio a({"/dev/gpiochip0"});
   a.begin();
-  io_req req;
-  a.mark_pin(req, 0, 1);
-  a.Io(req);
+  Gpio::Pins pins({0, 1, 2});
+  a.mark_pin(pins, {0, false});
+  a.mark_pin(pins, {1, false});
+  a.mark_pin(pins, {2, true});
+  a.Io(pins);
   usleep(2000000);
   return 0;
 }

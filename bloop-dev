@@ -116,7 +116,7 @@ elif [ "$1" == "setup" ]; then
     clang-format \
     cppcheck \
     i2c-tools \
-    linux-modules-extra-5.15.0-1003-azure
+    linux-modules-5.17.0-1003-oem
 
   virtualenv -p python3 $PYTHON_ENV
   $PYBIN/pip install pre-commit

@@ -16,7 +16,6 @@ endif()
 target_include_directories(gtests PUBLIC include)
 
 target_link_libraries(gtests
-  gpiod
   gtest
   devices
   drivers)

@@ -12,5 +12,5 @@ mkdir /config
 mount -t configfs none /config
 mkdir -p $LINE0
 echo 1 > $DEVICE/live
-echo 3 > $CHIP0/num_lines
+echo 1 > $CHIP0/num_lines
 EOF

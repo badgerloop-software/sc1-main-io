@@ -28,9 +28,8 @@ class Gpio {
   uint64_t directions;
   uint64_t values;
   struct gpiohandle_request request[GPIOHANDLES_MAX];
-  char bank_name[MAX_BANKS][GPIO_MAX_NAME_SIZE];
+  char bank_name[MAX_BANKS][32];
   int bank_fd[MAX_BANKS] = {0};
-  struct gpiod_chip *chip;
 
  public:
   Gpio(const vector<string> &chips);

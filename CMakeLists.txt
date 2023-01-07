@@ -23,7 +23,6 @@ add_subdirectory(embedded/drivers)
 add_subdirectory(btf)
 
 set(libraries
-    gpiod
     devices
     drivers
     pthread)

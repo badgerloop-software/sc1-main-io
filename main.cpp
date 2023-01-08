@@ -214,15 +214,31 @@ int gpio_test(Serial serial) {
 }
 */
 
+#include <assert.h>
+
 int main() {
   Gpio a({"/dev/gpiochip0"});
-  a.begin();
-  Gpio::Pins pins({0, 1, 2});
-  a.mark_pin(pins, {0, false});
-  a.mark_pin(pins, {1, false});
-  a.mark_pin(pins, {2, true});
-  a.Io(pins);
-  usleep(2000000);
+  assert(!a.begin());
+  Gpio::Pin p0(0, GPIOHANDLE_REQUEST_OUTPUT);
+  Gpio::Pin p1(1, GPIOHANDLE_REQUEST_OUTPUT);
+  Gpio::Pin p2(2, GPIOHANDLE_REQUEST_OUTPUT);
+  assert(!a.setValue(p1, 0));
+
+  bool value;
+
+  assert(!a.getValue(p0, value));
+  std::cerr << "Got: " << value << std::endl;
+
+  assert(!a.setValue(p1, 1));
+  std::cerr << "Set: " << 1 << std::endl;
+
+  assert(!a.setValue(p2, 0));
+  std::cerr << "Set: " << 0 << std::endl;
+  usleep(300000);
+
+  assert(!a.getValue(p0, value));
+  std::cerr << "Got: " << value << std::endl;
+
   return 0;
 }
 

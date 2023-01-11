@@ -17,10 +17,9 @@ using std::vector;
 #define MAX_PINS (32)
 #define BANKS (4)
 
-static int fds[BANKS];
-
 class Gpio {
  private:
+  int fds[BANKS];
   const vector<string> chips;
 
  public:
@@ -29,18 +28,22 @@ class Gpio {
     int bank;
     gpiohandle_request req;
     gpiohandle_data data;
-    Pin(int pin, __u32 flag) : line(pin % MAX_PINS), bank(pin / MAX_PINS) {
+    Pin(const Gpio &g, int pin, __u32 flag)
+        : line(pin % MAX_PINS), bank(pin / MAX_PINS) {
       memset(req.default_values, 0, sizeof(req.default_values));
       req.lineoffsets[0] = line;
       req.lines = 1;
       req.fd = -1;
-      if (fds[bank] != -1) {
+      if (g.fds[bank] != -1) {
         strcpy(req.consumer_label, "Bloop");
         req.flags = flag;
-        if (ioctl(fds[bank], GPIO_GET_LINEHANDLE_IOCTL, &req) < 0)
+        if (ioctl(g.fds[bank], GPIO_GET_LINEHANDLE_IOCTL, &req) < 0)
           perror("Error getting linehandles");
       }
     };
+    ~Pin() {
+      if (req.fd != -1) close(req.fd);
+    }
   };
 
   int getValue(Pin &p, bool &value) {
@@ -65,6 +68,11 @@ class Gpio {
 
   Gpio(vector<string> &&chips) : chips(chips) {
     for (int i = 0; i < BANKS; i++) fds[i] = -1;
+  }
+
+  ~Gpio() {
+    for (int i = 0; i < BANKS; i++)
+      if (fds[i] != -1) close(fds[i]);
   }
 
   int begin() {

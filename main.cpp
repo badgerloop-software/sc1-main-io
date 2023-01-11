@@ -219,9 +219,9 @@ int gpio_test(Serial serial) {
 int main() {
   Gpio a({"/dev/gpiochip0"});
   assert(!a.begin());
-  Gpio::Pin p0(0, GPIOHANDLE_REQUEST_OUTPUT);
-  Gpio::Pin p1(1, GPIOHANDLE_REQUEST_OUTPUT);
-  Gpio::Pin p2(2, GPIOHANDLE_REQUEST_OUTPUT);
+  Gpio::Pin p0(a, 0, GPIOHANDLE_REQUEST_OUTPUT);
+  Gpio::Pin p1(a, 1, GPIOHANDLE_REQUEST_OUTPUT);
+  Gpio::Pin p2(a, 2, GPIOHANDLE_REQUEST_OUTPUT);
   assert(!a.setValue(p1, 0));
 
   bool value;

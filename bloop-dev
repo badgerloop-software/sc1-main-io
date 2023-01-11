@@ -5,14 +5,7 @@ PYTHON_ENV=$ROOT_DIR/.env
 PYBIN=$PYTHON_ENV/bin
 PRE_COMMIT=$PYBIN/pre-commit
 PYTHON=$PYBIN/python
-
 ARGS="-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DBUILD_GMOCK=OFF"
-
-prep() {
-  ./btf/i2cinit.sh && ./btf/caninit.sh && ./btf/gpioinit.sh 2> /dev/null
-  STUB_BUS=$(i2cdetect -l | awk '{ if ($4 ~ /stub/) { print substr($1,5) }}' 2> /dev/null)
-  [ -z ${STUB_BUS} ] || ARGS="$ARGS -DSTUB_BUS=${STUB_BUS}"
-}
 
 #credit: https://emojicombos.com/rick-and-morty-ascii-art
 pickle_rick() {
@@ -48,7 +41,9 @@ warn() {
 }
 
 if [ "$1" == "build" ]; then
-  prep
+  ./btf/i2cinit.sh && ./btf/caninit.sh && ./btf/gpioinit.sh 2> /dev/null
+  STUB_BUS=$(i2cdetect -l | awk '{ if ($4 ~ /stub/) { print substr($1,5) }}' 2> /dev/null)
+  [ -z ${STUB_BUS} ] || ARGS="$ARGS -DSTUB_BUS=${STUB_BUS}"
 
   [ -d build ] || mkdir build
   pushd build
@@ -61,9 +56,9 @@ if [ "$1" == "build" ]; then
   popd
   sudo ./out/gtests
   [ $? -eq 0 ] && pickle_rick || oops "GTests failed"
+  ln -sf $PWD/build/compile_commands.json $PWD
 
 elif [ "$1" == "cross" ]; then
-  prep
 
   [ -d build ] || mkdir build
   pushd build
@@ -78,16 +73,16 @@ elif [ "$1" == "cross" ]; then
     TOOLCHAIN='./toolchains/beaglebone.cmake'
   fi
 
-  if [ ! -d /opt/$HFGNU ]; then
+  #if [ ! -d /opt/$HFGNU ]; then
 
-    curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/10.3-2021.07/binrel/$HFGNU.tar.xz \
-    -o /tmp/$HFGNU.tar.xz
+  #  curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/10.3-2021.07/binrel/$HFGNU.tar.xz \
+  #  -o /tmp/$HFGNU.tar.xz
 
-    [ $? -ne 0 ] && oops "Failure to get arm-linux-gnueabihf"
+  #  [ $? -ne 0 ] && oops "Failure to get arm-linux-gnueabihf"
 
-    sudo tar xf /tmp/$HFGNU.tar.xz -C /opt/
-    rm /tmp/$HFGNU.tar.xz
-  fi
+  #  sudo tar xf /tmp/$HFGNU.tar.xz -C /opt/
+  #  rm /tmp/$HFGNU.tar.xz
+  #fi
 
   cmake ${ARGS} -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN ..
 

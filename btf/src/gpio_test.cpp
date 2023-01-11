@@ -13,6 +13,10 @@ class GpioTest : public testing::Test {
   const string line0 = chip0 + "/sim_gpio0";
   const string line1 = chip0 + "/sim_gpio1";
   const string line2 = chip0 + "/sim_gpio2";
+
+  const string line31 = chip0 + "/sim_gpio31";
+  const string line32 = chip1 + "/sim_gpio0";
+
   const string line62 = chip1 + "/sim_gpio62";
   const string line63 = chip1 + "/sim_gpio63";
 
@@ -30,27 +34,25 @@ class GpioTest : public testing::Test {
 
 TEST_F(GpioTest, gpio_sim) {
   EXPECT_EQ(DUT.begin(), 0);
-  Gpio::Pin p0 = Gpio::Pin(0, GPIOHANDLE_REQUEST_OUTPUT);
-  Gpio::Pin p1 = Gpio::Pin(1, GPIOHANDLE_REQUEST_OUTPUT);
-  Gpio::Pin p2 = Gpio::Pin(2, GPIOHANDLE_REQUEST_OUTPUT);
-  Gpio::Pin p62 = Gpio::Pin(62, GPIOHANDLE_REQUEST_INPUT);
-  Gpio::Pin p63 = Gpio::Pin(63, GPIOHANDLE_REQUEST_INPUT);
-  EXPECT_EQ(DUT.setValue(p0, 1), 0);
-  EXPECT_EQ(DUT.setValue(p1, 0), 0);
-  EXPECT_EQ(DUT.setValue(p2, 1), 0);
+  Gpio::Pin p0 = Gpio::Pin(DUT, 0, GPIOHANDLE_REQUEST_OUTPUT);
+  Gpio::Pin p62 = Gpio::Pin(DUT, 62, GPIOHANDLE_REQUEST_INPUT);
+  Gpio::Pin p63 = Gpio::Pin(DUT, 63, GPIOHANDLE_REQUEST_INPUT);
 
   char value;
 
+  EXPECT_EQ(DUT.setValue(p0, 1), 0);
   _getValue(line0 + "/value", value);
   EXPECT_EQ(value, '1');
-  _getValue(line1 + "/value", value);
+
+  EXPECT_EQ(DUT.setValue(p0, 0), 0);
+  _getValue(line0 + "/value", value);
   EXPECT_EQ(value, '0');
-  _getValue(line2 + "/value", value);
-  EXPECT_EQ(value, '1');
 
   bool input;
+
   EXPECT_EQ(DUT.getValue(p62, input), 0);
   EXPECT_EQ(input, 1);
+
   EXPECT_EQ(DUT.getValue(p63, input), 0);
   EXPECT_EQ(input, 0);
 }

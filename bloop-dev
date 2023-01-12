@@ -64,25 +64,35 @@ elif [ "$1" == "cross" ]; then
   pushd build
 
   if [ $(uname -m) == "aarch64" ]; then
-    HFGNU="gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf"
     TOOLCHAIN='./toolchains/beaglebone_aarch64.cmake'
-
+    if [ ! -d /opt/arm-buildroot-linux-gnueabihf_sdk-buildroot ]; then
+      pushd ../btf/buildroot
+      make beaglebone_defconfig
+      cp ../linux_config output/build/linux-custom/.config
+      make
+      make sdk
+      cp output/images/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar.gz /tmp/
+      gzip -d /tmp/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar.gz
+      tar xvf /tmp/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar
+      rm -f /tmp/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar.gz
+      sudo mv arm-buildroot-linux-gnueabihf_sdk-buildroot /opt/
+      popd
+    fi
 
   elif [ $(uname -m) == "x86_64" ]; then
     HFGNU="gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf"
     TOOLCHAIN='./toolchains/beaglebone.cmake'
+    if [ ! -d /opt/$HFGNU ]; then
+
+      curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/10.3-2021.07/binrel/$HFGNU.tar.xz \
+      -o /tmp/$HFGNU.tar.xz
+
+      [ $? -ne 0 ] && oops "Failure to get arm-linux-gnueabihf"
+
+      sudo tar xf /tmp/$HFGNU.tar.xz -C /opt/
+      rm /tmp/$HFGNU.tar.xz
+    fi
   fi
-
-  #if [ ! -d /opt/$HFGNU ]; then
-
-  #  curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/10.3-2021.07/binrel/$HFGNU.tar.xz \
-  #  -o /tmp/$HFGNU.tar.xz
-
-  #  [ $? -ne 0 ] && oops "Failure to get arm-linux-gnueabihf"
-
-  #  sudo tar xf /tmp/$HFGNU.tar.xz -C /opt/
-  #  rm /tmp/$HFGNU.tar.xz
-  #fi
 
   cmake ${ARGS} -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN ..
 

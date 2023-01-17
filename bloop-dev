@@ -42,9 +42,14 @@ warn() {
 
 if [ "$1" == "build" ]
 then
-  ./btf/i2cinit.sh && ./btf/caninit.sh && ./btf/gpioinit.sh 2> /dev/null # TODO write these bash scripts in C, so BBB can also do gtests
+  ############ TODO ##############
+  # Gtest only works on hosts thanks to these lines.
+  # Find a way to init fake devices and assign the correct STUB_BUS
+  # Start by implementing *init.sh in C in the GTests
+  ./btf/i2cinit.sh && ./btf/caninit.sh && ./btf/gpioinit.sh 2> /dev/null
   STUB_BUS=$(i2cdetect -l | awk '{ if ($4 ~ /stub/) { print substr($1,5) }}' 2> /dev/null)
   [ -z ${STUB_BUS} ] || ARGS="$ARGS -DSTUB_BUS=${STUB_BUS}"
+  ################################
   [ -d build ] || mkdir build
   pushd build
   cmake $ARGS ..
@@ -81,9 +86,9 @@ then
 
 elif [ "$1" == "clean" ]
 then
-  rm -rf build
-  rm -rf out
-  rm -rf coverage
+  rm -rf $ROOT_DIR/build
+  rm -rf $ROOT_DIR/out
+  rm -rf $ROOT_DIR/coverage
   echo "clean finished"
 
 elif [ "$1" == "setup" ]
@@ -124,7 +129,7 @@ then
   read -r -p "Start a fresh buildroot project? [y/N] " response
   case "$response" in
     [yY][eE][sS]|[yY]) # y, Y, yEs, YES, yES...
-      $0 clean
+      $ROOT_DIR/$0 clean
       make defconfig BR2_DEFCONFIG=$ROOT_DIR/third-party/br-external/configs/beaglebone_config O=$BUILD_DIR
       ;;
     *)

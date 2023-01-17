@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ROOT_DIR=$(dirname $0)
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PYTHON_ENV=$ROOT_DIR/.env
 PYBIN=$PYTHON_ENV/bin
 PRE_COMMIT=$PYBIN/pre-commit
@@ -40,73 +40,53 @@ warn() {
   echo -e "\033[1;42mWarning:\033[0m \033[1;32m${*}\033[0m" >&2
 }
 
-if [ "$1" == "build" ]; then
+if [ "$1" == "build" ]
+then
   ./btf/i2cinit.sh && ./btf/caninit.sh && ./btf/gpioinit.sh 2> /dev/null
   STUB_BUS=$(i2cdetect -l | awk '{ if ($4 ~ /stub/) { print substr($1,5) }}' 2> /dev/null)
   [ -z ${STUB_BUS} ] || ARGS="$ARGS -DSTUB_BUS=${STUB_BUS}"
-
   [ -d build ] || mkdir build
   pushd build
-
-  cmake ${ARGS} ..
+  cmake $ARGS ..
   [ $? -ne 0 ] && oops "CMake failed"
   make
   [ $? -ne 0 ] && oops "Make failed"
-
   popd
   sudo ./out/gtests
   [ $? -eq 0 ] && pickle_rick || oops "GTests failed"
-  ln -sf $PWD/build/compile_commands.json $PWD
+  ln -sf $ROOT_DIR/build/compile_commands.json $ROOT_DIR
 
-elif [ "$1" == "cross" ]; then
-
+elif [ "$1" == "cross" ]
+then
+  XC=arm-buildroot-linux-gnueabihf_sdk-buildroot
+  if [ ! -d /opt/$XC ]
+  then
+    pushd $ROOT_DIR/third-party/buildroot
+    make distclean
+    make defconfig BR2_DEFCONFIG=$ROOT_DIR/third-party/br-external/configs/beaglebone_config
+    make sdk
+    cp images/$XC.tar.gz /tmp/
+    gzip -d /tmp/$XC.tar.gz
+    sudo tar xvf /tmp/$XC.tar -C /opt/
+    rm -f /tmp/$XC.tar
+    popd
+  fi
   [ -d build ] || mkdir build
   pushd build
-
-  if [ $(uname -m) == "aarch64" ]; then
-    TOOLCHAIN='./toolchains/beaglebone_aarch64.cmake'
-    if [ ! -d /opt/arm-buildroot-linux-gnueabihf_sdk-buildroot ]; then
-      pushd ../btf/buildroot
-      make beaglebone_defconfig
-      cp ../linux_config output/build/linux-custom/.config
-      make
-      make sdk
-      cp output/images/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar.gz /tmp/
-      gzip -d /tmp/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar.gz
-      tar xvf /tmp/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar
-      rm -f /tmp/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar.gz
-      sudo mv arm-buildroot-linux-gnueabihf_sdk-buildroot /opt/
-      popd
-    fi
-
-  elif [ $(uname -m) == "x86_64" ]; then
-    HFGNU="gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf"
-    TOOLCHAIN='./toolchains/beaglebone.cmake'
-    if [ ! -d /opt/$HFGNU ]; then
-
-      curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/10.3-2021.07/binrel/$HFGNU.tar.xz \
-      -o /tmp/$HFGNU.tar.xz
-
-      [ $? -ne 0 ] && oops "Failure to get arm-linux-gnueabihf"
-
-      sudo tar xf /tmp/$HFGNU.tar.xz -C /opt/
-      rm /tmp/$HFGNU.tar.xz
-    fi
-  fi
-
-  cmake ${ARGS} -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN ..
-
+  cmake $ARGS -DCMAKE_TOOLCHAIN_FILE=toolchains/beaglebone.cmake ..
   [ $? -ne 0 ] && oops "CMake failed"
   make
   [ $? -ne 0 ] && oops "Make failed" || pickle_rick
 
-elif [ "$1" == "clean" ]; then
+elif [ "$1" == "clean" ]
+then
   rm -rf build
   rm -rf out
   rm -rf coverage
   echo "clean finished"
 
-elif [ "$1" == "setup" ]; then
+elif [ "$1" == "setup" ]
+then
   sudo apt update -y
   sudo apt install -y \
     cmake \
@@ -127,11 +107,62 @@ elif [ "$1" == "setup" ]; then
     warn "Restart to install kernel modules" || \
     warn "Upgrade to kinetic (22.10) then run setup to install kernel modules"
 
-elif [ "$1" == "lint" ]; then
+elif [ "$1" == "lint" ]
+then
   $PRE_COMMIT run -a
 
-elif [ "$1" == "autocode" ]; then
+elif [ "$1" == "autocode" ]
+then
   $PYTHON $ROOT_DIR/autocoding/autocode.py
+
+elif [ "$1" == "br" ]
+then
+  pushd $ROOT_DIR/third-party/buildroot
+  read -r -p "Start a fresh buildroot project? [y/N] " response
+  case "$response" in
+    [yY][eE][sS]|[yY]) # y, Y, yEs, YES, yES...
+      make distclean
+      make defconfig BR2_DEFCONFIG=$ROOT_DIR/third-party/br-external/configs/beaglebone_config
+      ;;
+    *)
+      ;;
+  esac
+  read -r -p "Change the Buildroot Configuration? [y/N] " response
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      make menuconfig
+      ;;
+    *)
+      ;;
+  esac
+  read -r -p "Change the Kernel Configuration? [y/N] " response
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      make linux-menuconfig
+      ;;
+    *)
+      ;;
+  esac
+  read -r -p "Make? [y/N] " response
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      make
+      make sdk
+      ;;
+    *)
+      ;;
+  esac
+  read -r -p "Copy to SD card? [y/N] " response
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      read -r -p "Enter drive name: " response
+      [ -e "$response" ] || oops "Invalid disk!"
+      sudo dd if=$ROOT_DIR/build/buildroot/output/images/sdcard.img of=$response
+      ;;
+    *)
+      ;;
+  esac
+  popd
 else
-  oops "Usage $0 {clean, build, cross, setup, lint, autocode}"
+  oops "Usage $0 {clean, build, cross, setup, lint, autocode, br}"
 fi

@@ -23,6 +23,7 @@ endif()
 add_subdirectory(embedded/devices)
 add_subdirectory(embedded/drivers)
 add_subdirectory(btf)
+add_subdirectory(third-party/googletest)
 
 set(libraries
     devices

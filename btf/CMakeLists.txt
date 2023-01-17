@@ -1,5 +1,3 @@
-add_subdirectory(googletest)
-
 enable_testing()
 
 add_executable(gtests

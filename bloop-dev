@@ -42,7 +42,7 @@ warn() {
 
 if [ "$1" == "build" ]
 then
-  ./btf/i2cinit.sh && ./btf/caninit.sh && ./btf/gpioinit.sh 2> /dev/null
+  ./btf/i2cinit.sh && ./btf/caninit.sh && ./btf/gpioinit.sh 2> /dev/null # TODO write these bash scripts in C, so BBB can also do gtests
   STUB_BUS=$(i2cdetect -l | awk '{ if ($4 ~ /stub/) { print substr($1,5) }}' 2> /dev/null)
   [ -z ${STUB_BUS} ] || ARGS="$ARGS -DSTUB_BUS=${STUB_BUS}"
   [ -d build ] || mkdir build
@@ -63,7 +63,8 @@ then
   then
     pushd $ROOT_DIR/third-party/buildroot
     make distclean
-    make defconfig BR2_DEFCONFIG=$ROOT_DIR/third-party/br-external/configs/beaglebone_config
+    make defconfig BR2_DEFCONFIG=$ROOT_DIR/third-party/br-external/configs/xc_config O=$ROOT_DIR/build/buildroot
+    cd $ROOT_DIR/build/buildroot
     make sdk
     cp images/$XC.tar.gz /tmp/
     gzip -d /tmp/$XC.tar.gz
@@ -118,15 +119,21 @@ then
 elif [ "$1" == "br" ]
 then
   pushd $ROOT_DIR/third-party/buildroot
+  BUILD_DIR=$ROOT_DIR/build/buildroot
+
   read -r -p "Start a fresh buildroot project? [y/N] " response
   case "$response" in
     [yY][eE][sS]|[yY]) # y, Y, yEs, YES, yES...
-      make distclean
-      make defconfig BR2_DEFCONFIG=$ROOT_DIR/third-party/br-external/configs/beaglebone_config
+      $0 clean
+      make defconfig BR2_DEFCONFIG=$ROOT_DIR/third-party/br-external/configs/beaglebone_config O=$BUILD_DIR
       ;;
     *)
       ;;
   esac
+
+  [ -d $BUILD_DIR ] || oops "No buildroot project exists in build"
+  cd $BUILD_DIR
+
   read -r -p "Change the Buildroot Configuration? [y/N] " response
   case "$response" in
     [yY][eE][sS]|[yY])
@@ -146,8 +153,7 @@ then
   read -r -p "Make? [y/N] " response
   case "$response" in
     [yY][eE][sS]|[yY])
-      make
-      make sdk
+      make sdk # also writes sdcard.img
       ;;
     *)
       ;;

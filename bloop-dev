@@ -108,10 +108,10 @@ then
 
   git submodule update --init --recursive
 
-  sudo apt install -y \
-    linux-modules-extra-5.19.0-21-generic && \
-    warn "Restart to install kernel modules" || \
-    warn "Upgrade to kinetic (22.10) then run setup to install kernel modules"
+  [ "$(uname -m)" == "aarch64" ] && \
+    sudo apt install -y linux-modules-5.15.0-1005-raspi || \
+    sudo apt install -y linux-modules-extra-5.15.0-1003-azure || \
+    warn "Install ubuntu jammy (22.04) for full GTest functionality"
 
 elif [ "$1" == "lint" ]
 then
@@ -121,12 +121,12 @@ elif [ "$1" == "autocode" ]
 then
   $PYTHON $ROOT_DIR/autocoding/autocode.py
 
-elif [ "$1" == "br" ]
+elif [ "$1" == "buildroot" ]
 then
   pushd $ROOT_DIR/third-party/buildroot
   BUILD_DIR=$ROOT_DIR/build/buildroot
 
-  read -r -p "Start a fresh buildroot project? [y/N] " response
+  read -r -p "Start a fresh build? [y/N] " response
   case "$response" in
     [yY][eE][sS]|[yY]) # y, Y, yEs, YES, yES...
       $ROOT_DIR/$0 clean
@@ -136,7 +136,7 @@ then
       ;;
   esac
 
-  [ -d $BUILD_DIR ] || oops "No buildroot project exists in build"
+  [ -d $BUILD_DIR ] && warn "$0 clean erases the build" || oops "No build exists yet at $BUILD_DIR"
   cd $BUILD_DIR
 
   read -r -p "Change the Buildroot Configuration? [y/N] " response
@@ -168,12 +168,12 @@ then
     [yY][eE][sS]|[yY])
       read -r -p "Enter drive name: " response
       [ -e "$response" ] || oops "Invalid disk!"
-      sudo dd if=$ROOT_DIR/build/buildroot/output/images/sdcard.img of=$response
+      sudo dd if=$ROOT_DIR/build/buildroot/images/sdcard.img of=$response
       ;;
     *)
       ;;
   esac
   popd
 else
-  oops "Usage $0 {clean, build, cross, setup, lint, autocode, br}"
+  oops "Usage $0 {clean, build, cross, setup, lint, autocode, buildroot}"
 fi

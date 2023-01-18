@@ -46,9 +46,9 @@ Shunt resistor values should be passed in ohms. 1 shunt resistor per channel
 */
 Ina3221::Ina3221(int bus, int addr, float shunt1, float shunt2, float shunt3)
     : I2c(bus, addr, O_RDWR) {
-  this->shunts[0] = shunt1;
-  this->shunts[1] = shunt2;
-  this->shunts[2] = shunt3;
+  shunts[0] = shunt1;
+  shunts[1] = shunt2;
+  shunts[2] = shunt3;
 }
 
 /*
@@ -57,51 +57,42 @@ and initiates power on reset
 */
 int Ina3221::begin() {
   int rc;
-  uint16_t devid;
 
-  rc = this->open_i2c();
-  if (rc) return rc;
+  rc = open();
+  if (rc < 0) return rc;
 
   // Read device register
-  rc = read_bytes_from_reg(INA_DEVID_REG, (uint8_t *)&devid, 2);
-  if (rc) return rc;
+  rc = read_word(INA_DEVID_REG);
+  if (rc < 0) return rc;
 
-  if (devid != INA_DEVID) {
-    std::cout << "Did not read correct device ID, read: " << devid << "\n";
+  if (rc != INA_DEVID) {
+    std::cout << "Did not read correct device ID, read: " << rc << "\n";
     return -EIO;
   }
 
   // Initiate POR
-  rc = write_data<uint16_t>(INA_CONFIG_REG, INA_CONFIG_RST);
+  rc = write_word(INA_CONFIG_REG, INA_CONFIG_RST);
 
-  if (rc) return rc;
+  if (rc < 0) return rc;
 
   // set thresholds
-  uint16_t temp = INA_CH1_CRIT_LIM;
-  rc = this->write_data<uint16_t>(INA_GET_CRIT_REG(1), temp);
-  if (rc) return rc;
-  temp = INA_CH2_CRIT_LIM;
-  rc = this->write_data<uint16_t>(INA_GET_CRIT_REG(2), temp);
-  if (rc) return rc;
-  temp = INA_CH3_CRIT_LIM;
-  rc = this->write_data<uint16_t>(INA_GET_CRIT_REG(3), temp);
-  if (rc) return rc;
+  rc = write_word(INA_GET_CRIT_REG(1), INA_CH1_CRIT_LIM);
+  if (rc < 0) return rc;
+  rc = write_word(INA_GET_CRIT_REG(2), INA_CH2_CRIT_LIM);
+  if (rc < 0) return rc;
+  rc = write_word(INA_GET_CRIT_REG(3), INA_CH3_CRIT_LIM);
+  if (rc < 0) return rc;
 
-  temp = INA_CH1_WARN_LIM;
-  rc = this->write_data<uint16_t>(INA_GET_WARN_REG(1), temp);
-  if (rc) return rc;
-  temp = INA_CH2_WARN_LIM;
-  rc = this->write_data<uint16_t>(INA_GET_WARN_REG(2), temp);
-  if (rc) return rc;
-  temp = INA_CH3_WARN_LIM;
-  rc = this->write_data<uint16_t>(INA_GET_WARN_REG(3), temp);
-  if (rc) return rc;
+  rc = write_word(INA_GET_WARN_REG(1), INA_CH1_WARN_LIM);
+  if (rc < 0) return rc;
+  rc = write_word(INA_GET_WARN_REG(2), INA_CH2_WARN_LIM);
+  if (rc < 0) return rc;
+  rc = write_word(INA_GET_WARN_REG(3), INA_CH3_WARN_LIM);
+  if (rc < 0) return rc;
 
-  temp = INA_PV_LOWER_LIM;
-  rc = this->write_data<uint16_t>(INA_PV_LOWER_REG, temp);
-  if (rc) return rc;
-  temp = INA_PV_UPPER_LIM;
-  rc = this->write_data<uint16_t>(INA_PV_UPPER_REG, temp);
+  rc = write_word(INA_PV_LOWER_REG, INA_PV_LOWER_LIM);
+  if (rc < 0) return rc;
+  rc = write_word(INA_PV_UPPER_REG, INA_PV_UPPER_LIM);
 
   return rc;
 }
@@ -110,7 +101,6 @@ int Ina3221::begin() {
 Reads bus voltage for a specified channel. Returns volts.
 */
 float Ina3221::readVoltage(int channel) {
-  int16_t voltage_from_reg;
   int reg;
   int rc;
 
@@ -120,21 +110,19 @@ float Ina3221::readVoltage(int channel) {
   }
 
   reg = INA_GET_VBUS_REG(channel);
-  rc = read_bytes_from_reg(reg, (uint8_t *)&voltage_from_reg, 2);
-  if (rc) return rc;
+  rc = read_word(reg);
+  if (rc < 0) return rc;
 
   // Get actual value from register
-  if (voltage_from_reg & INA_VOLTAGE_SIGN)
-    voltage_from_reg = voltage_from_reg * -1;
+  if (rc & INA_VOLTAGE_SIGN) rc *= -1;
 
-  return (float)voltage_from_reg * INA_BVOLTAGE_MULT;
+  return (float)rc * INA_BVOLTAGE_MULT;
 }
 
 /*
 Reads current for a specific channel. Returns amps.
 */
 float Ina3221::readCurrent(int channel) {
-  int16_t voltage_from_reg;
   int reg;
   int rc;
 
@@ -144,14 +132,12 @@ float Ina3221::readCurrent(int channel) {
   }
 
   reg = INA_GET_CURR_REG(channel);
-  rc = read_bytes_from_reg(reg, (uint8_t *)&voltage_from_reg, 2);
-  if (rc) return rc;
+  rc = read_word(reg);
+  if (rc < 0) return rc;
 
   // Get actual value from register
-  if (voltage_from_reg & INA_VOLTAGE_SIGN)
-    voltage_from_reg = voltage_from_reg * -1;
+  if (rc & INA_VOLTAGE_SIGN) rc *= -1;
 
   // Return voltage divided by shunt resistor
-  return ((float)voltage_from_reg * INA_SVOLTAGE_MULT) /
-         this->shunts[channel - 1];
+  return ((float)rc * INA_SVOLTAGE_MULT) / shunts[channel - 1];
 }

@@ -2,53 +2,72 @@
 #define __CAN_H__
 
 #include <linux/can.h>
-#include <pthread.h>
 #include <stdint.h>
+
+#include <functional>
+#include <iostream>
+#include <mutex>
+#include <thread>
+#include <unordered_map>
+#include <vector>
+
+using std::function;
+using std::lock_guard;
+using std::mutex;
+using std::pair;
+using std::thread;
+using std::unordered_map;
+using std::vector;
+
+typedef pair<int, function<void(struct can_frame &)>> callback;
 
 template <typename T>
 struct mutexVar {
  private:
-  pthread_mutex_t mutex;
+  mutex mu;
   T value = -1;
 
  public:
-  /* volatile cannot be memcpy'd
-   * so memcpy to a tmp var
-   * then set the volatile
-   */
   void setValue(T data) {
-    pthread_mutex_lock(&mutex);
+    lock_guard<mutex> l(mu);
     value = data;
-    pthread_mutex_unlock(&mutex);
   }
-  /* reading a variable
-   * doesn't require a
-   * mutex lock and unlock
-   *
-   * but the value is private
-   * so it can only be changed
-   * via setValue, utilizing the mutex
-   */
   T getValue(void) {
-    T data;
-    pthread_mutex_lock(&mutex);
-    data = value;
-    pthread_mutex_unlock(&mutex);
-    return data;
+    lock_guard<mutex> l(mu);
+    return value;
   }
 };
 
+class CanDevice;
+
 class Can {
  private:
+  unordered_map<int, function<void(struct can_frame &)>> callback_map;
+  mutex mu;
+  thread t;
+  const char *can_i;
+  int pfd[2];
   int sock;
   bool isInit = false;
-  pthread_mutex_t canMutex;
+  void loop();
+  int read(struct can_frame &msg);
 
  public:
-  Can() {};
+  Can(const char *can_i);
+  ~Can();
+  void add(const vector<callback> &callbacks);
+  int send(int id, uint8_t *data, uint8_t size);
   int init();
-  int canRead(struct can_frame *msg);
-  int canSend(uint16_t id, uint8_t *data, int size);
+};
+
+class CanDevice {
+ protected:
+  Can &bus;
+
+ public:
+  CanDevice(Can &bus, const vector<callback> &callbacks) : bus(bus) {
+    bus.add(callbacks);
+  }
 };
 
 #endif

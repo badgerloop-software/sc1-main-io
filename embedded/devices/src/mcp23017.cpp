@@ -10,13 +10,11 @@ Mcp23017::Mcp23017(int bus, int addr) : I2c(bus, addr, O_RDWR) {}
 
 int Mcp23017::clear_settings() {
   /* Reset dir regs */
-  if (this->write_data<uint8_t>(MCP_DIRA_REG, 0xFF) ||
-      this->write_data<uint8_t>(MCP_DIRB_REG, 0xFF))
+  if (write_byte(MCP_DIRA_REG, 0xFF) || write_byte(MCP_DIRB_REG, 0xFF))
     return -EIO;
 
   /* Reset GPIO regs */
-  if (this->write_data<uint8_t>(MCP_GPIOA_REG, 0x00) ||
-      this->write_data<uint8_t>(MCP_GPIOB_REG, 0x00))
+  if (write_byte(MCP_GPIOA_REG, 0x00) || write_byte(MCP_GPIOB_REG, 0x00))
     return -EIO;
 
   return 0;
@@ -25,21 +23,21 @@ int Mcp23017::clear_settings() {
 int Mcp23017::begin(const uint8_t directions[]) {
   int rc;
 
-  if (!this->is_open()) {
-    rc = this->open_i2c();
-    if (rc) return rc;
+  if (!is_open()) {
+    rc = open();
+    if (rc < 0) return rc;
   }
 
-  rc = this->clear_settings();
-  if (rc) {
+  rc = clear_settings();
+  if (rc < 0) {
     std::cerr << "Error clearing settings\n";
     return rc;
   }
 
-  for (int i = 0; i < MCP_NUM_PINS; i++) this->set_dir(i, directions[i]);
+  for (int i = 0; i < MCP_NUM_PINS; i++) set_dir(i, directions[i]);
 
   for (int i = 0; i < MCP_NUM_PINS; i++) {
-    if (this->get_dir(i) != directions[i]) {
+    if (get_dir(i) != directions[i]) {
       std::cerr << "Error setting direction of pin " << i << "\n";
       return -EIO;
     }
@@ -47,8 +45,7 @@ int Mcp23017::begin(const uint8_t directions[]) {
   return 0;
 }
 
-uint8_t Mcp23017::get_dir(int pin) {
-  uint8_t current_status;
+int Mcp23017::get_dir(int pin) {
   uint8_t dirReg;
 
   if (pin >= MCP_NUM_PINS) return -EINVAL;
@@ -56,9 +53,10 @@ uint8_t Mcp23017::get_dir(int pin) {
   dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
   pin = GET_REL_PIN(pin);
 
-  current_status = this->read_from_reg(dirReg);
+  int rc = read_byte(dirReg);
+  if (rc < 0) return rc;
 
-  return ((current_status >> pin) & 1);
+  return ((rc >> pin) & 1);
 }
 
 int Mcp23017::set_dir(int pin, uint8_t dir) {
@@ -70,32 +68,33 @@ int Mcp23017::set_dir(int pin, uint8_t dir) {
   dirReg = IS_BANK_A(pin) ? MCP_DIRA_REG : MCP_DIRB_REG;
   pin = GET_REL_PIN(pin);
 
-  current_status = this->read_from_reg(dirReg);
+  rc = read_byte(dirReg);
+  if (rc < 0) return rc;
+  current_status = rc;
   if (dir)
-    rc = this->write_data<uint8_t>(dirReg, current_status | (1 << pin));
+    rc = write_byte(dirReg, current_status | (1 << pin));
   else
-    rc = this->write_data<uint8_t>(dirReg, current_status & ~(1 << pin));
+    rc = write_byte(dirReg, current_status & ~(1 << pin));
 
   return rc;
 }
 
-uint8_t Mcp23017::get_state(int pin) {
-  uint8_t current_status;
+int Mcp23017::get_state(int pin) {
   uint8_t stateReg;
+  int rc;
 
   if (pin >= MCP_NUM_PINS) return -EINVAL;
 
   stateReg = IS_BANK_A(pin) ? MCP_GPIOA_REG : MCP_GPIOB_REG;
   pin = GET_REL_PIN(pin);
 
-  current_status = this->read_from_reg(stateReg);
+  rc = read_byte(stateReg);
+  if (rc < 0) return rc;
 
-  return ((current_status >> pin) & 1);
+  return ((rc >> pin) & 1);
 }
 
 int Mcp23017::set_state(int pin, uint8_t val) {
-  uint8_t current_status;
-  uint8_t current_dir;
   uint8_t stateReg;
   uint8_t dirReg;
   int rc;
@@ -106,15 +105,19 @@ int Mcp23017::set_state(int pin, uint8_t val) {
   stateReg = IS_BANK_A(pin) ? MCP_GPIOA_REG : MCP_GPIOB_REG;
   pin = GET_REL_PIN(pin);
 
-  current_dir = this->read_from_reg(dirReg);
+  // check direction
+  rc = read_byte(dirReg);
+  if (rc < 0) return rc;
+  if ((rc >> pin) & 0x1) return -EINVAL;
 
-  if ((current_dir >> pin) & 0x1) return -EINVAL;
-  current_status = this->read_from_reg(stateReg);
+  // set state
+  rc = read_byte(stateReg);
+  if (rc < 0) return rc;
 
   if (val)
-    rc = this->write_data<uint8_t>(stateReg, current_status | (1 << pin));
+    rc = write_byte(stateReg, rc | (1 << pin));
   else
-    rc = this->write_data<uint8_t>(stateReg, current_status & ~(1 << pin));
+    rc = write_byte(stateReg, rc & ~(1 << pin));
 
   return rc;
 }

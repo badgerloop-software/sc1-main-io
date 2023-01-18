@@ -1,45 +1,17 @@
-name: C/C++ CI
+name: Main-IO CI
 
-on:
-  push:
-  pull_request:
+on: push
 
 jobs:
-
-  build:
+  WubbaLubbaDubDub:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup
-      run: ./bloop-dev setup
-    - name: Build
-      run: ./bloop-dev build
-
-  build-test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup
-      run: ./bloop-dev setup
-    - name: Build Test
-      run: ./bloop-dev build test
-
-  cross-compile:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup
-      run: ./bloop-dev setup
-    - name: Debug
-      run: cd ~ && ls
-    - name: Cross-Compile
-      run: ./bloop-dev cross
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup
       run: ./bloop-dev setup
     - name: Lint
       run: ./bloop-dev lint
+    - name: Cross-Compile
+      run: ./bloop-dev cross && ./bloop-dev clean
+    - name: Build
+      run: ./bloop-dev build

@@ -1,157 +1,179 @@
 #!/bin/bash
 
-
-ROOT_DIR=$(dirname $0)
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PYTHON_ENV=$ROOT_DIR/.env
 PYBIN=$PYTHON_ENV/bin
 PRE_COMMIT=$PYBIN/pre-commit
 PYTHON=$PYBIN/python
+ARGS="-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DBUILD_GMOCK=OFF"
 
+#credit: https://emojicombos.com/rick-and-morty-ascii-art
+pickle_rick() {
+echo -e '\033[32m⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⡤⣠⣤⣴⡾⠛⠛⠛⠛⠛⠋⠙⠛⠛⠻⣿⣿⣶⣤⡀
+⠀⠀⠀⠀⠀⠀⠘⢟⠒⠒⠦⢴⡿⣿⠟⢳⠀⠉⠢⡦⣤⠶⠶⢿⣿⣿⣿⣶⣄⠀⠙⠟⠉⠛⢿⣦⡀
+⠀⠀⠀⠀⠀⠀⠀⠈⢧⠀⠀⠀⠙⠳⣾⣿⠇⠀⠀⠘⣿⡄⡷⣶⣶⣤⣄⣭⣿⣷⣦⣀⠀⠀⠀⠻⣿⣆
+⠀⠀⠀⠀⠀⠀⠀⠀⣸⠀⠀⠀⠀⠀⠈⠋⠀⠀⠀⠀⠘⡿⠁⢫⠉⠻⢿⣿⣉⠛⢿⣿⣦⣀⡀⠀⠛⢿⣷⣤⡀
+⢀⣠⠤⠤⠀⠠⠤⢴⣻⠀⠀⠀⢀⡠⠤⠒⠒⠒⠢⣄⠀⠁⠀⢸⠀⠀⠀⠀⠹⣷⡈⢻⣿⢿⣿⣦⣀⣀⢹⡝⢿⣦⡀
+⠀⠉⠓⢄⠀⠀⠀⠀⠀⠀⣠⠞⠁⣀⡠⠤⠐⠒⠒⠚⢷⡄⠀⢸⡀⣀⣠⣆⣀⣈⡉⠀⠙⣷⣍⠻⣿⣿⠀⠙⠈⠻⣿⣦⡀
+⠀⠀⠀⠀⣷⡄⠀⠀⠀⢰⠁⡴⢊⡡⠔⠒⠉⠉⠉⢉⡩⠼⣆⠀⠉⠀⢰⠙⢿⣿⣿⣄⠀⠻⣿⣷⡈⢻⣷⡀⢀⠀⢸⣿⣧
+⠀⠀⠀⢸⣿⣿⡀⠀⢠⡇⠈⠋⣡⠤⠀⠤⣄⠀⡴⠉⠀⠀⠀⠱⡄⢀⡏⠀⠸⡾⢿⣿⡇⠀⢸⣧⡁⠸⣯⠳⣿⠃⠀⣻⣿
+⠲⣦⠒⠛⠛⠋⠀⠀⢸⠁⠀⡜⠁⠀⡀⠀⠈⡦⡇⠀⠐⠋⠀⢀⣇⣼⣀⣴⠀⠀⢠⣿⡥⠄⠀⠛⠿⠦⢜⣧⠙⢦⠈⣿⣿
+⠀⠈⢳⣄⡀⠀⠀⠀⢸⡀⠀⡇⠀⠀⠃⠀⠀⡇⠑⢤⣀⣀⡤⣾⠀⠀⢀⠇⢀⠴⠊⠁⠀⣀⣀⣀⣀⠀⠀⠈⠑⢼⣀⣿⣿⡄
+⠀⠀⠀⣿⣿⡶⠤⠀⠀⡇⠀⢘⠢⠤⠤⣴⠊⠀⡄⠹⡄⠒⠚⠹⠉⢦⠎⣰⠃⢀⠴⢚⣛⡓⠠⠄⠀⠈⠑⠢⢄⠀⠑⢿⣿⡇
+⠀⠀⣸⣟⡁⠀⠀⠀⢠⢷⠀⠀⠉⠉⠉⠁⠀⠀⠘⠦⠇⠀⠀⠀⡧⠋⡴⠁⡴⢡⠞⠁⠀⠈⠳⡄⠀⠀⠀⠒⠤⣑⡄⠘⣿⠁
+⠀⠀⢹⣷⣮⡙⠢⡄⢣⡈⡆⠀⠀⡄⣀⣠⡤⠄⠀⠠⠤⣀⢠⠐⡇⠐⡅⡜⠀⢸⠀⠀⠒⠀⠀⡅⢠⠖⠉⠉⠙⢮⠹⡀⢿
+⠀⠀⠈⣿⣿⡇⡴⠁⠀⣉⣻⣄⠀⠫⠹⠞⠁⠀⠀⠀⠀⠠⠋⢰⠃⡠⢻⠁⠀⠈⠳⠤⣀⡠⠜⠁⢆⠀⠀⢤⠀⠀⡇⡇⡸
+⠀⠀⠀⠘⢿⣿⣴⡞⢯⡁⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠋⠀⠧⣸⠀⠀⠀⠀⠀⠀⠐⠢⠽⠘⠦⣀⣀⣀⠔⠁⡇⠇
+⠀⠀⠀⠀⠈⠛⢿⣿⣌⣷⡈⠉⠙⣿⣷⣤⠤⣀⣠⣤⣴⡊⠁⠀⠀⠀⠈⢇⠀⢀⣾⣿⣿⣭⣱⣦⡀⠀⠀⠀⠀⠀⣸⡞
+⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣦⠀⠀⠈⠙⣿⣿⣦⣬⣽⣿⣶⣤⣤⣶⣤⣬⣧⡈⠛⠋⠉⠙⠻⣿⣷⠀⠀⠀⢀⡴⢙
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣿⣶⡄⠀⠀⠈⠙⠻⣯⣍⡉⠙⣛⠛⠛⠛⢻⣿⣿⣶⢤⣀⠀⠀⠈⠁⢀⣀⠴⠚⠒⠋
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢷⣦⣀⣴⣦⠀⠉⠻⠿⠿⢿⡿⠷⠞⠛⠛⠋⣁⣀⣤⣭⣿⣿⣯⡿⠏
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠿⢿⣷⣶⣶⣤⣤⣶⣤⣶⣶⣴⣾⣿⣿⠿⠟⠛⠋⠉⠁\033[0m'
+}
 
-if [ $# -eq 0 ]; then
-    echo "Usage $0 {clean, build, cross, setup, lint, autocode}"
-    exit 1
-fi
+oops() {
+  echo -e "\033[1;41mError:\033[0m \033[1;31m${*}\033[0m" >&2
+  exit 1
+}
 
+warn() {
+  echo -e "\033[1;42mWarning:\033[0m \033[1;32m${*}\033[0m" >&2
+}
 
+if [ "$1" == "build" ]
+then
+  ############ TODO ##############
+  # Gtest only works on hosts thanks to these lines.
+  # Find a way to init fake devices and assign the correct STUB_BUS
+  # Start by implementing *init.sh in C in the GTests
+  ./btf/i2cinit.sh && ./btf/caninit.sh && ./btf/gpioinit.sh 2> /dev/null
+  STUB_BUS=$(i2cdetect -l | awk '{ if ($4 ~ /stub/) { print substr($1,5) }}' 2> /dev/null)
+  [ -z ${STUB_BUS} ] || ARGS="$ARGS -DSTUB_BUS=${STUB_BUS}"
+  ################################
+  [ -d build ] || mkdir build
+  pushd build
+  cmake $ARGS ..
+  [ $? -ne 0 ] && oops "CMake failed"
+  make
+  [ $? -ne 0 ] && oops "Make failed"
+  popd
+  sudo ./out/gtests
+  [ $? -eq 0 ] && pickle_rick || oops "GTests failed"
+  ln -sf $ROOT_DIR/build/compile_commands.json $ROOT_DIR
 
-if [ "$1" == "build" ]; then
-    $0 clean
-    mkdir build && cd build
-    if [ "$2" == "test" ]; then
-        cmake -DTEST=ON -Wno-dev ..
-    else
-        cmake ..
-    fi
+elif [ "$1" == "cross" ]
+then
+  XC=arm-buildroot-linux-gnueabihf_sdk-buildroot
+  if [ ! -d /opt/$XC ]
+  then
+    pushd $ROOT_DIR/third-party/buildroot
+    make distclean
+    make defconfig BR2_DEFCONFIG=$ROOT_DIR/third-party/br-external/configs/xc_config O=$ROOT_DIR/build/buildroot
+    cd $ROOT_DIR/build/buildroot
+    make sdk
+    cp images/$XC.tar.gz /tmp/
+    gzip -d /tmp/$XC.tar.gz
+    sudo tar xvf /tmp/$XC.tar -C /opt/
+    rm -f /tmp/$XC.tar
+    popd
+  fi
+  [ -d build ] || mkdir build
+  pushd build
+  cmake $ARGS -DCMAKE_TOOLCHAIN_FILE=toolchains/beaglebone.cmake ..
+  [ $? -ne 0 ] && oops "CMake failed"
+  make
+  [ $? -ne 0 ] && oops "Make failed" || pickle_rick
 
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, CMake failed"
-        exit 1
-    fi
+elif [ "$1" == "clean" ]
+then
+  rm -rf $ROOT_DIR/build
+  rm -rf $ROOT_DIR/out
+  rm -rf $ROOT_DIR/coverage
+  echo "clean finished"
 
-    make
+elif [ "$1" == "setup" ]
+then
+  sudo apt update -y
+  sudo apt install -y \
+    cmake \
+    python3 \
+    virtualenv \
+    clang-format \
+    cppcheck \
+    i2c-tools
 
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, Make failed"
-        exit 1
-    fi
-    cat <<'EOF'
-        ___
-    . -^   `--,
-   /# =========`-_
-  /# (--====___====\
- /#   .- --.  . --.|
-/##   |  * ) (   * ),
-|##   \    /\ \   / |
-|###   ---   \ ---  |
-|####      ___)    #|
-|######           ##|
- \##### ---------- /
-  \####           (
-   `\###          |
-     \###         |
-      \##        |
-       \###.    .)
-        `======/
-EOF
+  virtualenv -p python3 $PYTHON_ENV
+  $PYBIN/pip install pre-commit
+  $PRE_COMMIT install
 
-elif [ "$1" == "cross" ]; then
-    $0 clean
-    mkdir build && cd build
-    if [ $(arch) == "aarch64" ]; then
+  git submodule update --init --recursive
 
-      if [ ! -d /opt/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf ]; then
-  	wget -c \
-      https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz \
-      -P /tmp/
-  	if [ $? -ne 0 ]; then
-  		echo "Failure to get arm-linux-gnueabihf"
-  	fi
-  	sudo tar xf /tmp/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz -C /opt/
+  [ "$(uname -m)" == "aarch64" ] && \
+    sudo apt install -y linux-modules-5.15.0-1005-raspi || \
+    sudo apt install -y linux-modules-extra-5.15.0-1003-azure || \
+    warn "Install ubuntu jammy (22.04) for full GTest functionality"
 
-  	rm /tmp/gcc-arm-10.3-2021.07-aarch64-arm-none-linux-gnueabihf.tar.xz
-      fi
-      toolchain='./toolchains/beaglebone_aarch64.cmake'
+elif [ "$1" == "lint" ]
+then
+  $PRE_COMMIT run -a
 
-    elif [ $(arch) == "x86_64" ]; then
+elif [ "$1" == "autocode" ]
+then
+  $PYTHON $ROOT_DIR/autocoding/autocode.py
 
-      if [ ! -d /opt/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf ]; then
-  	wget -c \
-      https://releases.linaro.org/components/toolchain/binaries/6.5-2018.12/arm-linux-gnueabihf/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz \
-      -P /tmp/
-  	if [ $? -ne 0 ]; then
-  		echo "Failure to get arm-linux-gnueabihf"
-  	fi
-  	sudo tar xf /tmp/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz -C /opt/
+elif [ "$1" == "buildroot" ]
+then
+  pushd $ROOT_DIR/third-party/buildroot
+  BUILD_DIR=$ROOT_DIR/build/buildroot
 
-  	rm /tmp/gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz
-      fi
-      toolchain='./toolchains/beaglebone.cmake'
-    fi
+  read -r -p "Start a fresh build? [y/N] " response
+  case "$response" in
+    [yY][eE][sS]|[yY]) # y, Y, yEs, YES, yES...
+      $ROOT_DIR/$0 clean
+      make defconfig BR2_DEFCONFIG=$ROOT_DIR/third-party/br-external/configs/beaglebone_config O=$BUILD_DIR
+      ;;
+    *)
+      ;;
+  esac
 
+  [ -d $BUILD_DIR ] && warn "$0 clean erases the build" || oops "No build exists yet at $BUILD_DIR"
+  cd $BUILD_DIR
 
-
-    if [ "$2" == "test" ]; then
-        cmake -DCMAKE_TOOLCHAIN_FILE=$toolchain -DTEST=ON -Wno-dev ..
-    else
-        cmake -DCMAKE_TOOLCHAIN_FILE=$toolchain ..
-    fi
-
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, CMake failed"
-        exit 1
-    fi
-
-    make
-
-    if [ $? -ne 0 ]; then
-        echo "Awwwww geeeeez rick, Make failed"
-        exit 1
-    fi
-    cat <<'EOF'
-        ___
-    . -^   `--,
-   /# =========`-_
-  /# (--====___====\
- /#   .- --.  . --.|
-/##   |  * ) (   * ),
-|##   \    /\ \   / |
-|###   ---   \ ---  |
-|####      ___)    #|
-|######           ##|
- \##### ---------- /
-  \####           (
-   `\###          |
-     \###         |
-      \##        |
-       \###.    .)
-        `======/
-EOF
-
-elif [ "$1" == "clean" ]; then
-	rm -rf build
-	rm -rf out
-	rm -rf coverage
-	echo "clean finished"
-
-elif [ "$1" == "setup" ]; then
-    sudo apt update
-    sudo apt install \
-        python3 \
-        virtualenv \
-        clang-format \
-        cppcheck
-
-    virtualenv -p python3 $PYTHON_ENV
-
-    $PYBIN/pip install pre-commit
-
-    $PRE_COMMIT install
-
-
-elif [ "$1" == "lint" ]; then
-    $PRE_COMMIT run -a
-
-elif [ "$1" == "autocode" ]; then
-    $PYTHON $ROOT_DIR/autocoding/autocode.py
+  read -r -p "Change the Buildroot Configuration? [y/N] " response
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      make menuconfig
+      ;;
+    *)
+      ;;
+  esac
+  read -r -p "Change the Kernel Configuration? [y/N] " response
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      make linux-menuconfig
+      ;;
+    *)
+      ;;
+  esac
+  read -r -p "Make? [y/N] " response
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      make sdk # also writes sdcard.img
+      ;;
+    *)
+      ;;
+  esac
+  read -r -p "Copy to SD card? [y/N] " response
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      read -r -p "Enter drive name: " response
+      [ -e "$response" ] || oops "Invalid disk!"
+      sudo dd if=$ROOT_DIR/build/buildroot/images/sdcard.img of=$response
+      ;;
+    *)
+      ;;
+  esac
+  popd
+else
+  oops "Usage $0 {clean, build, cross, setup, lint, autocode, buildroot}"
 fi

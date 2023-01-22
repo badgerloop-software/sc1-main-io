@@ -26,14 +26,19 @@ for line in formatFile:
     if len(numBytes) > 1:
         numBytes = numBytes[1].split(",")
         totalBytes += int(numBytes[0])
+formatFile.close()
 
 # add the closing brace and the struct variable names
 structFile.write("} data_format_read, data_format_write;\n")
 
 # write an int variable to the top of the file which contains the total number of bytes of this struct
+structFile.close()
 structFile = open("struct.cpp", "r")
 temp = structFile.read()
+structFile.close()
 structFile = open("struct.cpp", "w")
 structFile.write("#define totalBytes " + str(totalBytes) + "\n\n")
+structFile.close()
 structFile = open("struct.cpp", "a")
 structFile.write(temp)
+structFile.close()

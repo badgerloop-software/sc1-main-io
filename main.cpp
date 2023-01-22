@@ -51,39 +51,27 @@ int main() {
   // }
   Serial serial = Serial();
   serial.openDevice(2, 115200);
-  char message[] = "abcdefghij";
+
+  struct {
+    float speed;
+    bool crash;
+    char state;
+  } data_format_read, data_format_write;
+
+  data_format_write.speed = 1.01;
+  data_format_write.crash = true;
+  data_format_write.state = 'a';
 
   // loop goes here
   while (true) {
-    std::string checkMessage = "";
-    // write a random number of bytes (1-9) to the Pi
-    unsigned int numWriteBytes = rand() % 9 + 1;
-    // std::cout << message + numWriteBytes << std::endl;
-    char nwb = char(numWriteBytes + 48);  // convert number of bytes to a char
-    // std::cout << "number of bytes to write: " << nwb << std::endl;
-    serial.writeString(&nwb);                  // write number of bytes
-    for (int i = 0; i < numWriteBytes; i++) {  // write message using for loop
-      serial.writeString(&message[i]);
-      checkMessage = checkMessage + message[i];
-    }
-    std::cout << "write: " << nwb << checkMessage << std::endl;
+    serial.writeBytes(&data_format_write, 6);
     usleep(1000000);
-
-    // read the number of bytes of incoming data
-    // std::cout << "bytes available : " << serial.available() << std::endl;
-    char readBytesIn[1];
-    serial.readString(readBytesIn, 1);
-    unsigned int numReadBytes = (int)readBytesIn[0] - 48;
-    std::cout << "nrb: " << numReadBytes << " char: " << readBytesIn
-              << std::endl;
-
-    // read that number of bytes to get the data.
-    // std::cout << "bytes available : " << serial.available() << std::endl;
-    char readResult[numReadBytes];
-    serial.readString(readResult, numReadBytes);
-    std::cout << "message read: " << readResult << std::endl;
-    // serial.flushReceiver();
+    serial.readBytes(&data_format_read, 6, 1000, 0);
+    serial.flushReceiver();
     usleep(1000000);
+    std::cout << "speed: " << data_format_read.speed << std::endl;
+    std::cout << "crash: " << data_format_read.crash << std::endl;
+    std::cout << "state: " << data_format_read.state << std::endl;
   }
 
   // Ina3221 test = Ina3221(2, 0x40, 0.005, 0.005, 0.005);

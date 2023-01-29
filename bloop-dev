@@ -136,8 +136,6 @@ elif [ "$1" == "clean" ]; then
 
 elif [ "$1" == "setup" ]; then
 
-#	./tools/detect-os.pl || exit 1
-
 	line=$(head -n 1 '/etc/os-release')
 	if echo $line | grep -i "FeDora" ;then
 		echo "Fedora detected"

@@ -136,7 +136,26 @@ elif [ "$1" == "clean" ]; then
 
 elif [ "$1" == "setup" ]; then
 
-	./tools/detect-os.pl || exit 1
+#	./tools/detect-os.pl || exit 1
+
+	line=$(head -n 1 '/etc/os-release')
+	if echo $line | grep -i "FeDora" ;then
+		echo "Fedora detected"
+		sudo dnf install python3 virtualenv clang-tools-extra cppcheck
+	elif echo $line | grep -i "Ubuntu" ;then
+		echo "Ubuntu detected"
+		sudo apt update && sudo apt install python3 virtualenv clang-format cppcheck
+	elif echo $line | grep -i "Arch";then
+		echo "Arch (BTW) detected"
+		sudo pacman -Syy && sudo pacman -S python python-virtualenv cppcheck
+		yay -S clang-format-static-bin
+	elif echo $line | grep -i "Debian";then
+		echo "Debian detected"
+		echo "Warning: Depending on debian release, packages may be too old!"
+		sudo apt update && sudo apt install python3 virtualenv clang-format cppcheck
+	else
+		echo "Unsupported platform"
+	fi
 
     virtualenv -p python3 $PYTHON_ENV
 

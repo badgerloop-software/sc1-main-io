@@ -135,12 +135,8 @@ elif [ "$1" == "clean" ]; then
 	echo "clean finished"
 
 elif [ "$1" == "setup" ]; then
-    sudo apt update
-    sudo apt install \
-        python3 \
-        virtualenv \
-        clang-format \
-        cppcheck
+
+	./tools/detect-os.pl || exit 1
 
     virtualenv -p python3 $PYTHON_ENV
 

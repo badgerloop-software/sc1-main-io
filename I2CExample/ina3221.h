@@ -12,10 +12,10 @@ class Ina3221 {
  private:
   float shunts[3];
   int addr;
-  I2C& i2cBus;
+  I2C *i2cBus;
 
  public:
-  Ina3221(int addr, float shunt1, float shunt2, float shunt3, I2C& i2cBus);
+  Ina3221(int addr, float shunt1, float shunt2, float shunt3, I2C* i2cBus);
   int begin();
   float readVoltage(int channel);
   float readCurrent(int channel);

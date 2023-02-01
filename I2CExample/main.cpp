@@ -3,7 +3,7 @@
 #include <array>
 
 // Instantiate I2C for test
-I2C i2cBus(PB_9, PB_8);
+I2C i2cBus(PF_0, PF_1);
 
 void printDisplay(std::array<float, 3> voltages, std::array<float, 3> currents) {
     printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -18,7 +18,8 @@ void printDisplay(std::array<float, 3> voltages, std::array<float, 3> currents) 
 int main()
 {
     // Instantiate instance
-    Ina3221 testDevice(0x40 << 1, 0.005, 0.005, 0.005, i2cBus);
+    i2cBus.frequency(100000);
+    Ina3221 testDevice((0x40 << 1), 0.005, 0.005, 0.005, &i2cBus);
     printf("Starting device\n");
     while (1) {
         if (!testDevice.begin()) {

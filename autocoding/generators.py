@@ -69,3 +69,35 @@ import util
 #                 )
 #         out += "} " + struct.attrib["id"] + "_t;\n\n"
 #     return out + "\n" + headers + "\n\n\n"
+
+
+def uart_struct_generator(json_file):
+    # define macros for readability
+    data_type_column = 1
+    num_bytes_column = 0
+
+    outputStruct = "typedef struct {\n"
+
+    # variable to counter number of bytes the struct will be
+    totalBytes = 0
+
+    # open the data format json file and read it line by line
+    for key in json_file.keys():
+        # if the type is uint8 and uint16, use the correct types in c++
+        if json_file[key][1] == "uint8" or json_file[key][data_type_column] == "uint16":
+            outputStruct += (
+                "  " + json_file[key][data_type_column] + "_t" + " " + key + ";\n"
+            )
+        else:
+            outputStruct += "  " + json_file[key][data_type_column] + " " + key + ";\n"
+        # get the number of bytes of this variable and add it to totalBytes
+        totalBytes += json_file[key][num_bytes_column]
+
+    # add a keep alive signal (which will always be true) and add 1 to totalBytes
+    outputStruct += "  bool keep_alive;\n"
+    totalBytes += 1
+    # add the closing brace
+    outputStruct += "} data_format;\n"
+    # at the top, add a macro for total number of bytes of this struct
+    outputStruct = "#define totalBytes " + str(totalBytes) + "\n\n" + outputStruct
+    return outputStruct

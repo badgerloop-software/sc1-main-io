@@ -2,10 +2,10 @@
 
 # open the file to write the struct to
 structFile = open("struct.cpp", "w")
-structFile.write("struct {\n")
+structFile.write("typedef struct {\n")
 
-# variable to counter number of bytes the struct will be
-totalBytes = 0
+# variable to counter number of bytes the struct will be (initialize to 1 because of the keep_alive bool)
+totalBytes = 1
 
 # open the data format json file and read it line by line
 formatFile = open("format.json", "r")
@@ -28,17 +28,24 @@ for line in formatFile:
         totalBytes += int(numBytes[0])
 formatFile.close()
 
-# add the closing brace and the struct variable names
-structFile.write("} data_format_read, data_format_write;\n")
+# add a keep alive signal (which will always be true)
+structFile.write("  bool keep_alive;\n")
+# add the closing brace and declare 3 structs
+structFile.write(
+    "} data_format;\n\n data_format dfwrite;\n data_format dfread;\n data_format emptyStruct;\n"
+)
+
 
 # write an int variable to the top of the file which contains the total number of bytes of this struct
 structFile.close()
 structFile = open("struct.cpp", "r")
-temp = structFile.read()
+temp = structFile.read()  # get the contents of struct.cpp
 structFile.close()
 structFile = open("struct.cpp", "w")
-structFile.write("#define totalBytes " + str(totalBytes) + "\n\n")
+structFile.write(
+    "#define totalBytes " + str(totalBytes) + "\n\n"
+)  # overwrite struct.cpp with the totalBytes int
 structFile.close()
 structFile = open("struct.cpp", "a")
-structFile.write(temp)
+structFile.write(temp)  # append the rest of struct.cpp
 structFile.close()

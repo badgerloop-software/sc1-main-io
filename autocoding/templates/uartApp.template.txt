@@ -1,0 +1,35 @@
+#include "uartApp.h"
+#include "rtos.h"
+#include <iostream>
+
+Thread thread1;
+Thread thread2;
+
+void send_message_thread() {
+    while(true) {
+        uart_buffer.lock();
+        writeUart(&dfwrite, totalBytes);
+        uart_buffer.unlock();
+        wait_us(1000000);
+    }
+}
+
+// TODO fix this method to how we want to read commands from DriverIO
+void read_command_thread() {
+    while(true) {
+        uart_buffer.lock();
+        dfread = emptyStruct;
+        readUart(&dfread, totalBytes);
+        uart_buffer.unlock();
+        wait_us(1000000);
+    }
+}
+
+int runUart() {
+    initUart();
+    thread1.start(read_command_thread);
+    thread2.start(send_message_thread);
+    return 0;
+}
+
+/*!!AUTO-GENERATE HERE!!*/

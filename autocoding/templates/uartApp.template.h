@@ -1,11 +1,9 @@
 // TODO: add mbed import statements here
-
+#define numCommandBytes 1
 /*!!AUTO-GENERATE HERE!!*/
 
-data_format dfwrite;
-data_format dfdata;
-data_format emptyStruct;
+bool get_restart_enable();
 
-void clearDataFormatRead() { dfread = emptyStruct; }
+void cleardfdata();
 
 int runUart();

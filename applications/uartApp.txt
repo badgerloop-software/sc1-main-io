@@ -4,12 +4,21 @@
          */
 
 
-        #include "uartApp.h"
+
+#include "uartApp.h"
 #include "rtos.h"
 #include <iostream>
 
 Thread thread1;
 Thread thread2;
+
+data_format dfwrite;
+data_format dfdata;
+data_format emptyStruct;
+
+bool restart_enable;
+
+void clearDataFormatRead() { dfdata = emptyStruct; }
 
 void send_message_thread() {
     while(true) {
@@ -24,8 +33,8 @@ void send_message_thread() {
 void read_command_thread() {
     while(true) {
         uart_buffer.lock();
-        dfread = emptyStruct;
-        readUart(&dfread, totalBytes);
+        restart_enable = 0;
+        readUart(&restart_enable, numCommandBytes);
         uart_buffer.unlock();
         wait_us(1000000);
     }
@@ -36,6 +45,15 @@ int runUart() {
     thread1.start(read_command_thread);
     thread2.start(send_message_thread);
     return 0;
+}
+
+Mutex restart_enable_mutex;
+
+bool get_restart_enable() {
+    restart_enable_mutex.lock();
+    bool val = restart_enable;
+    restart_enable_mutex.unlock();
+    return val;
 }
 
 Mutex speed_mutex;
@@ -244,1213 +262,1213 @@ void copyDataStructToWriteStruct(){
   dfwrite.bms_input_voltage = get_bms_input_voltage();
 }
 
-float get_speed(){
+float get_speed() {
   speed_mutex.lock();
   float val = dfdata.speed;
   speed_mutex.unlock();
   return val;
 }
-void set_speed(float val){
+void set_speed(float val) {
   speed_mutex.lock();
   dfdata.speed = val;
   speed_mutex.unlock();
 }
 
-bool get_driver_eStop(){
+bool get_driver_eStop() {
   driver_eStop_mutex.lock();
   bool val = dfdata.driver_eStop;
   driver_eStop_mutex.unlock();
   return val;
 }
-void set_driver_eStop(bool val){
+void set_driver_eStop(bool val) {
   driver_eStop_mutex.lock();
   dfdata.driver_eStop = val;
   driver_eStop_mutex.unlock();
 }
 
-bool get_external_eStop(){
+bool get_external_eStop() {
   external_eStop_mutex.lock();
   bool val = dfdata.external_eStop;
   external_eStop_mutex.unlock();
   return val;
 }
-void set_external_eStop(bool val){
+void set_external_eStop(bool val) {
   external_eStop_mutex.lock();
   dfdata.external_eStop = val;
   external_eStop_mutex.unlock();
 }
 
-bool get_battery_eStop(){
+bool get_battery_eStop() {
   battery_eStop_mutex.lock();
   bool val = dfdata.battery_eStop;
   battery_eStop_mutex.unlock();
   return val;
 }
-void set_battery_eStop(bool val){
+void set_battery_eStop(bool val) {
   battery_eStop_mutex.lock();
   dfdata.battery_eStop = val;
   battery_eStop_mutex.unlock();
 }
 
-bool get_crash(){
+bool get_crash() {
   crash_mutex.lock();
   bool val = dfdata.crash;
   crash_mutex.unlock();
   return val;
 }
-void set_crash(bool val){
+void set_crash(bool val) {
   crash_mutex.lock();
   dfdata.crash = val;
   crash_mutex.unlock();
 }
 
-bool get_door(){
+bool get_door() {
   door_mutex.lock();
   bool val = dfdata.door;
   door_mutex.unlock();
   return val;
 }
-void set_door(bool val){
+void set_door(bool val) {
   door_mutex.lock();
   dfdata.door = val;
   door_mutex.unlock();
 }
 
-bool get_mcu_check(){
+bool get_mcu_check() {
   mcu_check_mutex.lock();
   bool val = dfdata.mcu_check;
   mcu_check_mutex.unlock();
   return val;
 }
-void set_mcu_check(bool val){
+void set_mcu_check(bool val) {
   mcu_check_mutex.lock();
   dfdata.mcu_check = val;
   mcu_check_mutex.unlock();
 }
 
-bool get_imd_status(){
+bool get_imd_status() {
   imd_status_mutex.lock();
   bool val = dfdata.imd_status;
   imd_status_mutex.unlock();
   return val;
 }
-void set_imd_status(bool val){
+void set_imd_status(bool val) {
   imd_status_mutex.lock();
   dfdata.imd_status = val;
   imd_status_mutex.unlock();
 }
 
-char get_state(){
+char get_state() {
   state_mutex.lock();
   char val = dfdata.state;
   state_mutex.unlock();
   return val;
 }
-void set_state(char val){
+void set_state(char val) {
   state_mutex.lock();
   dfdata.state = val;
   state_mutex.unlock();
 }
 
-float get_linear_accel_x(){
+float get_linear_accel_x() {
   linear_accel_x_mutex.lock();
   float val = dfdata.linear_accel_x;
   linear_accel_x_mutex.unlock();
   return val;
 }
-void set_linear_accel_x(float val){
+void set_linear_accel_x(float val) {
   linear_accel_x_mutex.lock();
   dfdata.linear_accel_x = val;
   linear_accel_x_mutex.unlock();
 }
 
-float get_linear_accel_y(){
+float get_linear_accel_y() {
   linear_accel_y_mutex.lock();
   float val = dfdata.linear_accel_y;
   linear_accel_y_mutex.unlock();
   return val;
 }
-void set_linear_accel_y(float val){
+void set_linear_accel_y(float val) {
   linear_accel_y_mutex.lock();
   dfdata.linear_accel_y = val;
   linear_accel_y_mutex.unlock();
 }
 
-float get_linear_accel_z(){
+float get_linear_accel_z() {
   linear_accel_z_mutex.lock();
   float val = dfdata.linear_accel_z;
   linear_accel_z_mutex.unlock();
   return val;
 }
-void set_linear_accel_z(float val){
+void set_linear_accel_z(float val) {
   linear_accel_z_mutex.lock();
   dfdata.linear_accel_z = val;
   linear_accel_z_mutex.unlock();
 }
 
-float get_angular_rate_pitch(){
+float get_angular_rate_pitch() {
   angular_rate_pitch_mutex.lock();
   float val = dfdata.angular_rate_pitch;
   angular_rate_pitch_mutex.unlock();
   return val;
 }
-void set_angular_rate_pitch(float val){
+void set_angular_rate_pitch(float val) {
   angular_rate_pitch_mutex.lock();
   dfdata.angular_rate_pitch = val;
   angular_rate_pitch_mutex.unlock();
 }
 
-float get_angular_rate_roll(){
+float get_angular_rate_roll() {
   angular_rate_roll_mutex.lock();
   float val = dfdata.angular_rate_roll;
   angular_rate_roll_mutex.unlock();
   return val;
 }
-void set_angular_rate_roll(float val){
+void set_angular_rate_roll(float val) {
   angular_rate_roll_mutex.lock();
   dfdata.angular_rate_roll = val;
   angular_rate_roll_mutex.unlock();
 }
 
-float get_angular_rate_yaw(){
+float get_angular_rate_yaw() {
   angular_rate_yaw_mutex.lock();
   float val = dfdata.angular_rate_yaw;
   angular_rate_yaw_mutex.unlock();
   return val;
 }
-void set_angular_rate_yaw(float val){
+void set_angular_rate_yaw(float val) {
   angular_rate_yaw_mutex.lock();
   dfdata.angular_rate_yaw = val;
   angular_rate_yaw_mutex.unlock();
 }
 
-float get_motor_temp(){
+float get_motor_temp() {
   motor_temp_mutex.lock();
   float val = dfdata.motor_temp;
   motor_temp_mutex.unlock();
   return val;
 }
-void set_motor_temp(float val){
+void set_motor_temp(float val) {
   motor_temp_mutex.lock();
   dfdata.motor_temp = val;
   motor_temp_mutex.unlock();
 }
 
-float get_motor_controller_temp(){
+float get_motor_controller_temp() {
   motor_controller_temp_mutex.lock();
   float val = dfdata.motor_controller_temp;
   motor_controller_temp_mutex.unlock();
   return val;
 }
-void set_motor_controller_temp(float val){
+void set_motor_controller_temp(float val) {
   motor_controller_temp_mutex.lock();
   dfdata.motor_controller_temp = val;
   motor_controller_temp_mutex.unlock();
 }
 
-float get_dcdc_temp(){
+float get_dcdc_temp() {
   dcdc_temp_mutex.lock();
   float val = dfdata.dcdc_temp;
   dcdc_temp_mutex.unlock();
   return val;
 }
-void set_dcdc_temp(float val){
+void set_dcdc_temp(float val) {
   dcdc_temp_mutex.lock();
   dfdata.dcdc_temp = val;
   dcdc_temp_mutex.unlock();
 }
 
-float get_driverIO_temp(){
+float get_driverIO_temp() {
   driverIO_temp_mutex.lock();
   float val = dfdata.driverIO_temp;
   driverIO_temp_mutex.unlock();
   return val;
 }
-void set_driverIO_temp(float val){
+void set_driverIO_temp(float val) {
   driverIO_temp_mutex.lock();
   dfdata.driverIO_temp = val;
   driverIO_temp_mutex.unlock();
 }
 
-float get_mainIO_temp(){
+float get_mainIO_temp() {
   mainIO_temp_mutex.lock();
   float val = dfdata.mainIO_temp;
   mainIO_temp_mutex.unlock();
   return val;
 }
-void set_mainIO_temp(float val){
+void set_mainIO_temp(float val) {
   mainIO_temp_mutex.lock();
   dfdata.mainIO_temp = val;
   mainIO_temp_mutex.unlock();
 }
 
-float get_cabin_temp(){
+float get_cabin_temp() {
   cabin_temp_mutex.lock();
   float val = dfdata.cabin_temp;
   cabin_temp_mutex.unlock();
   return val;
 }
-void set_cabin_temp(float val){
+void set_cabin_temp(float val) {
   cabin_temp_mutex.lock();
   dfdata.cabin_temp = val;
   cabin_temp_mutex.unlock();
 }
 
-float get_road_temp(){
+float get_road_temp() {
   road_temp_mutex.lock();
   float val = dfdata.road_temp;
   road_temp_mutex.unlock();
   return val;
 }
-void set_road_temp(float val){
+void set_road_temp(float val) {
   road_temp_mutex.lock();
   dfdata.road_temp = val;
   road_temp_mutex.unlock();
 }
 
-float get_brake_temp(){
+float get_brake_temp() {
   brake_temp_mutex.lock();
   float val = dfdata.brake_temp;
   brake_temp_mutex.unlock();
   return val;
 }
-void set_brake_temp(float val){
+void set_brake_temp(float val) {
   brake_temp_mutex.lock();
   dfdata.brake_temp = val;
   brake_temp_mutex.unlock();
 }
 
-float get_air_temp(){
+float get_air_temp() {
   air_temp_mutex.lock();
   float val = dfdata.air_temp;
   air_temp_mutex.unlock();
   return val;
 }
-void set_air_temp(float val){
+void set_air_temp(float val) {
   air_temp_mutex.lock();
   dfdata.air_temp = val;
   air_temp_mutex.unlock();
 }
 
-bool get_cruise(){
+bool get_cruise() {
   cruise_mutex.lock();
   bool val = dfdata.cruise;
   cruise_mutex.unlock();
   return val;
 }
-void set_cruise(bool val){
+void set_cruise(bool val) {
   cruise_mutex.lock();
   dfdata.cruise = val;
   cruise_mutex.unlock();
 }
 
-bool get_left_turn(){
+bool get_left_turn() {
   left_turn_mutex.lock();
   bool val = dfdata.left_turn;
   left_turn_mutex.unlock();
   return val;
 }
-void set_left_turn(bool val){
+void set_left_turn(bool val) {
   left_turn_mutex.lock();
   dfdata.left_turn = val;
   left_turn_mutex.unlock();
 }
 
-bool get_right_turn(){
+bool get_right_turn() {
   right_turn_mutex.lock();
   bool val = dfdata.right_turn;
   right_turn_mutex.unlock();
   return val;
 }
-void set_right_turn(bool val){
+void set_right_turn(bool val) {
   right_turn_mutex.lock();
   dfdata.right_turn = val;
   right_turn_mutex.unlock();
 }
 
-bool get_hazards(){
+bool get_hazards() {
   hazards_mutex.lock();
   bool val = dfdata.hazards;
   hazards_mutex.unlock();
   return val;
 }
-void set_hazards(bool val){
+void set_hazards(bool val) {
   hazards_mutex.lock();
   dfdata.hazards = val;
   hazards_mutex.unlock();
 }
 
-bool get_headlights(){
+bool get_headlights() {
   headlights_mutex.lock();
   bool val = dfdata.headlights;
   headlights_mutex.unlock();
   return val;
 }
-void set_headlights(bool val){
+void set_headlights(bool val) {
   headlights_mutex.lock();
   dfdata.headlights = val;
   headlights_mutex.unlock();
 }
 
-bool get_mainIO_heartbeat(){
+bool get_mainIO_heartbeat() {
   mainIO_heartbeat_mutex.lock();
   bool val = dfdata.mainIO_heartbeat;
   mainIO_heartbeat_mutex.unlock();
   return val;
 }
-void set_mainIO_heartbeat(bool val){
+void set_mainIO_heartbeat(bool val) {
   mainIO_heartbeat_mutex.lock();
   dfdata.mainIO_heartbeat = val;
   mainIO_heartbeat_mutex.unlock();
 }
 
-float get_accelerator(){
+float get_accelerator() {
   accelerator_mutex.lock();
   float val = dfdata.accelerator;
   accelerator_mutex.unlock();
   return val;
 }
-void set_accelerator(float val){
+void set_accelerator(float val) {
   accelerator_mutex.lock();
   dfdata.accelerator = val;
   accelerator_mutex.unlock();
 }
 
-float get_bus_5V(){
+float get_bus_5V() {
   bus_5V_mutex.lock();
   float val = dfdata.bus_5V;
   bus_5V_mutex.unlock();
   return val;
 }
-void set_bus_5V(float val){
+void set_bus_5V(float val) {
   bus_5V_mutex.lock();
   dfdata.bus_5V = val;
   bus_5V_mutex.unlock();
 }
 
-float get_bus_12V(){
+float get_bus_12V() {
   bus_12V_mutex.lock();
   float val = dfdata.bus_12V;
   bus_12V_mutex.unlock();
   return val;
 }
-void set_bus_12V(float val){
+void set_bus_12V(float val) {
   bus_12V_mutex.lock();
   dfdata.bus_12V = val;
   bus_12V_mutex.unlock();
 }
 
-float get_mainIO_current_in(){
+float get_mainIO_current_in() {
   mainIO_current_in_mutex.lock();
   float val = dfdata.mainIO_current_in;
   mainIO_current_in_mutex.unlock();
   return val;
 }
-void set_mainIO_current_in(float val){
+void set_mainIO_current_in(float val) {
   mainIO_current_in_mutex.lock();
   dfdata.mainIO_current_in = val;
   mainIO_current_in_mutex.unlock();
 }
 
-float get_driverIO_current_in(){
+float get_driverIO_current_in() {
   driverIO_current_in_mutex.lock();
   float val = dfdata.driverIO_current_in;
   driverIO_current_in_mutex.unlock();
   return val;
 }
-void set_driverIO_current_in(float val){
+void set_driverIO_current_in(float val) {
   driverIO_current_in_mutex.lock();
   dfdata.driverIO_current_in = val;
   driverIO_current_in_mutex.unlock();
 }
 
-bool get_power_critical(){
+bool get_power_critical() {
   power_critical_mutex.lock();
   bool val = dfdata.power_critical;
   power_critical_mutex.unlock();
   return val;
 }
-void set_power_critical(bool val){
+void set_power_critical(bool val) {
   power_critical_mutex.lock();
   dfdata.power_critical = val;
   power_critical_mutex.unlock();
 }
 
-bool get_power_warning(){
+bool get_power_warning() {
   power_warning_mutex.lock();
   bool val = dfdata.power_warning;
   power_warning_mutex.unlock();
   return val;
 }
-void set_power_warning(bool val){
+void set_power_warning(bool val) {
   power_warning_mutex.lock();
   dfdata.power_warning = val;
   power_warning_mutex.unlock();
 }
 
-bool get_power_tc(){
+bool get_power_tc() {
   power_tc_mutex.lock();
   bool val = dfdata.power_tc;
   power_tc_mutex.unlock();
   return val;
 }
-void set_power_tc(bool val){
+void set_power_tc(bool val) {
   power_tc_mutex.lock();
   dfdata.power_tc = val;
   power_tc_mutex.unlock();
 }
 
-uint16_t get_tstamp_ms(){
+uint16_t get_tstamp_ms() {
   tstamp_ms_mutex.lock();
   uint16 val = dfdata.tstamp_ms;
   tstamp_ms_mutex.unlock();
   return val;
 }
-void set_tstamp_ms(uint16_t val){
+void set_tstamp_ms(uint16_t val) {
   tstamp_ms_mutex.lock();
   dfdata.tstamp_ms = val;
   tstamp_ms_mutex.unlock();
 }
 
-uint8_t get_tstamp_sc(){
+uint8_t get_tstamp_sc() {
   tstamp_sc_mutex.lock();
   uint8 val = dfdata.tstamp_sc;
   tstamp_sc_mutex.unlock();
   return val;
 }
-void set_tstamp_sc(uint8_t val){
+void set_tstamp_sc(uint8_t val) {
   tstamp_sc_mutex.lock();
   dfdata.tstamp_sc = val;
   tstamp_sc_mutex.unlock();
 }
 
-uint8_t get_tstamp_mn(){
+uint8_t get_tstamp_mn() {
   tstamp_mn_mutex.lock();
   uint8 val = dfdata.tstamp_mn;
   tstamp_mn_mutex.unlock();
   return val;
 }
-void set_tstamp_mn(uint8_t val){
+void set_tstamp_mn(uint8_t val) {
   tstamp_mn_mutex.lock();
   dfdata.tstamp_mn = val;
   tstamp_mn_mutex.unlock();
 }
 
-uint8_t get_tstamp_hr(){
+uint8_t get_tstamp_hr() {
   tstamp_hr_mutex.lock();
   uint8 val = dfdata.tstamp_hr;
   tstamp_hr_mutex.unlock();
   return val;
 }
-void set_tstamp_hr(uint8_t val){
+void set_tstamp_hr(uint8_t val) {
   tstamp_hr_mutex.lock();
   dfdata.tstamp_hr = val;
   tstamp_hr_mutex.unlock();
 }
 
-bool get_mps_enable(){
+bool get_mps_enable() {
   mps_enable_mutex.lock();
   bool val = dfdata.mps_enable;
   mps_enable_mutex.unlock();
   return val;
 }
-void set_mps_enable(bool val){
+void set_mps_enable(bool val) {
   mps_enable_mutex.lock();
   dfdata.mps_enable = val;
   mps_enable_mutex.unlock();
 }
 
-bool get_mppt_contactor(){
+bool get_mppt_contactor() {
   mppt_contactor_mutex.lock();
   bool val = dfdata.mppt_contactor;
   mppt_contactor_mutex.unlock();
   return val;
 }
-void set_mppt_contactor(bool val){
+void set_mppt_contactor(bool val) {
   mppt_contactor_mutex.lock();
   dfdata.mppt_contactor = val;
   mppt_contactor_mutex.unlock();
 }
 
-bool get_motor_controller_contactor(){
+bool get_motor_controller_contactor() {
   motor_controller_contactor_mutex.lock();
   bool val = dfdata.motor_controller_contactor;
   motor_controller_contactor_mutex.unlock();
   return val;
 }
-void set_motor_controller_contactor(bool val){
+void set_motor_controller_contactor(bool val) {
   motor_controller_contactor_mutex.lock();
   dfdata.motor_controller_contactor = val;
   motor_controller_contactor_mutex.unlock();
 }
 
-bool get_low_contactor(){
+bool get_low_contactor() {
   low_contactor_mutex.lock();
   bool val = dfdata.low_contactor;
   low_contactor_mutex.unlock();
   return val;
 }
-void set_low_contactor(bool val){
+void set_low_contactor(bool val) {
   low_contactor_mutex.lock();
   dfdata.low_contactor = val;
   low_contactor_mutex.unlock();
 }
 
-bool get_dcdc_valid(){
+bool get_dcdc_valid() {
   dcdc_valid_mutex.lock();
   bool val = dfdata.dcdc_valid;
   dcdc_valid_mutex.unlock();
   return val;
 }
-void set_dcdc_valid(bool val){
+void set_dcdc_valid(bool val) {
   dcdc_valid_mutex.lock();
   dfdata.dcdc_valid = val;
   dcdc_valid_mutex.unlock();
 }
 
-bool get_supplemental_valid(){
+bool get_supplemental_valid() {
   supplemental_valid_mutex.lock();
   bool val = dfdata.supplemental_valid;
   supplemental_valid_mutex.unlock();
   return val;
 }
-void set_supplemental_valid(bool val){
+void set_supplemental_valid(bool val) {
   supplemental_valid_mutex.lock();
   dfdata.supplemental_valid = val;
   supplemental_valid_mutex.unlock();
 }
 
-bool get_mppt_mode(){
+bool get_mppt_mode() {
   mppt_mode_mutex.lock();
   bool val = dfdata.mppt_mode;
   mppt_mode_mutex.unlock();
   return val;
 }
-void set_mppt_mode(bool val){
+void set_mppt_mode(bool val) {
   mppt_mode_mutex.lock();
   dfdata.mppt_mode = val;
   mppt_mode_mutex.unlock();
 }
 
-float get_mppt_current_out(){
+float get_mppt_current_out() {
   mppt_current_out_mutex.lock();
   float val = dfdata.mppt_current_out;
   mppt_current_out_mutex.unlock();
   return val;
 }
-void set_mppt_current_out(float val){
+void set_mppt_current_out(float val) {
   mppt_current_out_mutex.lock();
   dfdata.mppt_current_out = val;
   mppt_current_out_mutex.unlock();
 }
 
-float get_string1_temp(){
+float get_string1_temp() {
   string1_temp_mutex.lock();
   float val = dfdata.string1_temp;
   string1_temp_mutex.unlock();
   return val;
 }
-void set_string1_temp(float val){
+void set_string1_temp(float val) {
   string1_temp_mutex.lock();
   dfdata.string1_temp = val;
   string1_temp_mutex.unlock();
 }
 
-float get_string2_temp(){
+float get_string2_temp() {
   string2_temp_mutex.lock();
   float val = dfdata.string2_temp;
   string2_temp_mutex.unlock();
   return val;
 }
-void set_string2_temp(float val){
+void set_string2_temp(float val) {
   string2_temp_mutex.lock();
   dfdata.string2_temp = val;
   string2_temp_mutex.unlock();
 }
 
-float get_string3_temp(){
+float get_string3_temp() {
   string3_temp_mutex.lock();
   float val = dfdata.string3_temp;
   string3_temp_mutex.unlock();
   return val;
 }
-void set_string3_temp(float val){
+void set_string3_temp(float val) {
   string3_temp_mutex.lock();
   dfdata.string3_temp = val;
   string3_temp_mutex.unlock();
 }
 
-float get_pack_temp(){
+float get_pack_temp() {
   pack_temp_mutex.lock();
   float val = dfdata.pack_temp;
   pack_temp_mutex.unlock();
   return val;
 }
-void set_pack_temp(float val){
+void set_pack_temp(float val) {
   pack_temp_mutex.lock();
   dfdata.pack_temp = val;
   pack_temp_mutex.unlock();
 }
 
-float get_pack_current(){
+float get_pack_current() {
   pack_current_mutex.lock();
   float val = dfdata.pack_current;
   pack_current_mutex.unlock();
   return val;
 }
-void set_pack_current(float val){
+void set_pack_current(float val) {
   pack_current_mutex.lock();
   dfdata.pack_current = val;
   pack_current_mutex.unlock();
 }
 
-float get_pack_voltage(){
+float get_pack_voltage() {
   pack_voltage_mutex.lock();
   float val = dfdata.pack_voltage;
   pack_voltage_mutex.unlock();
   return val;
 }
-void set_pack_voltage(float val){
+void set_pack_voltage(float val) {
   pack_voltage_mutex.lock();
   dfdata.pack_voltage = val;
   pack_voltage_mutex.unlock();
 }
 
-float get_cell_group1_voltage(){
+float get_cell_group1_voltage() {
   cell_group1_voltage_mutex.lock();
   float val = dfdata.cell_group1_voltage;
   cell_group1_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group1_voltage(float val){
+void set_cell_group1_voltage(float val) {
   cell_group1_voltage_mutex.lock();
   dfdata.cell_group1_voltage = val;
   cell_group1_voltage_mutex.unlock();
 }
 
-float get_cell_group2_voltage(){
+float get_cell_group2_voltage() {
   cell_group2_voltage_mutex.lock();
   float val = dfdata.cell_group2_voltage;
   cell_group2_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group2_voltage(float val){
+void set_cell_group2_voltage(float val) {
   cell_group2_voltage_mutex.lock();
   dfdata.cell_group2_voltage = val;
   cell_group2_voltage_mutex.unlock();
 }
 
-float get_cell_group3_voltage(){
+float get_cell_group3_voltage() {
   cell_group3_voltage_mutex.lock();
   float val = dfdata.cell_group3_voltage;
   cell_group3_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group3_voltage(float val){
+void set_cell_group3_voltage(float val) {
   cell_group3_voltage_mutex.lock();
   dfdata.cell_group3_voltage = val;
   cell_group3_voltage_mutex.unlock();
 }
 
-float get_cell_group4_voltage(){
+float get_cell_group4_voltage() {
   cell_group4_voltage_mutex.lock();
   float val = dfdata.cell_group4_voltage;
   cell_group4_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group4_voltage(float val){
+void set_cell_group4_voltage(float val) {
   cell_group4_voltage_mutex.lock();
   dfdata.cell_group4_voltage = val;
   cell_group4_voltage_mutex.unlock();
 }
 
-float get_cell_group5_voltage(){
+float get_cell_group5_voltage() {
   cell_group5_voltage_mutex.lock();
   float val = dfdata.cell_group5_voltage;
   cell_group5_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group5_voltage(float val){
+void set_cell_group5_voltage(float val) {
   cell_group5_voltage_mutex.lock();
   dfdata.cell_group5_voltage = val;
   cell_group5_voltage_mutex.unlock();
 }
 
-float get_cell_group6_voltage(){
+float get_cell_group6_voltage() {
   cell_group6_voltage_mutex.lock();
   float val = dfdata.cell_group6_voltage;
   cell_group6_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group6_voltage(float val){
+void set_cell_group6_voltage(float val) {
   cell_group6_voltage_mutex.lock();
   dfdata.cell_group6_voltage = val;
   cell_group6_voltage_mutex.unlock();
 }
 
-float get_cell_group7_voltage(){
+float get_cell_group7_voltage() {
   cell_group7_voltage_mutex.lock();
   float val = dfdata.cell_group7_voltage;
   cell_group7_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group7_voltage(float val){
+void set_cell_group7_voltage(float val) {
   cell_group7_voltage_mutex.lock();
   dfdata.cell_group7_voltage = val;
   cell_group7_voltage_mutex.unlock();
 }
 
-float get_cell_group8_voltage(){
+float get_cell_group8_voltage() {
   cell_group8_voltage_mutex.lock();
   float val = dfdata.cell_group8_voltage;
   cell_group8_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group8_voltage(float val){
+void set_cell_group8_voltage(float val) {
   cell_group8_voltage_mutex.lock();
   dfdata.cell_group8_voltage = val;
   cell_group8_voltage_mutex.unlock();
 }
 
-float get_cell_group9_voltage(){
+float get_cell_group9_voltage() {
   cell_group9_voltage_mutex.lock();
   float val = dfdata.cell_group9_voltage;
   cell_group9_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group9_voltage(float val){
+void set_cell_group9_voltage(float val) {
   cell_group9_voltage_mutex.lock();
   dfdata.cell_group9_voltage = val;
   cell_group9_voltage_mutex.unlock();
 }
 
-float get_cell_group10_voltage(){
+float get_cell_group10_voltage() {
   cell_group10_voltage_mutex.lock();
   float val = dfdata.cell_group10_voltage;
   cell_group10_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group10_voltage(float val){
+void set_cell_group10_voltage(float val) {
   cell_group10_voltage_mutex.lock();
   dfdata.cell_group10_voltage = val;
   cell_group10_voltage_mutex.unlock();
 }
 
-float get_cell_group11_voltage(){
+float get_cell_group11_voltage() {
   cell_group11_voltage_mutex.lock();
   float val = dfdata.cell_group11_voltage;
   cell_group11_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group11_voltage(float val){
+void set_cell_group11_voltage(float val) {
   cell_group11_voltage_mutex.lock();
   dfdata.cell_group11_voltage = val;
   cell_group11_voltage_mutex.unlock();
 }
 
-float get_cell_group12_voltage(){
+float get_cell_group12_voltage() {
   cell_group12_voltage_mutex.lock();
   float val = dfdata.cell_group12_voltage;
   cell_group12_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group12_voltage(float val){
+void set_cell_group12_voltage(float val) {
   cell_group12_voltage_mutex.lock();
   dfdata.cell_group12_voltage = val;
   cell_group12_voltage_mutex.unlock();
 }
 
-float get_cell_group13_voltage(){
+float get_cell_group13_voltage() {
   cell_group13_voltage_mutex.lock();
   float val = dfdata.cell_group13_voltage;
   cell_group13_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group13_voltage(float val){
+void set_cell_group13_voltage(float val) {
   cell_group13_voltage_mutex.lock();
   dfdata.cell_group13_voltage = val;
   cell_group13_voltage_mutex.unlock();
 }
 
-float get_cell_group14_voltage(){
+float get_cell_group14_voltage() {
   cell_group14_voltage_mutex.lock();
   float val = dfdata.cell_group14_voltage;
   cell_group14_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group14_voltage(float val){
+void set_cell_group14_voltage(float val) {
   cell_group14_voltage_mutex.lock();
   dfdata.cell_group14_voltage = val;
   cell_group14_voltage_mutex.unlock();
 }
 
-float get_cell_group15_voltage(){
+float get_cell_group15_voltage() {
   cell_group15_voltage_mutex.lock();
   float val = dfdata.cell_group15_voltage;
   cell_group15_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group15_voltage(float val){
+void set_cell_group15_voltage(float val) {
   cell_group15_voltage_mutex.lock();
   dfdata.cell_group15_voltage = val;
   cell_group15_voltage_mutex.unlock();
 }
 
-float get_cell_group16_voltage(){
+float get_cell_group16_voltage() {
   cell_group16_voltage_mutex.lock();
   float val = dfdata.cell_group16_voltage;
   cell_group16_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group16_voltage(float val){
+void set_cell_group16_voltage(float val) {
   cell_group16_voltage_mutex.lock();
   dfdata.cell_group16_voltage = val;
   cell_group16_voltage_mutex.unlock();
 }
 
-float get_cell_group17_voltage(){
+float get_cell_group17_voltage() {
   cell_group17_voltage_mutex.lock();
   float val = dfdata.cell_group17_voltage;
   cell_group17_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group17_voltage(float val){
+void set_cell_group17_voltage(float val) {
   cell_group17_voltage_mutex.lock();
   dfdata.cell_group17_voltage = val;
   cell_group17_voltage_mutex.unlock();
 }
 
-float get_cell_group18_voltage(){
+float get_cell_group18_voltage() {
   cell_group18_voltage_mutex.lock();
   float val = dfdata.cell_group18_voltage;
   cell_group18_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group18_voltage(float val){
+void set_cell_group18_voltage(float val) {
   cell_group18_voltage_mutex.lock();
   dfdata.cell_group18_voltage = val;
   cell_group18_voltage_mutex.unlock();
 }
 
-float get_cell_group19_voltage(){
+float get_cell_group19_voltage() {
   cell_group19_voltage_mutex.lock();
   float val = dfdata.cell_group19_voltage;
   cell_group19_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group19_voltage(float val){
+void set_cell_group19_voltage(float val) {
   cell_group19_voltage_mutex.lock();
   dfdata.cell_group19_voltage = val;
   cell_group19_voltage_mutex.unlock();
 }
 
-float get_cell_group20_voltage(){
+float get_cell_group20_voltage() {
   cell_group20_voltage_mutex.lock();
   float val = dfdata.cell_group20_voltage;
   cell_group20_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group20_voltage(float val){
+void set_cell_group20_voltage(float val) {
   cell_group20_voltage_mutex.lock();
   dfdata.cell_group20_voltage = val;
   cell_group20_voltage_mutex.unlock();
 }
 
-float get_cell_group21_voltage(){
+float get_cell_group21_voltage() {
   cell_group21_voltage_mutex.lock();
   float val = dfdata.cell_group21_voltage;
   cell_group21_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group21_voltage(float val){
+void set_cell_group21_voltage(float val) {
   cell_group21_voltage_mutex.lock();
   dfdata.cell_group21_voltage = val;
   cell_group21_voltage_mutex.unlock();
 }
 
-float get_cell_group22_voltage(){
+float get_cell_group22_voltage() {
   cell_group22_voltage_mutex.lock();
   float val = dfdata.cell_group22_voltage;
   cell_group22_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group22_voltage(float val){
+void set_cell_group22_voltage(float val) {
   cell_group22_voltage_mutex.lock();
   dfdata.cell_group22_voltage = val;
   cell_group22_voltage_mutex.unlock();
 }
 
-float get_cell_group23_voltage(){
+float get_cell_group23_voltage() {
   cell_group23_voltage_mutex.lock();
   float val = dfdata.cell_group23_voltage;
   cell_group23_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group23_voltage(float val){
+void set_cell_group23_voltage(float val) {
   cell_group23_voltage_mutex.lock();
   dfdata.cell_group23_voltage = val;
   cell_group23_voltage_mutex.unlock();
 }
 
-float get_cell_group24_voltage(){
+float get_cell_group24_voltage() {
   cell_group24_voltage_mutex.lock();
   float val = dfdata.cell_group24_voltage;
   cell_group24_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group24_voltage(float val){
+void set_cell_group24_voltage(float val) {
   cell_group24_voltage_mutex.lock();
   dfdata.cell_group24_voltage = val;
   cell_group24_voltage_mutex.unlock();
 }
 
-float get_cell_group25_voltage(){
+float get_cell_group25_voltage() {
   cell_group25_voltage_mutex.lock();
   float val = dfdata.cell_group25_voltage;
   cell_group25_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group25_voltage(float val){
+void set_cell_group25_voltage(float val) {
   cell_group25_voltage_mutex.lock();
   dfdata.cell_group25_voltage = val;
   cell_group25_voltage_mutex.unlock();
 }
 
-float get_cell_group26_voltage(){
+float get_cell_group26_voltage() {
   cell_group26_voltage_mutex.lock();
   float val = dfdata.cell_group26_voltage;
   cell_group26_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group26_voltage(float val){
+void set_cell_group26_voltage(float val) {
   cell_group26_voltage_mutex.lock();
   dfdata.cell_group26_voltage = val;
   cell_group26_voltage_mutex.unlock();
 }
 
-float get_cell_group27_voltage(){
+float get_cell_group27_voltage() {
   cell_group27_voltage_mutex.lock();
   float val = dfdata.cell_group27_voltage;
   cell_group27_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group27_voltage(float val){
+void set_cell_group27_voltage(float val) {
   cell_group27_voltage_mutex.lock();
   dfdata.cell_group27_voltage = val;
   cell_group27_voltage_mutex.unlock();
 }
 
-float get_cell_group28_voltage(){
+float get_cell_group28_voltage() {
   cell_group28_voltage_mutex.lock();
   float val = dfdata.cell_group28_voltage;
   cell_group28_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group28_voltage(float val){
+void set_cell_group28_voltage(float val) {
   cell_group28_voltage_mutex.lock();
   dfdata.cell_group28_voltage = val;
   cell_group28_voltage_mutex.unlock();
 }
 
-float get_cell_group29_voltage(){
+float get_cell_group29_voltage() {
   cell_group29_voltage_mutex.lock();
   float val = dfdata.cell_group29_voltage;
   cell_group29_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group29_voltage(float val){
+void set_cell_group29_voltage(float val) {
   cell_group29_voltage_mutex.lock();
   dfdata.cell_group29_voltage = val;
   cell_group29_voltage_mutex.unlock();
 }
 
-float get_cell_group30_voltage(){
+float get_cell_group30_voltage() {
   cell_group30_voltage_mutex.lock();
   float val = dfdata.cell_group30_voltage;
   cell_group30_voltage_mutex.unlock();
   return val;
 }
-void set_cell_group30_voltage(float val){
+void set_cell_group30_voltage(float val) {
   cell_group30_voltage_mutex.lock();
   dfdata.cell_group30_voltage = val;
   cell_group30_voltage_mutex.unlock();
 }
 
-float get_soc(){
+float get_soc() {
   soc_mutex.lock();
   float val = dfdata.soc;
   soc_mutex.unlock();
   return val;
 }
-void set_soc(float val){
+void set_soc(float val) {
   soc_mutex.lock();
   dfdata.soc = val;
   soc_mutex.unlock();
 }
 
-float get_soh(){
+float get_soh() {
   soh_mutex.lock();
   float val = dfdata.soh;
   soh_mutex.unlock();
   return val;
 }
-void set_soh(float val){
+void set_soh(float val) {
   soh_mutex.lock();
   dfdata.soh = val;
   soh_mutex.unlock();
 }
 
-float get_pack_capacity(){
+float get_pack_capacity() {
   pack_capacity_mutex.lock();
   float val = dfdata.pack_capacity;
   pack_capacity_mutex.unlock();
   return val;
 }
-void set_pack_capacity(float val){
+void set_pack_capacity(float val) {
   pack_capacity_mutex.lock();
   dfdata.pack_capacity = val;
   pack_capacity_mutex.unlock();
 }
 
-float get_adaptive_total_capacity(){
+float get_adaptive_total_capacity() {
   adaptive_total_capacity_mutex.lock();
   float val = dfdata.adaptive_total_capacity;
   adaptive_total_capacity_mutex.unlock();
   return val;
 }
-void set_adaptive_total_capacity(float val){
+void set_adaptive_total_capacity(float val) {
   adaptive_total_capacity_mutex.lock();
   dfdata.adaptive_total_capacity = val;
   adaptive_total_capacity_mutex.unlock();
 }
 
-bool get_bps_fault(){
+bool get_bps_fault() {
   bps_fault_mutex.lock();
   bool val = dfdata.bps_fault;
   bps_fault_mutex.unlock();
   return val;
 }
-void set_bps_fault(bool val){
+void set_bps_fault(bool val) {
   bps_fault_mutex.lock();
   dfdata.bps_fault = val;
   bps_fault_mutex.unlock();
 }
 
-uint8_t get_fan_speed(){
+uint8_t get_fan_speed() {
   fan_speed_mutex.lock();
   uint8 val = dfdata.fan_speed;
   fan_speed_mutex.unlock();
   return val;
 }
-void set_fan_speed(uint8_t val){
+void set_fan_speed(uint8_t val) {
   fan_speed_mutex.lock();
   dfdata.fan_speed = val;
   fan_speed_mutex.unlock();
 }
 
-bool get_voltage_failsafe(){
+bool get_voltage_failsafe() {
   voltage_failsafe_mutex.lock();
   bool val = dfdata.voltage_failsafe;
   voltage_failsafe_mutex.unlock();
   return val;
 }
-void set_voltage_failsafe(bool val){
+void set_voltage_failsafe(bool val) {
   voltage_failsafe_mutex.lock();
   dfdata.voltage_failsafe = val;
   voltage_failsafe_mutex.unlock();
 }
 
-bool get_current_failsafe(){
+bool get_current_failsafe() {
   current_failsafe_mutex.lock();
   bool val = dfdata.current_failsafe;
   current_failsafe_mutex.unlock();
   return val;
 }
-void set_current_failsafe(bool val){
+void set_current_failsafe(bool val) {
   current_failsafe_mutex.lock();
   dfdata.current_failsafe = val;
   current_failsafe_mutex.unlock();
 }
 
-bool get_supply_power_failsafe(){
+bool get_supply_power_failsafe() {
   supply_power_failsafe_mutex.lock();
   bool val = dfdata.supply_power_failsafe;
   supply_power_failsafe_mutex.unlock();
   return val;
 }
-void set_supply_power_failsafe(bool val){
+void set_supply_power_failsafe(bool val) {
   supply_power_failsafe_mutex.lock();
   dfdata.supply_power_failsafe = val;
   supply_power_failsafe_mutex.unlock();
 }
 
-bool get_memory_failsafe(){
+bool get_memory_failsafe() {
   memory_failsafe_mutex.lock();
   bool val = dfdata.memory_failsafe;
   memory_failsafe_mutex.unlock();
   return val;
 }
-void set_memory_failsafe(bool val){
+void set_memory_failsafe(bool val) {
   memory_failsafe_mutex.lock();
   dfdata.memory_failsafe = val;
   memory_failsafe_mutex.unlock();
 }
 
-bool get_relay_failsafe(){
+bool get_relay_failsafe() {
   relay_failsafe_mutex.lock();
   bool val = dfdata.relay_failsafe;
   relay_failsafe_mutex.unlock();
   return val;
 }
-void set_relay_failsafe(bool val){
+void set_relay_failsafe(bool val) {
   relay_failsafe_mutex.lock();
   dfdata.relay_failsafe = val;
   relay_failsafe_mutex.unlock();
 }
 
-bool get_bms_canbus_failure(){
+bool get_bms_canbus_failure() {
   bms_canbus_failure_mutex.lock();
   bool val = dfdata.bms_canbus_failure;
   bms_canbus_failure_mutex.unlock();
   return val;
 }
-void set_bms_canbus_failure(bool val){
+void set_bms_canbus_failure(bool val) {
   bms_canbus_failure_mutex.lock();
   dfdata.bms_canbus_failure = val;
   bms_canbus_failure_mutex.unlock();
 }
 
-float get_pack_resistance(){
+float get_pack_resistance() {
   pack_resistance_mutex.lock();
   float val = dfdata.pack_resistance;
   pack_resistance_mutex.unlock();
   return val;
 }
-void set_pack_resistance(float val){
+void set_pack_resistance(float val) {
   pack_resistance_mutex.lock();
   dfdata.pack_resistance = val;
   pack_resistance_mutex.unlock();
 }
 
-float get_avg_cell_resistance(){
+float get_avg_cell_resistance() {
   avg_cell_resistance_mutex.lock();
   float val = dfdata.avg_cell_resistance;
   avg_cell_resistance_mutex.unlock();
   return val;
 }
-void set_avg_cell_resistance(float val){
+void set_avg_cell_resistance(float val) {
   avg_cell_resistance_mutex.lock();
   dfdata.avg_cell_resistance = val;
   avg_cell_resistance_mutex.unlock();
 }
 
-float get_bms_input_voltage(){
+float get_bms_input_voltage() {
   bms_input_voltage_mutex.lock();
   float val = dfdata.bms_input_voltage;
   bms_input_voltage_mutex.unlock();
   return val;
 }
-void set_bms_input_voltage(float val){
+void set_bms_input_voltage(float val) {
   bms_input_voltage_mutex.lock();
   dfdata.bms_input_voltage = val;
   bms_input_voltage_mutex.unlock();

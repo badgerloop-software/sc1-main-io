@@ -137,7 +137,7 @@ def uartApp_cpp_generator(json_file):
                 valueType
                 + "_t get_"
                 + key
-                + "(){\n  "
+                + "() {\n  "
                 + mutexName
                 + ".lock();\n  "
                 + valueType
@@ -153,7 +153,7 @@ def uartApp_cpp_generator(json_file):
                 + "("
                 + valueType
                 + "_t "
-                + "val){\n  "
+                + "val) {\n  "
                 + mutexName
                 + ".lock();\n  dfdata."
                 + key
@@ -166,7 +166,7 @@ def uartApp_cpp_generator(json_file):
                 valueType
                 + " get_"
                 + key
-                + "(){\n  "
+                + "() {\n  "
                 + mutexName
                 + ".lock();\n  "
                 + valueType
@@ -181,7 +181,7 @@ def uartApp_cpp_generator(json_file):
                 + key
                 + "("
                 + valueType
-                + " val){\n  "
+                + " val) {\n  "
                 + mutexName
                 + ".lock();\n  dfdata."
                 + key

@@ -70,6 +70,17 @@ import util
 #         out += "} " + struct.attrib["id"] + "_t;\n\n"
 #     return out + "\n" + headers + "\n\n\n"
 
+shutdown_errors = [
+    "driver_eStop",
+    "external_eStop",
+    "crash",
+    "door",
+    "imd_status",
+    "mcu_stat_fdbk",
+    "door_lim_out",
+    "mcu_latch",
+]
+
 
 def uartApp_h_generator(json_file):
     # define macros for readability
@@ -102,16 +113,11 @@ def uartApp_h_generator(json_file):
         # get the number of bytes of this variable and add it to totalBytes
         totalBytes += json_file[key][num_bytes_column]
 
-    # add a keep alive signal (which will always be true) and add 1 to totalBytes
-    outputStruct += "  bool keep_alive;\n"
-    totalBytes += 1
-    # add a getter method for the keep alive signal
-    getterSetterMethods += "bool get_keep_alive();\n"
     # add the closing brace
     outputStruct += "} data_format;\n\n"
     # at the top, add a macro for total number of bytes of this struct
-    outputStruct = "#define totalBytes " + str(totalBytes) + "\n\n" + outputStruct
-    return "\n" + outputStruct + getterSetterMethods
+    outputStruct = "#define TOTAL_BYTES " + str(totalBytes) + "\n\n" + outputStruct
+    return "\n" + outputStruct + "\n" + getterSetterMethods
 
 
 def uartApp_cpp_generator(json_file):
@@ -120,7 +126,8 @@ def uartApp_cpp_generator(json_file):
 
     mutexes = ""
     getterSetterMethods = ""
-    copyStructMethod = "void copyDataStructToWriteStruct(){\n"
+    # add a short preface to set the pack power by multiplying pack voltage and current.
+    copyStructMethod = "void copyDataStructToWriteStruct() {\n  // set pack power\n  float v = get_pack_voltage();\n  float i = get_pack_current();\n  set_pack_power(i*v);\n\n"
 
     # open the data format json file and read it line by line
     # key is the name
@@ -141,7 +148,7 @@ def uartApp_cpp_generator(json_file):
                 + mutexName
                 + ".lock();\n  "
                 + valueType
-                + " val = dfdata."
+                + "_t val = dfdata."
                 + key
                 + ";\n  "
                 + mutexName
@@ -192,4 +199,20 @@ def uartApp_cpp_generator(json_file):
 
     # add closing brace to copy struct method
     copyStructMethod += "}\n"
-    return "\n" + mutexes + "\n" + copyStructMethod + "\n" + getterSetterMethods
+
+    # generate shutdown error check if statement
+    shutdownErrorCheck = "void check_shutdown_errors() {\n  if (!("
+    for s in shutdown_errors:
+        shutdownErrorCheck += "get_" + s + "() && "
+    shutdownErrorCheck = shutdownErrorCheck[0:-4]  # get rid of the extra &&
+    shutdownErrorCheck += ")) {\n    set_mcu_hv_en(0);\n  }\n}\n\n"
+
+    return (
+        "\n"
+        + mutexes
+        + "\n"
+        + copyStructMethod
+        + "\n"
+        + getterSetterMethods
+        + shutdownErrorCheck
+    )

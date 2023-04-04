@@ -201,11 +201,11 @@ def uartApp_cpp_generator(json_file):
     copyStructMethod += "}\n"
 
     # generate shutdown error check if statement
-    shutdownErrorCheck = "void check_shutdown_errors() {\n  if (!("
+    shutdownErrorCheck = "void check_shutdown_errors() {\n  if ("
     for s in shutdown_errors:
-        shutdownErrorCheck += "get_" + s + "() && "
-    shutdownErrorCheck = shutdownErrorCheck[0:-4]  # get rid of the extra &&
-    shutdownErrorCheck += ")) {\n    set_mcu_hv_en(0);\n  }\n}\n\n"
+        shutdownErrorCheck += "get_" + s + "() || "
+    shutdownErrorCheck = shutdownErrorCheck[0:-4]  # get rid of the extra ||
+    shutdownErrorCheck += ") {\n    set_mcu_hv_en(0);\n  }\n}\n\n"
 
     return (
         "\n"

@@ -25,6 +25,9 @@ bool restart_enable;
 
 void clearDataFormatRead() { dfdata = emptyStruct; }
 
+void check_shutdown_errors();
+void copyDataStructToWriteStruct();
+
 void send_message_thread() {
   while (true) {
     check_shutdown_errors();  // check if mcu_hv_en needs to be set to 0
@@ -95,6 +98,7 @@ Mutex imd_status_mutex;
 Mutex mcu_latch_mutex;
 Mutex state_mutex;
 Mutex fr_telem_mutex;
+Mutex fr_out_mutex;
 Mutex linear_accel_x_mutex;
 Mutex linear_accel_y_mutex;
 Mutex linear_accel_z_mutex;
@@ -133,9 +137,13 @@ Mutex brake_status_mutex;
 Mutex mech_brake_status_mutex;
 Mutex parking_brake_mutex;
 Mutex accelerator_mutex;
+Mutex accelerator_out_mutex;
 Mutex motor_current_mutex;
 Mutex motor_power_mutex;
 Mutex mc_status_mutex;
+Mutex mppt_can_heartbeat_mutex;
+Mutex mcc_can_heartbeat_mutex;
+Mutex bms_can_heartbeat_mutex;
 Mutex mainIO_heartbeat_mutex;
 Mutex main_5V_bus_mutex;
 Mutex main_12V_bus_mutex;
@@ -268,6 +276,7 @@ void copyDataStructToWriteStruct() {
   dfwrite.mcu_latch = get_mcu_latch();
   dfwrite.state = get_state();
   dfwrite.fr_telem = get_fr_telem();
+  dfwrite.fr_out = get_fr_out();
   dfwrite.linear_accel_x = get_linear_accel_x();
   dfwrite.linear_accel_y = get_linear_accel_y();
   dfwrite.linear_accel_z = get_linear_accel_z();
@@ -306,9 +315,13 @@ void copyDataStructToWriteStruct() {
   dfwrite.mech_brake_status = get_mech_brake_status();
   dfwrite.parking_brake = get_parking_brake();
   dfwrite.accelerator = get_accelerator();
+  dfwrite.accelerator_out = get_accelerator_out();
   dfwrite.motor_current = get_motor_current();
   dfwrite.motor_power = get_motor_power();
   dfwrite.mc_status = get_mc_status();
+  dfwrite.mppt_can_heartbeat = get_mppt_can_heartbeat();
+  dfwrite.mcc_can_heartbeat = get_mcc_can_heartbeat();
+  dfwrite.bms_can_heartbeat = get_bms_can_heartbeat();
   dfwrite.mainIO_heartbeat = get_mainIO_heartbeat();
   dfwrite.main_5V_bus = get_main_5V_bus();
   dfwrite.main_12V_bus = get_main_12V_bus();
@@ -582,6 +595,18 @@ void set_fr_telem(bool val) {
   fr_telem_mutex.lock();
   dfdata.fr_telem = val;
   fr_telem_mutex.unlock();
+}
+
+bool get_fr_out() {
+  fr_out_mutex.lock();
+  bool val = dfdata.fr_out;
+  fr_out_mutex.unlock();
+  return val;
+}
+void set_fr_out(bool val) {
+  fr_out_mutex.lock();
+  dfdata.fr_out = val;
+  fr_out_mutex.unlock();
 }
 
 float get_linear_accel_x() {
@@ -1040,6 +1065,18 @@ void set_accelerator(float val) {
   accelerator_mutex.unlock();
 }
 
+float get_accelerator_out() {
+  accelerator_out_mutex.lock();
+  float val = dfdata.accelerator_out;
+  accelerator_out_mutex.unlock();
+  return val;
+}
+void set_accelerator_out(float val) {
+  accelerator_out_mutex.lock();
+  dfdata.accelerator_out = val;
+  accelerator_out_mutex.unlock();
+}
+
 float get_motor_current() {
   motor_current_mutex.lock();
   float val = dfdata.motor_current;
@@ -1074,6 +1111,42 @@ void set_mc_status(uint8_t val) {
   mc_status_mutex.lock();
   dfdata.mc_status = val;
   mc_status_mutex.unlock();
+}
+
+bool get_mppt_can_heartbeat() {
+  mppt_can_heartbeat_mutex.lock();
+  bool val = dfdata.mppt_can_heartbeat;
+  mppt_can_heartbeat_mutex.unlock();
+  return val;
+}
+void set_mppt_can_heartbeat(bool val) {
+  mppt_can_heartbeat_mutex.lock();
+  dfdata.mppt_can_heartbeat = val;
+  mppt_can_heartbeat_mutex.unlock();
+}
+
+bool get_mcc_can_heartbeat() {
+  mcc_can_heartbeat_mutex.lock();
+  bool val = dfdata.mcc_can_heartbeat;
+  mcc_can_heartbeat_mutex.unlock();
+  return val;
+}
+void set_mcc_can_heartbeat(bool val) {
+  mcc_can_heartbeat_mutex.lock();
+  dfdata.mcc_can_heartbeat = val;
+  mcc_can_heartbeat_mutex.unlock();
+}
+
+bool get_bms_can_heartbeat() {
+  bms_can_heartbeat_mutex.lock();
+  bool val = dfdata.bms_can_heartbeat;
+  bms_can_heartbeat_mutex.unlock();
+  return val;
+}
+void set_bms_can_heartbeat(bool val) {
+  bms_can_heartbeat_mutex.lock();
+  dfdata.bms_can_heartbeat = val;
+  bms_can_heartbeat_mutex.unlock();
 }
 
 bool get_mainIO_heartbeat() {
@@ -2421,9 +2494,9 @@ void set_discharge_enable(bool val) {
 }
 
 void check_shutdown_errors() {
-  if (!(get_driver_eStop() && get_external_eStop() && get_crash() &&
-        get_door() && get_imd_status() && get_mcu_stat_fdbk() &&
-        get_door_lim_out() && get_mcu_latch())) {
+  if (get_driver_eStop() || get_external_eStop() || get_crash() || get_door() ||
+      get_imd_status() || get_mcu_stat_fdbk() || get_door_lim_out() ||
+      get_mcu_latch()) {
     set_mcu_hv_en(0);
   }
 }

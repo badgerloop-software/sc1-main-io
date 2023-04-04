@@ -7,7 +7,7 @@
 #include "mbed.h"
 //#include "uart.h"
 
-#define TOTAL_BYTES 399
+#define TOTAL_BYTES 407
 
 typedef struct {
   float speed;
@@ -23,6 +23,7 @@ typedef struct {
   bool mcu_latch;
   char state;
   bool fr_telem;
+  bool fr_out;
   float linear_accel_x;
   float linear_accel_y;
   float linear_accel_z;
@@ -61,9 +62,13 @@ typedef struct {
   bool mech_brake_status;
   bool parking_brake;
   float accelerator;
+  float accelerator_out;
   float motor_current;
   float motor_power;
   uint8_t mc_status;
+  bool mppt_can_heartbeat;
+  bool mcc_can_heartbeat;
+  bool bms_can_heartbeat;
   bool mainIO_heartbeat;
   float main_5V_bus;
   float main_12V_bus;
@@ -217,6 +222,9 @@ void set_state(char val);
 bool get_fr_telem();
 void set_fr_telem(bool val);
 
+bool get_fr_out();
+void set_fr_out(bool val);
+
 float get_linear_accel_x();
 void set_linear_accel_x(float val);
 
@@ -331,6 +339,9 @@ void set_parking_brake(bool val);
 float get_accelerator();
 void set_accelerator(float val);
 
+float get_accelerator_out();
+void set_accelerator_out(float val);
+
 float get_motor_current();
 void set_motor_current(float val);
 
@@ -339,6 +350,15 @@ void set_motor_power(float val);
 
 uint8_t get_mc_status();
 void set_mc_status(uint8_t val);
+
+bool get_mppt_can_heartbeat();
+void set_mppt_can_heartbeat(bool val);
+
+bool get_mcc_can_heartbeat();
+void set_mcc_can_heartbeat(bool val);
+
+bool get_bms_can_heartbeat();
+void set_bms_can_heartbeat(bool val);
 
 bool get_mainIO_heartbeat();
 void set_mainIO_heartbeat(bool val);

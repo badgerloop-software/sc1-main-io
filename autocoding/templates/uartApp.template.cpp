@@ -18,6 +18,9 @@ bool restart_enable;
 
 void clearDataFormatRead() { dfdata = emptyStruct; }
 
+void check_shutdown_errors();
+void copyDataStructToWriteStruct();
+
 void send_message_thread() {
   while (true) {
     check_shutdown_errors();  // check if mcu_hv_en needs to be set to 0

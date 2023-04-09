@@ -1,5 +1,6 @@
 #include "mbed.h"
 //#include "uart.h"
+#pragma pack(push, 1)
 
 /*!!AUTO-GENERATE HERE!!*/
 

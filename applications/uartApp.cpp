@@ -10,8 +10,9 @@
 
 #include "rtos.h"
 #define NUM_COMMAND_BYTES 1
-#define T_MESSAGE_US 70000  // around 1/15 of a second
-#define HEARTBEAT 2         // error state if this # messages that aren't read
+#define T_MESSAGE_US \
+  1000000            // 1 second right now (should be around 1/15 of a second)
+#define HEARTBEAT 2  // error state if this # messages that aren't read
 
 Thread thread1;
 Thread thread2;

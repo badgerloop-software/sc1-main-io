@@ -6,6 +6,7 @@
 
 #include "mbed.h"
 //#include "uart.h"
+#pragma pack(push, 1)
 
 #define TOTAL_BYTES 407
 

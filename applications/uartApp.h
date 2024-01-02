@@ -4,11 +4,14 @@
  * target is built
  */
 
+#ifndef __uartApp__h__
+#define __uartApp__h__
+
 #include "mbed.h"
 //#include "uart.h"
 #pragma pack(push, 1)
 
-#define TOTAL_BYTES 407
+#define TOTAL_BYTES 431
 
 typedef struct {
   float speed;
@@ -101,6 +104,12 @@ typedef struct {
   float string1_temp;
   float string2_temp;
   float string3_temp;
+  float string1_V_in;
+  float string2_V_in;
+  float string3_V_in;
+  float string1_I_in;
+  float string2_I_in;
+  float string3_I_in;
   float pack_temp;
   float pack_internal_temp;
   float pack_current;
@@ -454,6 +463,24 @@ void set_string2_temp(float val);
 float get_string3_temp();
 void set_string3_temp(float val);
 
+float get_string1_V_in();
+void set_string1_V_in(float val);
+
+float get_string2_V_in();
+void set_string2_V_in(float val);
+
+float get_string3_V_in();
+void set_string3_V_in(float val);
+
+float get_string1_I_in();
+void set_string1_I_in(float val);
+
+float get_string2_I_in();
+void set_string2_I_in(float val);
+
+float get_string3_I_in();
+void set_string3_I_in(float val);
+
 float get_pack_temp();
 void set_pack_temp(float val);
 
@@ -703,3 +730,6 @@ bool get_restart_enable();
 void cleardfdata();
 
 int runUart();
+
+#pragma pack(pop)
+#endif

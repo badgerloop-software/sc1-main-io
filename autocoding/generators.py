@@ -70,17 +70,6 @@ import util
 #         out += "} " + struct.attrib["id"] + "_t;\n\n"
 #     return out + "\n" + headers + "\n\n\n"
 
-shutdown_errors = [
-    "driver_eStop",
-    "external_eStop",
-    "crash",
-    "door",
-    "imd_status",
-    "mcu_stat_fdbk",
-    "door_lim_out",
-    "mcu_latch",
-]
-
 
 def uartApp_h_generator(json_file):
     # define macros for readability
@@ -127,7 +116,7 @@ def uartApp_cpp_generator(json_file):
     mutexes = ""
     getterSetterMethods = ""
     # add a short preface to set the pack power by multiplying pack voltage and current.
-    copyStructMethod = "void copyDataStructToWriteStruct() {\n  // set pack power\n  float v = get_pack_voltage();\n  float i = get_pack_current();\n  set_pack_power(i*v);\n\n"
+    copyStructMethod = "void copyDataStructToWriteStruct() {\n  // set pack power\n  float v = get_pack_voltage();\n  float i = get_pack_current();\n  set_pack_power(i*v);\n\n  dfwrite_mutex.lock();\n"
 
     # open the data format json file and read it line by line
     # key is the name
@@ -198,21 +187,6 @@ def uartApp_cpp_generator(json_file):
             )
 
     # add closing brace to copy struct method
-    copyStructMethod += "}\n"
+    copyStructMethod += "  dfwrite_mutex.unlock();\n}\n"
 
-    # generate shutdown error check if statement
-    shutdownErrorCheck = "void check_shutdown_errors() {\n  if ("
-    for s in shutdown_errors:
-        shutdownErrorCheck += "get_" + s + "() || "
-    shutdownErrorCheck = shutdownErrorCheck[0:-4]  # get rid of the extra ||
-    shutdownErrorCheck += ") {\n    set_mcu_hv_en(0);\n  }\n}\n\n"
-
-    return (
-        "\n"
-        + mutexes
-        + "\n"
-        + copyStructMethod
-        + "\n"
-        + getterSetterMethods
-        + shutdownErrorCheck
-    )
+    return "\n" + mutexes + "\n" + copyStructMethod + "\n" + getterSetterMethods

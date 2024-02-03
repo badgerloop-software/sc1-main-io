@@ -1,8 +1,7 @@
-#ifndef __uartApp__h__
-#define __uartApp__h__
+#ifndef __dataFormat__h__
+#define __dataFormat__h__
 
 #include "mbed.h"
-//#include "uart.h"
 #pragma pack(push, 1)
 
 /*!!AUTO-GENERATE HERE!!*/
@@ -11,7 +10,8 @@ bool get_restart_enable();
 
 void cleardfdata();
 
-int runUart();
+// starts the threads for reading and writing
+int runDataFormat();
 
 #pragma pack(pop)
 #endif

@@ -87,7 +87,7 @@ def uartApp_h_generator(json_file):
     for key in json_file.keys():
         valueType = json_file[key][data_type_column]
         # if the type is uint8 and uint16, use the correct types in c++
-        if valueType == "uint8" or valueType == "uint16":
+        if valueType == "uint8" or valueType == "uint16" or valueType == "uint64":
             outputStruct += "  " + valueType + "_t" + " " + key + ";\n"
             getterSetterMethods += valueType + "_t get_" + key + "();\n"
             getterSetterMethods += (
@@ -128,7 +128,7 @@ def uartApp_cpp_generator(json_file):
         # add to the copy struct method
         copyStructMethod += "  dfwrite." + key + " = get_" + key + "();\n"
         # if the type is uint8 and uint16, use the correct types in c++
-        if valueType == "uint8" or valueType == "uint16":
+        if valueType == "uint8" or valueType == "uint16" or valueType == "uint64":
             getterSetterMethods += (
                 valueType
                 + "_t get_"
